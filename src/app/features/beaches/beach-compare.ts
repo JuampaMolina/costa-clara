@@ -349,7 +349,7 @@ const FOCUSABLE_SELECTOR =
                     <h3 class="text-base font-semibold tracking-tight text-slate-900">
                       {{ beach.name }}
                     </h3>
-                    <p class="text-xs text-slate-500">
+                    <p class="text-xs text-slate-600">
                       {{ beach.municipality }} · {{ islandLabel(beach.island) }}
                     </p>
                   </div>
@@ -366,7 +366,7 @@ const FOCUSABLE_SELECTOR =
 
                 <dl class="mt-3 grid grid-cols-2 gap-2.5 text-xs">
                   <div>
-                    <dt class="font-semibold text-slate-500">Calidad del agua</dt>
+                    <dt class="font-semibold text-slate-600">Calidad del agua</dt>
                     <dd class="mt-0.5 flex items-center gap-1.5 font-medium text-slate-800">
                       <span
                         class="h-2 w-2 shrink-0 rounded-full"
@@ -378,14 +378,14 @@ const FOCUSABLE_SELECTOR =
                   </div>
 
                   <div>
-                    <dt class="font-semibold text-slate-500">Tendencia</dt>
+                    <dt class="font-semibold text-slate-600">Tendencia</dt>
                     <dd class="mt-0.5">
                       <span [class]="trendClass(beach)">{{ trendLabel(beach) }}</span>
                     </dd>
                   </div>
 
                   <div>
-                    <dt class="font-semibold text-slate-500">Bandera azul</dt>
+                    <dt class="font-semibold text-slate-600">Bandera azul</dt>
                     <dd class="mt-0.5 font-medium text-slate-800">
                       @if (beach.blueFlag) {
                         Sí{{ beach.blueFlagYear ? ' (' + beach.blueFlagYear + ')' : '' }}
@@ -396,27 +396,27 @@ const FOCUSABLE_SELECTOR =
                   </div>
 
                   <div>
-                    <dt class="font-semibold text-slate-500">Accesibilidad</dt>
+                    <dt class="font-semibold text-slate-600">Accesibilidad</dt>
                     <dd class="mt-0.5 font-medium text-slate-800">
                       {{ accessibilityLabel(beach) }}
                     </dd>
                   </div>
 
                   <div>
-                    <dt class="font-semibold text-slate-500">Última muestra</dt>
+                    <dt class="font-semibold text-slate-600">Última muestra</dt>
                     <dd class="mt-0.5 font-medium text-slate-800">{{ sampleDate(beach) }}</dd>
                   </div>
 
                   @if (userLocation()) {
                     <div>
-                      <dt class="font-semibold text-slate-500">Distancia</dt>
+                      <dt class="font-semibold text-slate-600">Distancia</dt>
                       <dd class="mt-0.5 font-medium text-sea-700">a {{ distanceLabel(beach) }}</dd>
                     </div>
                   }
                 </dl>
 
                 <div class="mt-3 border-t border-slate-200/70 pt-3">
-                  <p class="text-[11px] font-semibold uppercase tracking-[0.1em] text-slate-500">
+                  <p class="text-[11px] font-semibold uppercase tracking-[0.1em] text-slate-600">
                     Servicios
                   </p>
                   <div class="mt-1.5 flex flex-wrap gap-1.5">
@@ -427,7 +427,7 @@ const FOCUSABLE_SELECTOR =
                         {{ service }}
                       </span>
                     } @empty {
-                      <span class="text-xs text-slate-500">Sin servicios registrados</span>
+                      <span class="text-xs text-slate-600">Sin servicios registrados</span>
                     }
                   </div>
                 </div>
@@ -633,7 +633,7 @@ export class BeachCompare {
       case 'estable':
         return `${base} bg-slate-100 text-slate-600`;
       default:
-        return `${base} bg-slate-100 text-slate-500`;
+        return `${base} bg-slate-100 text-slate-600`;
     }
   }
 

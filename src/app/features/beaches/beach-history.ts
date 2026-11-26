@@ -27,9 +27,9 @@ const CHART_PADDING_Y = 14;
   template: `
     <div class="mt-4 rounded-2xl border border-slate-100 bg-slate-50/70 p-3">
       <div class="flex items-center justify-between gap-2">
-        <p class="text-[11px] font-semibold uppercase tracking-wide text-slate-400">
+        <h3 class="text-[11px] font-semibold uppercase tracking-wide text-slate-500">
           Histórico de calidad
-        </p>
+        </h3>
         <span [class]="trendClass()">
           @switch (trend()) {
             @case ('mejora') {
@@ -76,7 +76,7 @@ const CHART_PADDING_Y = 14;
           }
         </svg>
 
-        <div class="mt-1 flex items-center justify-between text-[10px] text-slate-400">
+        <div class="mt-1 flex items-center justify-between text-[10px] text-slate-500">
           <span>{{ formatDate(first()?.date) }}</span>
           <span>{{ formatDate(latest()?.date) }}</span>
         </div>
@@ -92,7 +92,7 @@ const CHART_PADDING_Y = 14;
                 ></span>
                 {{ label(sample.quality) }}
               </span>
-              <span class="text-slate-400">{{ formatDate(sample.date) }}</span>
+              <span class="text-slate-500">{{ formatDate(sample.date) }}</span>
             </li>
           }
         </ul>
@@ -153,11 +153,11 @@ export class BeachHistory {
       case 'mejora':
         return `${base} bg-emerald-50 text-emerald-700`;
       case 'empeora':
-        return `${base} bg-rose-50 text-rose-600`;
+        return `${base} bg-rose-50 text-rose-700`;
       case 'estable':
-        return `${base} bg-slate-100 text-slate-500`;
+        return `${base} bg-slate-100 text-slate-600`;
       default:
-        return `${base} bg-slate-100 text-slate-400`;
+        return `${base} bg-slate-100 text-slate-600`;
     }
   });
 

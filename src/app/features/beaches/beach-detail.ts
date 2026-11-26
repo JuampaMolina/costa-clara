@@ -2,11 +2,14 @@ import {
   ChangeDetectionStrategy,
   Component,
   DestroyRef,
+  ElementRef,
+  afterNextRender,
   computed,
   inject,
   input,
   output,
   signal,
+  viewChild,
 } from '@angular/core';
 import { Beach, ISLANDS, QUALITY_COLORS, QUALITY_LABELS } from '../../core/models/beach';
 import { FavoritesStore } from '../../core/services/favorites';
@@ -89,7 +92,7 @@ import { BeachHistory } from './beach-history';
 
           <button
             type="button"
-            class="rounded-full p-1.5 text-slate-400 transition hover:bg-slate-100 hover:text-slate-700"
+            class="rounded-full p-1.5 text-slate-500 transition hover:bg-slate-100 hover:text-slate-700"
             data-testid="detail-share"
             aria-label="Compartir playa"
             (click)="share()"
@@ -112,7 +115,7 @@ import { BeachHistory } from './beach-history';
 
           <button
             type="button"
-            class="-mr-1 rounded-full p-1.5 text-slate-400 transition hover:bg-slate-100 hover:text-slate-700"
+            class="-mr-1 rounded-full p-1.5 text-slate-500 transition hover:bg-slate-100 hover:text-slate-700"
             aria-label="Cerrar ficha"
             (click)="closed.emit()"
           >
@@ -122,6 +125,7 @@ import { BeachHistory } from './beach-history';
               fill="none"
               stroke="currentColor"
               stroke-width="2"
+              aria-hidden="true"
             >
               <path d="M6 6l12 12M18 6L6 18" stroke-linecap="round" />
             </svg>
@@ -135,7 +139,13 @@ import { BeachHistory } from './beach-history';
         </p>
       }
 
-      <h2 class="mt-2 text-2xl font-semibold tracking-tight text-slate-900">{{ beach().name }}</h2>
+      <h2
+        #title
+        tabindex="-1"
+        class="mt-2 text-2xl font-semibold tracking-tight text-slate-900 focus:outline-none"
+      >
+        {{ beach().name }}
+      </h2>
       <p class="mt-0.5 text-sm text-slate-500">{{ islandLabel() }} · {{ beach().municipality }}</p>
 
       <p class="mt-3 text-sm leading-6 text-slate-600">{{ beach().description }}</p>
@@ -146,7 +156,7 @@ import { BeachHistory } from './beach-history';
             {{ service }}
           </span>
         } @empty {
-          <span class="text-xs text-slate-400">Sin servicios en la ficha</span>
+          <span class="text-xs text-slate-500">Sin servicios en la ficha</span>
         }
       </div>
 
@@ -154,13 +164,13 @@ import { BeachHistory } from './beach-history';
 
       <dl class="mt-5 grid grid-cols-2 gap-3 border-t border-slate-100 pt-4 text-sm">
         <div>
-          <dt class="text-[11px] font-semibold uppercase tracking-wide text-slate-400">
+          <dt class="text-[11px] font-semibold uppercase tracking-wide text-slate-500">
             Última muestra
           </dt>
           <dd class="mt-0.5 font-medium text-slate-700">{{ sampleDate() }}</dd>
         </div>
         <div>
-          <dt class="text-[11px] font-semibold uppercase tracking-wide text-slate-400">
+          <dt class="text-[11px] font-semibold uppercase tracking-wide text-slate-500">
             Coordenadas
           </dt>
           <dd class="mt-0.5 font-medium text-slate-700">
@@ -187,9 +197,9 @@ import { BeachHistory } from './beach-history';
             <path d="M7 17L17 7M9 7h8v8" stroke-linecap="round" stroke-linejoin="round" />
           </svg>
         </a>
-        <span class="text-[11px] text-slate-400">
+        <span class="text-[11px] text-slate-500">
           @if (isDemo()) {
-            <span class="text-amber-600">Datos de demostración</span>
+            <span class="text-amber-700">Datos de demostración</span>
           } @else if (source(); as src) {
             <a
               [href]="src.url"
@@ -204,7 +214,7 @@ import { BeachHistory } from './beach-history';
       </div>
 
       @if (!isDemo() && source(); as src) {
-        <p class="mt-2 text-[10px] leading-4 text-slate-400">
+        <p class="mt-2 text-[10px] leading-4 text-slate-500">
           {{ src.license }}
           @if (updatedAt()) {
             · Actualizado {{ updatedAt() }}
@@ -226,6 +236,7 @@ export class BeachDetail {
 
   readonly shareState = signal<'idle' | 'copied' | 'error'>('idle');
 
+  private readonly title = viewChild.required<ElementRef<HTMLHeadingElement>>('title');
   private shareTimer?: ReturnType<typeof setTimeout>;
 
   readonly qualityLabel = computed(() => QUALITY_LABELS[this.beach().quality]);
@@ -265,22 +276,23 @@ export class BeachDetail {
     const base = 'rounded-full p-1.5 transition';
     return this.isCompared()
       ? `${base} bg-sea-50 text-sea-700 ring-1 ring-sea-200`
-      : `${base} text-slate-400 hover:bg-slate-100 hover:text-slate-700`;
+      : `${base} text-slate-500 hover:bg-slate-100 hover:text-slate-700`;
   });
 
   readonly favoriteButtonClass = computed(() => {
     const base = 'rounded-full p-1.5 transition';
     return this.isFavorite()
       ? `${base} text-rose-500 hover:bg-rose-50`
-      : `${base} text-slate-400 hover:bg-slate-100 hover:text-slate-700`;
+      : `${base} text-slate-500 hover:bg-slate-100 hover:text-slate-700`;
   });
 
   readonly shareStatusClass = computed(
     () =>
-      `mt-2 text-xs font-medium ${this.shareState() === 'error' ? 'text-rose-600' : 'text-emerald-600'}`,
+      `mt-2 text-xs font-medium ${this.shareState() === 'error' ? 'text-rose-700' : 'text-emerald-700'}`,
   );
 
   constructor() {
+    afterNextRender(() => this.title().nativeElement.focus({ preventScroll: true }));
     this.destroyRef.onDestroy(() => clearTimeout(this.shareTimer));
   }
 

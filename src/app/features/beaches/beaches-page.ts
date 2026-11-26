@@ -160,6 +160,8 @@ export class BeachesPage {
   private readonly pillBase = 'rounded-full px-3 py-1.5 text-xs font-semibold transition';
   private readonly pillActive = 'bg-slate-900 text-white shadow-sm';
   private readonly pillIdle = 'bg-slate-100 text-slate-600 hover:bg-slate-200';
+  private readonly pillMuted =
+    'bg-white text-slate-600 ring-1 ring-inset ring-slate-200 hover:bg-slate-100';
   private readonly itemBase =
     'group flex w-full items-center gap-1 rounded-xl transition focus-within:ring-2 focus-within:ring-sea-400';
   private readonly itemActive = 'bg-sky-50 ring-1 ring-sky-200';
@@ -586,7 +588,15 @@ export class BeachesPage {
   }
 
   closeDetail(): void {
+    const id = this.selectedId();
     this.selectedId.set(null);
+
+    if (!id || typeof requestAnimationFrame === 'undefined') return;
+
+    requestAnimationFrame(() => {
+      const row = document.getElementById(`beach-item-${id}`)?.querySelector<HTMLElement>('button');
+      (row ?? this.searchInput()?.nativeElement)?.focus();
+    });
   }
 
   clearFilters(): void {
@@ -622,14 +632,15 @@ export class BeachesPage {
   }
 
   pillClass(active: boolean, muted = false): string {
-    const state = active ? this.pillActive : `${this.pillIdle}${muted ? ' opacity-60' : ''}`;
+    const state = active ? this.pillActive : muted ? this.pillMuted : this.pillIdle;
     return `${this.pillBase} ${state}`;
   }
 
   serviceChipClass(active: boolean, muted = false): string {
     const base = 'rounded-full px-2.5 py-1 text-xs font-medium transition';
     if (active) return `${base} bg-sea-700 text-white shadow-xs`;
-    return `${base} border border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-100${muted ? ' opacity-60' : ''}`;
+    const tone = muted ? 'bg-slate-50 text-slate-600' : 'bg-white text-slate-700';
+    return `${base} border border-slate-200 ${tone} hover:border-slate-300 hover:bg-slate-100`;
   }
 
   beachItemClass(active: boolean): string {
@@ -650,16 +661,16 @@ export class BeachesPage {
     }
 
     if (this.isCompareFull()) {
-      return `${this.actionIconBase} text-slate-300 opacity-60 hover:bg-slate-100`;
+      return `${this.actionIconBase} text-slate-500 hover:bg-slate-100`;
     }
 
-    return `${this.actionIconBase} text-slate-400 hover:bg-slate-100 hover:text-slate-700`;
+    return `${this.actionIconBase} text-slate-500 hover:bg-slate-100 hover:text-slate-700`;
   }
 
   favoriteButtonClass(active: boolean): string {
     const state = active
       ? 'text-rose-500 hover:bg-rose-50'
-      : 'text-slate-400 hover:bg-slate-100 hover:text-slate-600';
+      : 'text-slate-500 hover:bg-slate-100 hover:text-slate-600';
 
     return `${this.actionIconBase} ${state}`;
   }
