@@ -4,7 +4,7 @@ Observatorio de playas y calidad del agua de Baleares: un mapa estático para co
 
 Se puede leer sin clonar el repositorio. La demo es <https://costa-clara-k23.pages.dev>. El código está en <https://github.com/JuampaMolina/costa-clara>.
 
-Las métricas de este documento se midieron el **2026-11-26** sobre el commit `9005c31`. No hay puntuación de Lighthouse en el repositorio; no se inventa.
+Las métricas de este documento se midieron el **2026-11-26** sobre el código de aplicación del commit `9005c31`. No hay puntuación de Lighthouse en el repositorio ni una medición fechada contra la demo. CC-54 la pide; no se inventa.
 
 ## Problema
 
@@ -54,7 +54,7 @@ El repo no contiene una comparativa previa con MapLibre. CC-54 pide dejar esa al
 
 ## Métricas
 
-Medidas el 2026-11-26 en `9005c31` (`npm run build`, Angular 22). El build terminó en 3.0 s y no superó el presupuesto (aviso a 700 kB, error a 1.2 MB).
+Medidas el 2026-11-26 con `npm run build` (Angular 22), el mismo código de aplicación que `9005c31`. El temporizador de `ng build` marcó 2.906 s. El resultado cabe bajo el aviso de 700 kB (error a 1.2 MB). Los kB son los que imprime el comando (604523 bytes de `main` salen como 604.52 kB), no kibibytes.
 
 | Métrica | Valor | Dónde |
 | --- | --- | --- |
@@ -62,15 +62,27 @@ Medidas el 2026-11-26 en `9005c31` (`npm run build`, Angular 22). El build termi
 | Datos generados | `null` (la app sigue en demo) | `beaches.generated.ts` |
 | Tests unitarios | 26 | 6 specs de Vitest; ver desglose |
 | Tests e2e | 30 | 15 flujos × desktop y Pixel 7 |
-| Tickets | 19/36 cerrados; los 7 P0, cerrados | [BACKLOG.md](../BACKLOG.md), 2026-11-26 |
-| Bundle inicial (raw) | 634.75 kB | `main` 604.52 kB + `styles` 30.23 kB |
+| Tickets | 19/36 cerrados; los 7 P0 están cerrados | [BACKLOG.md](../BACKLOG.md), 2026-11-26 |
+| Bundle inicial (raw) | 634.75 kB | `main-PYG52YJP.js` 604.52 kB + `styles-6XIDCANR.css` 30.23 kB |
 | Transfer estimado | 163.09 kB | 157.17 kB + 5.92 kB |
 
 Desglose unitario: `app` 2, `favorites` 4, `beach-history` 4, `beach-filter` 6, `data-import` 7, `geo` 3.
 
-[HANDOFF.md](../HANDOFF.md) cita ~610 kB y [docs/despliegue.md](./despliegue.md) ~596 kB. Son aproximaciones anteriores. La fila de este documento es la salida de `npm run build` en `9005c31`.
+Dos frases del cuerpo de [BACKLOG.md](../BACKLOG.md) no coinciden con el código y no se usan en esta tabla. CC-03 dice «6 flujos × desktop/móvil»; la lista Hecho del mismo fichero ya cuenta 30 e2e, y `e2e/beaches.spec.ts` tiene 15 tests que Playwright lanza en los proyectos `desktop` y `mobile` (dispositivo Pixel 7). CC-16 dice «8 casos»; `data-import.spec.ts` tiene 7.
+
+[HANDOFF.md](../HANDOFF.md) cita ~610 kB y [docs/despliegue.md](./despliegue.md) ~596 kB. Son aproximaciones anteriores. La fila de este documento es la salida de `npm run build` sobre el código de aplicación de `9005c31`.
 
 Límites que el código ya impone y que no son métricas de producto: coordenadas del importador dentro de lon 1–4.5 y lat 38.5–40.2; islas solo `mallorca`, `menorca`, `ibiza` y `formentera`; calidades `excelente`, `buena`, `suficiente`, `insuficiente` y `sin-datos`.
+
+## Capturas
+
+CC-54 pide capturas. No hay imágenes en el repositorio, y no se fabrican para este documento.
+
+Estas URLs de la demo respondieron HTTP 200 el 2026-11-26. Abren la vista sin clonar el repo:
+
+- Home: <https://costa-clara-k23.pages.dev>
+- Filtros y ficha. Cala Macarella es de Menorca y en el seed tiene calidad `excelente`: <https://costa-clara-k23.pages.dev/?isla=menorca&calidad=excelente&playa=cala-macarella>
+- Ruta desconocida: <https://costa-clara-k23.pages.dev/ruta-inexistente> también responde 200. La página 404 es la de Angular (CC-06), no un 404 de HTTP. El detalle está en el [ADR 0002](./adr/0002-url-como-estado.md).
 
 ## Enlaces
 
@@ -82,7 +94,7 @@ Límites que el código ya impone y que no son métricas de producto: coordenada
 
 ## Siguientes pasos
 
-Orden que ya marcan README y HANDOFF. Ninguno está hecho en `9005c31`.
+Orden de [README.md](../README.md). Ninguno está hecho en `9005c31`. [HANDOFF.md](../HANDOFF.md) no usa el mismo orden: pone el comparador (CC-21) y las facetas (CC-23) antes que la PWA, y la auditoría axe (CC-50) antes que el offline (CC-40). CC-23 no está en la lista del README ni en la de abajo.
 
 1. Conectar la fuente oficial y automatizar la actualización (CC-13). Hasta entonces el seed sigue etiquetado como demo.
 2. PWA offline (CC-40).

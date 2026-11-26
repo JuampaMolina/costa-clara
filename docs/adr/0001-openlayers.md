@@ -14,7 +14,7 @@ CC-54 nombra MapLibre como alternativa a documentar. El repositorio no contiene 
 
 ## Decisión
 
-Usar OpenLayers 10, importando solo los módulos que el mapa necesita (`Map`, `View`, `Cluster`, `VectorLayer`, `OSM`, `XYZ`, estilos).
+Usar OpenLayers 10 con imports nombrados, no el paquete entero. El mapa usa, entre otros, `Map`, `View`, `Cluster`, `VectorLayer`, `TileLayer`, `OSM`, `XYZ`, `ScaleLine`, `fromLonLat` y estilos.
 
 Lo que el código hace con esa librería:
 
@@ -32,4 +32,4 @@ No se añade MapLibre ni otra librería de mapas. Cambiarla exigiría revisar la
 - El peso se nota. En `9005c31`, `npm run build` dejó el chunk `main` en 604.52 kB (157.17 kB transferidos) dentro de un inicial de 634.75 kB. Cabe bajo el aviso de 700 kB, pero OpenLayers es la mayor parte de ese chunk y el mapa no se carga en diferido. Bajarlo es CC-41, no un cambio de librería.
 - Clustering, proyección (`fromLonLat`) y controles salen de la librería. No hay que mantener un motor de teselas propio para 19 puntos.
 - La gráfica del histórico no usa OpenLayers ni otra dependencia: es un SVG propio (CC-20), para no sumar peso al de la ficha.
-- Quien retome el mapa tiene que respetar `prefers-reduced-motion` en los `animate` de la vista y no ocultar la atribución al restilar los controles.
+- `src/styles.css` acorta transiciones CSS si `prefers-reduced-motion` está activo, y el scroll de la lista usa `behavior: 'auto'` en ese caso. Los dos `view.animate` de `beach-map.ts` siguen pasando `duration: 450` y no leen esa preferencia. Quien retome el mapa tiene que cortar esa duración, y no ocultar la atribución al restilar los controles.
