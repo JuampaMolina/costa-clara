@@ -20,6 +20,7 @@ import {
   MarineWeather,
   MarineWeatherService,
 } from '../../core/services/marine-weather';
+import { buildBeachUrl } from '../../core/services/seo';
 import { getBeachSamples } from '../../core/utils/beach-history';
 import { BeachHistory } from './beach-history';
 
@@ -303,6 +304,21 @@ type MarineState =
           }
         </p>
       }
+
+      <div class="mt-3 border-t border-slate-100 pt-2.5 text-[11px] leading-4 text-slate-600">
+        <a
+          data-testid="report-data"
+          [href]="reportUrl()"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="font-medium text-sea-700 underline underline-offset-2 transition hover:text-sea-900"
+        >
+          Reportar un dato
+        </a>
+        <p class="mt-1 text-[10px] leading-4 text-slate-600">
+          Abre un issue en GitHub para revisar y corregir el dato. No incluyas datos personales.
+        </p>
+      </div>
     </article>
   `,
 })
@@ -344,6 +360,22 @@ export class BeachDetail {
     () =>
       `https://www.google.com/maps/dir/?api=1&destination=${this.beach().lat},${this.beach().lon}`,
   );
+  readonly reportUrl = computed(() => {
+    const beach = this.beach();
+    const detailUrl = buildBeachUrl(beach.id);
+    const title = `Reportar dato: ${beach.name} (${beach.id})`;
+    const body = [
+      `Playa: ${beach.name} (${beach.id})`,
+      'Campo a revisar: ',
+      `URL de la ficha: ${detailUrl}`,
+      '',
+      'Describe el dato incorrecto o la fuente oficial:',
+      '',
+      'Nota: no incluyas datos personales.',
+    ].join('\n');
+
+    return `https://github.com/JuampaMolina/costa-clara/issues/new?title=${encodeURIComponent(title)}&body=${encodeURIComponent(body)}`;
+  });
   readonly sampleDate = computed(() =>
     new Date(this.beach().lastSample).toLocaleDateString('es-ES', {
       day: '2-digit',

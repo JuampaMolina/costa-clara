@@ -9,9 +9,11 @@
       name="description"
       content="Consulta la calidad del agua, los servicios y la ubicación de las playas de Baleares en un mapa interactivo."
     />
+    <link rel="canonical" href="https://costa-clara-k23.pages.dev/" />
     <meta name="theme-color" content="#0284c7" />
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="Costa Clara" />
+    <meta property="og:url" content="https://costa-clara-k23.pages.dev/" />
     <meta property="og:title" content="Costa Clara · Playas de Baleares" />
     <meta
       property="og:description"
@@ -27,6 +29,24 @@
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:image" content="https://costa-clara-k23.pages.dev/og-image.png" />
     <link rel="icon" type="image/x-icon" href="favicon.ico" />
+    <script id="website-jsonld" type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "Costa Clara",
+        "url": "https://costa-clara-k23.pages.dev/",
+        "inLanguage": "es",
+        "description": "Consulta la calidad del agua, los servicios y la ubicación de las playas de Baleares en un mapa interactivo.",
+        "potentialAction": {
+          "@type": "SearchAction",
+          "target": {
+            "@type": "EntryPoint",
+            "urlTemplate": "https://costa-clara-k23.pages.dev/?q={search_term_string}"
+          },
+          "query-input": "required name=search_term_string"
+        }
+      }
+    </script>
   </head>
   <body>
     <app-root></app-root>
