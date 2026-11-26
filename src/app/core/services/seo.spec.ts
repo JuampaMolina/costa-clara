@@ -2,6 +2,7 @@ import { DOCUMENT } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { Meta, Title } from '@angular/platform-browser';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { TranslationService } from '../i18n/translation.service';
 import { Beach } from '../models/beach';
 import {
   BEACH_JSONLD_ID,
@@ -49,6 +50,8 @@ describe('SeoService', () => {
   let meta: Meta;
 
   beforeEach(() => {
+    localStorage.clear();
+    window.history.replaceState({}, '', '/');
     TestBed.configureTestingModule({});
     service = TestBed.inject(SeoService);
     doc = TestBed.inject(DOCUMENT);
@@ -62,6 +65,8 @@ describe('SeoService', () => {
   afterEach(() => {
     doc.head.querySelectorAll('link[rel="canonical"]').forEach((node) => node.remove());
     doc.getElementById(BEACH_JSONLD_ID)?.remove();
+    localStorage.clear();
+    window.history.replaceState({}, '', '/');
   });
 
   it('construye la URL canónica de una playa sin filtros', () => {
@@ -136,5 +141,23 @@ describe('SeoService', () => {
     expect(meta.getTag('property="og:url"')?.content).toBe(HOME_URL);
     expect(doc.head.querySelector('link[rel="canonical"]')?.getAttribute('href')).toBe(HOME_URL);
     expect(doc.getElementById(BEACH_JSONLD_ID)).toBeNull();
+  });
+
+  it('traduce el título y las descripciones según el idioma activo', () => {
+    const i18n = TestBed.inject(TranslationService);
+
+    i18n.setLang('en');
+    service.update(null);
+    expect(title.getTitle()).toBe('Costa Clara · Balearic Beaches');
+    expect(meta.getTag('name="description"')?.content).toContain('Interactive map');
+
+    service.update(ES_TRENC);
+    expect(title.getTitle()).toBe('Es Trenc · Costa Clara');
+    expect(meta.getTag('name="description"')?.content).toContain('excellent water quality');
+
+    i18n.setLang('ca');
+    service.update(null);
+    expect(title.getTitle()).toBe('Costa Clara · Platges de les Balears');
+    expect(meta.getTag('name="description"')?.content).toContain('Mapa interactiu');
   });
 });

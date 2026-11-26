@@ -12,7 +12,8 @@ import {
   signal,
   viewChild,
 } from '@angular/core';
-import { Beach, ISLANDS, QUALITY_COLORS, QUALITY_LABELS } from '../../core/models/beach';
+import { TranslationService } from '../../core/i18n/translation.service';
+import { Beach, QUALITY_COLORS } from '../../core/models/beach';
 import { AnalyticsService } from '../../core/services/analytics';
 import { FavoritesStore } from '../../core/services/favorites';
 import {
@@ -46,7 +47,7 @@ type MarineState =
           </span>
           @if (beach().blueFlag) {
             <span class="rounded-full bg-sky-50 px-2 py-0.5 text-[11px] font-semibold text-sky-700">
-              Bandera azul
+              {{ i18n.t('detail.blueFlag') }}
             </span>
           }
         </div>
@@ -59,8 +60,8 @@ type MarineState =
             [attr.aria-pressed]="isCompared()"
             [attr.aria-label]="
               isCompared()
-                ? 'Quitar ' + beach().name + ' del comparador'
-                : 'Añadir ' + beach().name + ' al comparador'
+                ? i18n.t('results.removeCompare', { name: beach().name })
+                : i18n.t('results.addCompare', { name: beach().name })
             "
             (click)="compareToggled.emit()"
           >
@@ -82,7 +83,9 @@ type MarineState =
             data-testid="detail-favorite"
             [class]="favoriteButtonClass()"
             [attr.aria-pressed]="isFavorite()"
-            [attr.aria-label]="isFavorite() ? 'Quitar de favoritas' : 'Añadir a favoritas'"
+            [attr.aria-label]="
+              isFavorite() ? i18n.t('detail.removeFavorite') : i18n.t('detail.addFavorite')
+            "
             (click)="toggleFavorite()"
           >
             <svg
@@ -105,7 +108,7 @@ type MarineState =
             type="button"
             class="rounded-full p-1.5 text-slate-500 transition hover:bg-slate-100 hover:text-slate-700"
             data-testid="detail-share"
-            aria-label="Compartir playa"
+            [attr.aria-label]="i18n.t('detail.shareAria')"
             (click)="share()"
           >
             <svg
@@ -127,7 +130,7 @@ type MarineState =
           <button
             type="button"
             class="-mr-1 rounded-full p-1.5 text-slate-500 transition hover:bg-slate-100 hover:text-slate-700"
-            aria-label="Cerrar ficha"
+            [attr.aria-label]="i18n.t('detail.closeAria')"
             (click)="closed.emit()"
           >
             <svg
@@ -146,7 +149,9 @@ type MarineState =
 
       @if (shareState() !== 'idle') {
         <p [class]="shareStatusClass()" role="status" aria-live="polite">
-          {{ shareState() === 'error' ? 'No se pudo copiar el enlace' : 'Enlace copiado' }}
+          {{
+            shareState() === 'error' ? i18n.t('detail.linkCopyError') : i18n.t('detail.linkCopied')
+          }}
         </p>
       }
 
@@ -167,7 +172,7 @@ type MarineState =
             {{ service }}
           </span>
         } @empty {
-          <span class="text-xs text-slate-500">Sin servicios en la ficha</span>
+          <span class="text-xs text-slate-500">{{ i18n.t('detail.noServices') }}</span>
         }
       </div>
 
@@ -176,7 +181,7 @@ type MarineState =
       <div aria-live="polite" role="status">
         @if (marineState().status === 'loading') {
           <p class="mt-3 text-xs text-slate-500" data-testid="marine-weather-loading">
-            Cargando estado del mar…
+            {{ i18n.t('detail.marineLoading') }}
           </p>
         }
       </div>
@@ -192,13 +197,13 @@ type MarineState =
               id="marine-weather-title"
               class="text-[11px] font-semibold uppercase tracking-wide text-slate-600"
             >
-              Estado del mar
+              {{ i18n.t('detail.marineTitle') }}
             </h3>
             <span class="text-[11px] text-slate-600">
               @if (marineObservedTime(); as time) {
-                Actualizado a las {{ time }}
+                {{ i18n.t('detail.marineUpdatedAt', { time }) }}
               } @else {
-                Actualizado: —
+                {{ i18n.t('detail.marineUpdatedEmpty') }}
               }
             </span>
           </div>
@@ -206,7 +211,7 @@ type MarineState =
           <dl class="mt-2.5 grid grid-cols-3 gap-2 text-center">
             <div class="rounded-xl bg-white/90 px-2 py-2 ring-1 ring-slate-200/70">
               <dt class="text-[10px] font-semibold uppercase tracking-wide text-slate-600">
-                Oleaje
+                {{ i18n.t('detail.marineWaves') }}
               </dt>
               <dd class="mt-0.5 text-sm font-semibold text-slate-800 tabular-nums">
                 {{ formatMetric(marine.waveHeight, 'm', 2) }}
@@ -214,7 +219,7 @@ type MarineState =
             </div>
             <div class="rounded-xl bg-white/90 px-2 py-2 ring-1 ring-slate-200/70">
               <dt class="text-[10px] font-semibold uppercase tracking-wide text-slate-600">
-                Periodo
+                {{ i18n.t('detail.marinePeriod') }}
               </dt>
               <dd class="mt-0.5 text-sm font-semibold text-slate-800 tabular-nums">
                 {{ formatMetric(marine.wavePeriod, 's', 1) }}
@@ -222,7 +227,7 @@ type MarineState =
             </div>
             <div class="rounded-xl bg-white/90 px-2 py-2 ring-1 ring-slate-200/70">
               <dt class="text-[10px] font-semibold uppercase tracking-wide text-slate-600">
-                Temp. agua
+                {{ i18n.t('detail.marineWaterTemp') }}
               </dt>
               <dd class="mt-0.5 text-sm font-semibold text-slate-800 tabular-nums">
                 {{ formatMetric(marine.seaTemperature, '°C', 1) }}
@@ -231,7 +236,7 @@ type MarineState =
           </dl>
 
           <p class="mt-2 text-[10px] leading-4 text-slate-600">
-            Fuente:
+            {{ i18n.t('detail.sourceLabel') }}
             <a
               [href]="marineSource.url"
               target="_blank"
@@ -248,13 +253,13 @@ type MarineState =
       <dl class="mt-5 grid grid-cols-2 gap-3 border-t border-slate-100 pt-4 text-sm">
         <div>
           <dt class="text-[11px] font-semibold uppercase tracking-wide text-slate-500">
-            Última muestra
+            {{ i18n.t('detail.latestSample') }}
           </dt>
           <dd class="mt-0.5 font-medium text-slate-700">{{ sampleDate() }}</dd>
         </div>
         <div>
           <dt class="text-[11px] font-semibold uppercase tracking-wide text-slate-500">
-            Coordenadas
+            {{ i18n.t('detail.coordinates') }}
           </dt>
           <dd class="mt-0.5 font-medium text-slate-700">
             {{ beach().lat.toFixed(4) }}, {{ beach().lon.toFixed(4) }}
@@ -269,7 +274,7 @@ type MarineState =
           target="_blank"
           rel="noopener noreferrer"
         >
-          Cómo llegar
+          {{ i18n.t('detail.directions') }}
           <svg
             viewBox="0 0 24 24"
             class="h-3.5 w-3.5"
@@ -282,7 +287,7 @@ type MarineState =
         </a>
         <span class="text-[11px] text-slate-500">
           @if (isDemo()) {
-            <span class="text-amber-700">Datos de demostración</span>
+            <span class="text-amber-700">{{ i18n.t('header.demoData') }}</span>
           } @else if (source(); as src) {
             <a
               [href]="src.url"
@@ -290,7 +295,7 @@ type MarineState =
               rel="noopener noreferrer"
               class="font-medium text-sea-700 underline underline-offset-2"
             >
-              Fuente: {{ src.name }}
+              {{ i18n.t('detail.sourceNamed', { name: src.name }) }}
             </a>
           }
         </span>
@@ -299,8 +304,8 @@ type MarineState =
       @if (!isDemo() && source(); as src) {
         <p class="mt-2 text-[10px] leading-4 text-slate-500">
           {{ src.license }}
-          @if (updatedAt()) {
-            · Actualizado {{ updatedAt() }}
+          @if (updatedAt(); as date) {
+            · {{ i18n.t('detail.updatedDate', { date }) }}
           }
         </p>
       }
@@ -313,10 +318,10 @@ type MarineState =
           rel="noopener noreferrer"
           class="font-medium text-sea-700 underline underline-offset-2 transition hover:text-sea-900"
         >
-          Reportar un dato
+          {{ i18n.t('detail.reportLink') }}
         </a>
         <p class="mt-1 text-[10px] leading-4 text-slate-600">
-          Abre un issue en GitHub para revisar y corregir el dato. No incluyas datos personales.
+          {{ i18n.t('detail.reportHelp') }}
         </p>
       </div>
     </article>
@@ -329,6 +334,7 @@ export class BeachDetail {
   readonly compareToggled = output<void>();
   readonly closed = output<void>();
 
+  readonly i18n = inject(TranslationService);
   readonly favorites = inject(FavoritesStore);
   private readonly marineWeather = inject(MarineWeatherService);
   private readonly analytics = inject(AnalyticsService);
@@ -348,14 +354,12 @@ export class BeachDetail {
     return state.status === 'ok' ? state.data : null;
   });
   readonly marineObservedTime = computed(() =>
-    formatObservedTime(this.marineData()?.observedAt ?? null),
+    formatObservedTime(this.marineData()?.observedAt ?? null, this.i18n.locale()),
   );
 
-  readonly qualityLabel = computed(() => QUALITY_LABELS[this.beach().quality]);
+  readonly qualityLabel = computed(() => this.i18n.qualityLabel(this.beach().quality));
   readonly qualityColor = computed(() => QUALITY_COLORS[this.beach().quality]);
-  readonly islandLabel = computed(
-    () => ISLANDS.find((island) => island.id === this.beach().island)?.label ?? this.beach().island,
-  );
+  readonly islandLabel = computed(() => this.i18n.islandLabel(this.beach().island));
   readonly mapsUrl = computed(
     () =>
       `https://www.google.com/maps/dir/?api=1&destination=${this.beach().lat},${this.beach().lon}`,
@@ -363,39 +367,27 @@ export class BeachDetail {
   readonly reportUrl = computed(() => {
     const beach = this.beach();
     const detailUrl = buildBeachUrl(beach.id);
-    const title = `Reportar dato: ${beach.name} (${beach.id})`;
+    const title = this.i18n.t('detail.reportIssueTitle', { name: beach.name, id: beach.id });
     const body = [
-      `Playa: ${beach.name} (${beach.id})`,
-      'Campo a revisar: ',
-      `URL de la ficha: ${detailUrl}`,
+      this.i18n.t('detail.reportIssueBeach', { name: beach.name, id: beach.id }),
+      this.i18n.t('detail.reportIssueField'),
+      this.i18n.t('detail.reportIssueUrl', { url: detailUrl }),
       '',
-      'Describe el dato incorrecto o la fuente oficial:',
+      this.i18n.t('detail.reportIssuePrompt'),
       '',
-      'Nota: no incluyas datos personales.',
+      this.i18n.t('detail.reportIssueNote'),
     ].join('\n');
 
     return `https://github.com/JuampaMolina/costa-clara/issues/new?title=${encodeURIComponent(title)}&body=${encodeURIComponent(body)}`;
   });
-  readonly sampleDate = computed(() =>
-    new Date(this.beach().lastSample).toLocaleDateString('es-ES', {
-      day: '2-digit',
-      month: 'short',
-      year: 'numeric',
-    }),
-  );
+  readonly sampleDate = computed(() => this.i18n.formatDate(this.beach().lastSample));
 
   readonly samples = computed(() => getBeachSamples(this.beach()));
   readonly isDemo = computed(() => this.beach().dataStatus !== 'real');
   readonly source = computed(() => this.beach().source ?? null);
   readonly updatedAt = computed(() => {
     const value = this.beach().updatedAt;
-    if (!value) return null;
-
-    return new Date(`${value.slice(0, 10)}T00:00:00`).toLocaleDateString('es-ES', {
-      day: '2-digit',
-      month: 'short',
-      year: 'numeric',
-    });
+    return value ? this.i18n.formatDate(value) : null;
   });
 
   readonly isFavorite = computed(() => this.favorites.isFavorite(this.beach().id));
@@ -453,7 +445,7 @@ export class BeachDetail {
   formatMetric(value: number | null, unit: string, maxDecimals = 1): string {
     if (value === null) return '—';
 
-    return `${value.toLocaleString('es-ES', { maximumFractionDigits: maxDecimals })} ${unit}`;
+    return `${this.i18n.formatNumber(value, { maximumFractionDigits: maxDecimals })} ${unit}`;
   }
 
   async share(): Promise<void> {
@@ -461,8 +453,8 @@ export class BeachDetail {
     if (!url) return;
 
     const data = {
-      title: `${this.beach().name} · Costa Clara`,
-      text: `Consulta ${this.beach().name} en Costa Clara`,
+      title: this.i18n.t('seo.beachTitle', { name: this.beach().name }),
+      text: this.i18n.t('detail.shareText', { name: this.beach().name }),
       url,
     };
 
@@ -522,7 +514,7 @@ export class BeachDetail {
   }
 }
 
-function formatObservedTime(value: string | null): string | null {
+function formatObservedTime(value: string | null, locale: string): string | null {
   if (!value) return null;
 
   const match = /T(\d{2}:\d{2})/.exec(value);
@@ -531,7 +523,7 @@ function formatObservedTime(value: string | null): string | null {
   const parsed = new Date(value);
   if (Number.isNaN(parsed.getTime())) return null;
 
-  return parsed.toLocaleTimeString('es-ES', {
+  return parsed.toLocaleTimeString(locale, {
     hour: '2-digit',
     minute: '2-digit',
   });

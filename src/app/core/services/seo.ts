@@ -1,6 +1,7 @@
 import { DOCUMENT, Injectable, inject } from '@angular/core';
 import { Meta, Title } from '@angular/platform-browser';
-import { Beach, ISLANDS, QUALITY_LABELS } from '../models/beach';
+import { TranslationService } from '../i18n/translation.service';
+import { Beach } from '../models/beach';
 
 export const SITE_URL = 'https://costa-clara-k23.pages.dev';
 export const HOME_URL = `${SITE_URL}/`;
@@ -66,6 +67,7 @@ export class SeoService {
   private readonly document = inject(DOCUMENT);
   private readonly title = inject(Title);
   private readonly meta = inject(Meta);
+  private readonly i18n = inject(TranslationService);
 
   update(beach: Beach | null): void {
     if (!beach) {
@@ -77,20 +79,28 @@ export class SeoService {
   }
 
   setHome(): void {
-    this.title.setTitle(DEFAULT_TITLE);
-    this.meta.updateTag({ name: 'description', content: DEFAULT_DESCRIPTION });
-    this.meta.updateTag({ property: 'og:title', content: DEFAULT_TITLE });
-    this.meta.updateTag({ property: 'og:description', content: DEFAULT_DESCRIPTION });
+    const homeTitle = this.i18n.t('seo.homeTitle');
+    const homeDescription = this.i18n.t('seo.homeDescription');
+
+    this.title.setTitle(homeTitle);
+    this.meta.updateTag({ name: 'description', content: homeDescription });
+    this.meta.updateTag({ property: 'og:title', content: homeTitle });
+    this.meta.updateTag({ property: 'og:description', content: homeDescription });
     this.meta.updateTag({ property: 'og:url', content: HOME_URL });
     this.setCanonical(HOME_URL);
     this.clearBeachJsonLd();
   }
 
   setBeach(beach: Beach): void {
-    const islandLabel = ISLANDS.find((item) => item.id === beach.island)?.label ?? beach.island;
-    const quality = QUALITY_LABELS[beach.quality].toLowerCase();
-    const description = `${beach.name} (${islandLabel}, ${beach.municipality}): calidad del agua ${quality}, servicios y cómo llegar.`;
-    const beachTitle = `${beach.name} · Costa Clara`;
+    const islandLabel = this.i18n.islandLabel(beach.island);
+    const quality = this.i18n.qualityLabel(beach.quality).toLowerCase();
+    const description = this.i18n.t('seo.beachDescription', {
+      name: beach.name,
+      island: islandLabel,
+      municipality: beach.municipality,
+      quality,
+    });
+    const beachTitle = this.i18n.t('seo.beachTitle', { name: beach.name });
     const url = buildBeachUrl(beach.id);
 
     this.title.setTitle(beachTitle);
