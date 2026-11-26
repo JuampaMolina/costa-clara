@@ -30,7 +30,7 @@ test('restaura isla y calidad desde la URL', async ({ page }) => {
 
   await expect(page.getByRole('button', { name: 'Menorca', exact: true })).toHaveAttribute(
     'aria-pressed',
-    'true'
+    'true',
   );
   await expect(page.getByLabel('Calidad del agua')).toHaveValue('excelente');
   await expect(page.getByTestId('result-count')).toHaveText('2 playas');
@@ -48,7 +48,7 @@ test('abre la ficha, sincroniza la URL y la cierra', async ({ page }) => {
   await expect(page).toHaveURL(/playa=cala-macarella/);
   await expect(page.getByRole('link', { name: /Cómo llegar/ })).toHaveAttribute(
     'href',
-    /google\.com\/maps/
+    /google\.com\/maps/,
   );
 
   await page.getByRole('button', { name: 'Cerrar ficha' }).click();
@@ -68,7 +68,7 @@ test('mantiene el estado compartido al recargar', async ({ page }) => {
   await expect(detailTitle).toBeVisible();
   await expect(page.getByRole('button', { name: 'Formentera', exact: true })).toHaveAttribute(
     'aria-pressed',
-    'true'
+    'true',
   );
 });
 
@@ -92,16 +92,14 @@ test('actualiza el título y los metadatos al abrir una playa', async ({ page })
   await expect(page).toHaveTitle('Es Trenc · Costa Clara');
   await expect(page.locator('meta[name="description"]')).toHaveAttribute(
     'content',
-    /Es Trenc \(Mallorca, Campos\)/
+    /Es Trenc \(Mallorca, Campos\)/,
   );
 });
 
 test('muestra la página 404 en rutas desconocidas', async ({ page }) => {
   await page.goto('/ruta/inexistente');
 
-  await expect(
-    page.getByRole('heading', { name: 'Esta playa no está en el mapa' })
-  ).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Esta playa no está en el mapa' })).toBeVisible();
   await expect(page).toHaveTitle('Página no encontrada · Costa Clara');
 
   await page.getByRole('link', { name: /Volver al mapa/ }).click();

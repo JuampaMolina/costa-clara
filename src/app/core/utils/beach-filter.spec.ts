@@ -15,7 +15,7 @@ describe('filterBeaches', () => {
 
     expect(result).toHaveLength(BEACHES.length);
     expect(result.map((beach) => beach.name)).toEqual(
-      [...result.map((beach) => beach.name)].sort((a, b) => a.localeCompare(b, 'es'))
+      [...result.map((beach) => beach.name)].sort((a, b) => a.localeCompare(b, 'es')),
     );
   });
 

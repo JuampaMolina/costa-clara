@@ -77,7 +77,11 @@ import { BeachHistory } from './beach-history';
               stroke-width="2"
               aria-hidden="true"
             >
-              <path d="M12 16V4M7 9l5-5 5 5M5 20h14" stroke-linecap="round" stroke-linejoin="round" />
+              <path
+                d="M12 16V4M7 9l5-5 5 5M5 20h14"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
             </svg>
           </button>
 
@@ -87,7 +91,13 @@ import { BeachHistory } from './beach-history';
             aria-label="Cerrar ficha"
             (click)="closed.emit()"
           >
-            <svg viewBox="0 0 24 24" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2">
+            <svg
+              viewBox="0 0 24 24"
+              class="h-4 w-4"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
               <path d="M6 6l12 12M18 6L6 18" stroke-linecap="round" />
             </svg>
           </button>
@@ -119,11 +129,15 @@ import { BeachHistory } from './beach-history';
 
       <dl class="mt-5 grid grid-cols-2 gap-3 border-t border-slate-100 pt-4 text-sm">
         <div>
-          <dt class="text-[11px] font-semibold uppercase tracking-wide text-slate-400">Última muestra</dt>
+          <dt class="text-[11px] font-semibold uppercase tracking-wide text-slate-400">
+            Última muestra
+          </dt>
           <dd class="mt-0.5 font-medium text-slate-700">{{ sampleDate() }}</dd>
         </div>
         <div>
-          <dt class="text-[11px] font-semibold uppercase tracking-wide text-slate-400">Coordenadas</dt>
+          <dt class="text-[11px] font-semibold uppercase tracking-wide text-slate-400">
+            Coordenadas
+          </dt>
           <dd class="mt-0.5 font-medium text-slate-700">
             {{ beach().lat.toFixed(4) }}, {{ beach().lon.toFixed(4) }}
           </dd>
@@ -138,7 +152,13 @@ import { BeachHistory } from './beach-history';
           rel="noopener noreferrer"
         >
           Cómo llegar
-          <svg viewBox="0 0 24 24" class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2">
+          <svg
+            viewBox="0 0 24 24"
+            class="h-3.5 w-3.5"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
             <path d="M7 17L17 7M9 7h8v8" stroke-linecap="round" stroke-linejoin="round" />
           </svg>
         </a>
@@ -184,18 +204,18 @@ export class BeachDetail {
   readonly qualityLabel = computed(() => QUALITY_LABELS[this.beach().quality]);
   readonly qualityColor = computed(() => QUALITY_COLORS[this.beach().quality]);
   readonly islandLabel = computed(
-    () => ISLANDS.find((island) => island.id === this.beach().island)?.label ?? this.beach().island
+    () => ISLANDS.find((island) => island.id === this.beach().island)?.label ?? this.beach().island,
   );
   readonly mapsUrl = computed(
     () =>
-      `https://www.google.com/maps/dir/?api=1&destination=${this.beach().lat},${this.beach().lon}`
+      `https://www.google.com/maps/dir/?api=1&destination=${this.beach().lat},${this.beach().lon}`,
   );
   readonly sampleDate = computed(() =>
     new Date(this.beach().lastSample).toLocaleDateString('es-ES', {
       day: '2-digit',
       month: 'short',
       year: 'numeric',
-    })
+    }),
   );
 
   readonly samples = computed(() => getBeachSamples(this.beach()));
@@ -223,7 +243,7 @@ export class BeachDetail {
 
   readonly shareStatusClass = computed(
     () =>
-      `mt-2 text-xs font-medium ${this.shareState() === 'error' ? 'text-rose-600' : 'text-emerald-600'}`
+      `mt-2 text-xs font-medium ${this.shareState() === 'error' ? 'text-rose-600' : 'text-emerald-600'}`,
   );
 
   constructor() {

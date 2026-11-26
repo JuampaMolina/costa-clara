@@ -55,7 +55,7 @@ describe('FavoritesStore', () => {
       new StorageEvent('storage', {
         key: FAVORITES_STORAGE_KEY,
         newValue: JSON.stringify(['cala-macarella']),
-      })
+      }),
     );
 
     expect(store.isFavorite('cala-macarella')).toBe(true);

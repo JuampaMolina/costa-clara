@@ -3,12 +3,7 @@ export type IslandId = 'mallorca' | 'menorca' | 'ibiza' | 'formentera';
 export type WaterQuality = 'excelente' | 'buena' | 'suficiente' | 'insuficiente' | 'sin-datos';
 
 export type ServiceId =
-  | 'Socorrista'
-  | 'Aseos'
-  | 'Duchas'
-  | 'Aparcamiento'
-  | 'Acceso adaptado'
-  | 'Chiringuito';
+  'Socorrista' | 'Aseos' | 'Duchas' | 'Aparcamiento' | 'Acceso adaptado' | 'Chiringuito';
 
 export type Accessibility = 'adaptada' | 'parcial' | 'sin-datos';
 

@@ -49,12 +49,7 @@ const CHART_PADDING_Y = 14;
       </div>
 
       @if (ordered().length > 0) {
-        <svg
-          viewBox="0 0 300 90"
-          class="mt-2 h-24 w-full"
-          role="img"
-          [attr.aria-label]="summary()"
-        >
+        <svg viewBox="0 0 300 90" class="mt-2 h-24 w-full" role="img" [attr.aria-label]="summary()">
           <line x1="14" y1="14" x2="286" y2="14" stroke="#e2e8f0" stroke-dasharray="3 3" />
           <line x1="14" y1="45" x2="286" y2="45" stroke="#e2e8f0" stroke-dasharray="3 3" />
           <line x1="14" y1="76" x2="286" y2="76" stroke="#e2e8f0" stroke-dasharray="3 3" />
@@ -109,7 +104,7 @@ export class BeachHistory {
   readonly samples = input.required<BeachSample[]>();
 
   readonly ordered = computed(() =>
-    [...this.samples()].sort((a, b) => a.date.localeCompare(b.date))
+    [...this.samples()].sort((a, b) => a.date.localeCompare(b.date)),
   );
 
   readonly first = computed(() => this.ordered()[0] ?? null);
@@ -139,7 +134,7 @@ export class BeachHistory {
   readonly polyline = computed(() =>
     this.points()
       .map((point) => `${point.x},${point.y}`)
-      .join(' ')
+      .join(' '),
   );
 
   readonly summary = computed(() => {

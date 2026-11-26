@@ -30,7 +30,7 @@ describe('buildDataset', () => {
   it('builds a validated beach with samples and provenance', () => {
     const [beach] = buildDataset(
       [beachRow()],
-      [sample({ date: '2026-06-01', quality: 'buena' }), sample()]
+      [sample({ date: '2026-06-01', quality: 'buena' }), sample()],
     );
 
     expect(beach.id).toBe('es-trenc');
@@ -49,10 +49,7 @@ describe('buildDataset', () => {
   });
 
   it('derives accessibility from services and trims separators', () => {
-    const [beach] = buildDataset(
-      [beachRow({ services: ' Acceso adaptado | Aseos ' })],
-      [sample()]
-    );
+    const [beach] = buildDataset([beachRow({ services: ' Acceso adaptado | Aseos ' })], [sample()]);
 
     expect(beach.services).toEqual(['Acceso adaptado', 'Aseos']);
     expect(beach.accessibility).toBe('adaptada');
@@ -60,16 +57,16 @@ describe('buildDataset', () => {
 
   it('rejects unknown islands, services, qualities and coordinates', () => {
     expect(() => buildDataset([beachRow({ island: 'canarias' })], [sample()])).toThrow(
-      /island "canarias"/
+      /island "canarias"/,
     );
-    expect(() => buildDataset([beachRow({ services: 'Socorrista;Helipuerto' })], [sample()])).toThrow(
-      /servicio "Helipuerto"/
-    );
+    expect(() =>
+      buildDataset([beachRow({ services: 'Socorrista;Helipuerto' })], [sample()]),
+    ).toThrow(/servicio "Helipuerto"/);
     expect(() => buildDataset([beachRow()], [sample({ quality: 'regular' })])).toThrow(
-      /quality "regular"/
+      /quality "regular"/,
     );
     expect(() => buildDataset([beachRow({ lon: '9.9' })], [sample()])).toThrow(
-      /fuera del rango de Baleares/
+      /fuera del rango de Baleares/,
     );
   });
 
@@ -83,19 +80,17 @@ describe('buildDataset', () => {
 
   it('rejects samples for unknown beaches and duplicate sample dates', () => {
     expect(() => buildDataset([beachRow()], [sample({ beach_id: 'otra-playa' })])).toThrow(
-      /playa inexistente "otra-playa"/
+      /playa inexistente "otra-playa"/,
     );
-    expect(() =>
-      buildDataset([beachRow()], [sample(), sample({ quality: 'buena' })])
-    ).toThrow(/muestra duplicada/);
+    expect(() => buildDataset([beachRow()], [sample(), sample({ quality: 'buena' })])).toThrow(
+      /muestra duplicada/,
+    );
   });
 
   it('rejects invalid dates and missing provenance', () => {
     expect(() => buildDataset([beachRow()], [sample({ date: '14/09/2026' })])).toThrow(
-      /YYYY-MM-DD/
+      /YYYY-MM-DD/,
     );
-    expect(() => buildDataset([beachRow({ source_url: '' })], [sample()])).toThrow(
-      /source_url/
-    );
+    expect(() => buildDataset([beachRow({ source_url: '' })], [sample()])).toThrow(/source_url/);
   });
 });

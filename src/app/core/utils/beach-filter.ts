@@ -26,7 +26,7 @@ export function filterBeaches(beaches: Beach[], filters: BeachFilters): Beach[] 
       if (!query) return true;
 
       const haystack = normalizeText(
-        [beach.name, beach.municipality, beach.description, ...beach.services].join(' ')
+        [beach.name, beach.municipality, beach.description, ...beach.services].join(' '),
       );
       return haystack.includes(query);
     })

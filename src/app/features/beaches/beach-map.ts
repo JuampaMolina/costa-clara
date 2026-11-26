@@ -159,7 +159,7 @@ export class BeachMap implements AfterViewInit, OnDestroy {
           });
           feature.setId(beach.id);
           return feature;
-        })
+        }),
       );
     });
 
@@ -198,7 +198,11 @@ export class BeachMap implements AfterViewInit, OnDestroy {
     this.vectorLayer = new VectorLayer({ source: this.clusterSource, style: this.styleFn });
 
     this.userSource = new VectorSource();
-    const userLayer = new VectorLayer({ source: this.userSource, style: this.userStyle, zIndex: 20 });
+    const userLayer = new VectorLayer({
+      source: this.userSource,
+      style: this.userStyle,
+      zIndex: 20,
+    });
 
     this.tileLayers.osm = new TileLayer({
       source: new OSM(),
@@ -264,7 +268,7 @@ export class BeachMap implements AfterViewInit, OnDestroy {
           }
           return true;
         },
-        { hitTolerance: 6 }
+        { hitTolerance: 6 },
       );
     });
 

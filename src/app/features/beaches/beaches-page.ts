@@ -54,7 +54,7 @@ export class BeachesPage {
   readonly locationStatus = signal<'idle' | 'loading' | 'error' | 'ready'>('idle');
   readonly isFullscreen = signal(false);
   readonly legendOpen = signal(
-    typeof window === 'undefined' || !window.matchMedia('(max-width: 639px)').matches
+    typeof window === 'undefined' || !window.matchMedia('(max-width: 639px)').matches,
   );
 
   private readonly defaultTitle = 'Costa Clara · Playas de Baleares';
@@ -65,9 +65,7 @@ export class BeachesPage {
   readonly island = signal<IslandFilter>(this.readIsland());
   readonly quality = signal<QualityFilter>(this.readQuality());
   readonly blueFlag = signal(this.route.snapshot.queryParamMap.get('bandera') === '1');
-  readonly showFavoritesOnly = signal(
-    this.route.snapshot.queryParamMap.get('favoritas') === '1'
-  );
+  readonly showFavoritesOnly = signal(this.route.snapshot.queryParamMap.get('favoritas') === '1');
   readonly selectedId = signal<string | null>(this.route.snapshot.queryParamMap.get('playa'));
 
   readonly islandOptions: ReadonlyArray<{ id: IslandFilter; label: string }> = [
@@ -98,8 +96,7 @@ export class BeachesPage {
   private readonly itemIdle = 'hover:bg-slate-50';
   private readonly favoritesPillBase =
     'inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-semibold transition';
-  private readonly favoriteButtonBase =
-    'absolute right-2 top-2.5 rounded-full p-1.5 transition';
+  private readonly favoriteButtonBase = 'absolute right-2 top-2.5 rounded-full p-1.5 transition';
 
   readonly filteredBeaches = computed(() => {
     const beaches = filterBeaches(BEACHES, {
@@ -130,7 +127,7 @@ export class BeachesPage {
       this.island() !== 'todas' ||
       this.quality() !== 'todas' ||
       this.blueFlag() ||
-      this.showFavoritesOnly()
+      this.showFavoritesOnly(),
   );
 
   readonly shareUrl = computed(() => {
@@ -152,15 +149,13 @@ export class BeachesPage {
 
   constructor() {
     const onFullscreenChange = (): void => {
-      this.isFullscreen.set(
-        typeof document !== 'undefined' && document.fullscreenElement !== null
-      );
+      this.isFullscreen.set(typeof document !== 'undefined' && document.fullscreenElement !== null);
     };
 
     if (typeof document !== 'undefined') {
       document.addEventListener('fullscreenchange', onFullscreenChange);
       this.destroyRef.onDestroy(() =>
-        document.removeEventListener('fullscreenchange', onFullscreenChange)
+        document.removeEventListener('fullscreenchange', onFullscreenChange),
       );
     }
 
@@ -176,7 +171,7 @@ export class BeachesPage {
 
       const current = this.route.snapshot.queryParamMap;
       const unchanged = Object.entries(queryParams).every(
-        ([key, value]) => (current.get(key) ?? null) === value
+        ([key, value]) => (current.get(key) ?? null) === value,
       );
 
       if (unchanged) return;
@@ -292,7 +287,7 @@ export class BeachesPage {
         this.locationStatus.set('ready');
       },
       () => this.locationStatus.set('error'),
-      { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 }
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 },
     );
   }
 
@@ -376,8 +371,7 @@ export class BeachesPage {
 
   private prefersReducedMotion(): boolean {
     return (
-      typeof window !== 'undefined' &&
-      window.matchMedia('(prefers-reduced-motion: reduce)').matches
+      typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
     );
   }
 }

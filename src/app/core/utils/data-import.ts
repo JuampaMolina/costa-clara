@@ -44,7 +44,7 @@ export function buildDataset(beachRows: RawRow[], sampleRows: RawRow[] = []): Be
       QUALITY_IDS,
       'quality',
       line,
-      issues
+      issues,
     );
 
     if (!beachId) {
@@ -67,10 +67,7 @@ export function buildDataset(beachRows: RawRow[], sampleRows: RawRow[] = []): Be
 
     seen.add(date);
     samplesSeen.set(beachId, seen);
-    samplesByBeach.set(beachId, [
-      ...(samplesByBeach.get(beachId) ?? []),
-      { date, quality },
-    ]);
+    samplesByBeach.set(beachId, [...(samplesByBeach.get(beachId) ?? []), { date, quality }]);
   }
 
   for (const [index, row] of beachRows.entries()) {
@@ -109,7 +106,7 @@ export function buildDataset(beachRows: RawRow[], sampleRows: RawRow[] = []): Be
       ISLAND_IDS,
       'island',
       line,
-      issues
+      issues,
     );
     const lon = parseCoordinate(text(row, 'lon'), 'lon', 1, 4.5, line, issues);
     const lat = parseCoordinate(text(row, 'lat'), 'lat', 38.5, 40.2, line, issues);
@@ -127,15 +124,13 @@ export function buildDataset(beachRows: RawRow[], sampleRows: RawRow[] = []): Be
         ACCESSIBILITY_IDS,
         'accessibility',
         line,
-        issues
+        issues,
       );
       if (parsed) accessibility = parsed;
     }
 
     const blueFlagYear = parseOptionalYear(text(row, 'blue_flag_year'), line, issues);
-    const samples = (samplesByBeach.get(id) ?? []).sort((a, b) =>
-      a.date.localeCompare(b.date)
-    );
+    const samples = (samplesByBeach.get(id) ?? []).sort((a, b) => a.date.localeCompare(b.date));
     const latest = samples.at(-1);
 
     if (id && !samples.length) {
@@ -204,7 +199,7 @@ function parseEnum<T extends string>(
   allowed: readonly T[],
   field: string,
   line: string,
-  issues: string[]
+  issues: string[],
 ): T | null {
   if (!value) return null;
 
@@ -222,7 +217,7 @@ function parseCoordinate(
   min: number,
   max: number,
   line: string,
-  issues: string[]
+  issues: string[],
 ): number | null {
   const parsed = Number(value);
 
@@ -243,7 +238,7 @@ function parseBoolean(
   value: string,
   field: string,
   line: string,
-  issues: string[]
+  issues: string[],
 ): boolean | null {
   const normalized = value.toLowerCase();
 
@@ -262,20 +257,18 @@ function parseServices(value: string, line: string, issues: string[]): ServiceId
       value
         .split(/[;|,]/)
         .map((service) => service.trim())
-        .filter(Boolean)
+        .filter(Boolean),
     ),
   ];
 
   for (const service of services) {
     if (!SERVICE_IDS.includes(service as ServiceId)) {
-      issues.push(
-        `${line}: servicio "${service}" no válido. Valores: ${SERVICE_IDS.join(', ')}`
-      );
+      issues.push(`${line}: servicio "${service}" no válido. Valores: ${SERVICE_IDS.join(', ')}`);
     }
   }
 
   return services.filter((service): service is ServiceId =>
-    SERVICE_IDS.includes(service as ServiceId)
+    SERVICE_IDS.includes(service as ServiceId),
   );
 }
 
