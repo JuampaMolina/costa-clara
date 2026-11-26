@@ -119,7 +119,7 @@ El orden recomendado, tamaños y criterios de aceptación están en [BACKLOG.md]
 - **No añadir backend todavía.** El seed en TS es suficiente. Si se añade Supabase/PostGIS, documenta variables de entorno y no subas secretos.
 - **No cambiar el stack** (Angular/OpenLayers/Tailwind) ni migrar a otro framework.
 - **Tailwind 4** se configura con `.postcssrc.json` y `@import "tailwindcss"` en `src/styles.css`. No hace falta `tailwind.config.js`.
-- **Presupuesto de bundle:** 700 kB warning / 1.2 MB error. Ahora mismo ~610 kB.
+- **Presupuesto de bundle:** 700 kB warning / 1.2 MB error. Ahora mismo ~635 kB.
 - **No tocar el CV** de `C:\Users\Juampa\.t3\projects\cv`; es otro repo.
 
 ## Criterio de “terminado”

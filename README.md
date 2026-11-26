@@ -51,6 +51,13 @@ npm run deploy   # build + deploy manual a Cloudflare Pages
 
 Instrucciones y rotación del token en [docs/despliegue.md](./docs/despliegue.md).
 
+## Documentación
+
+- [Caso de estudio](./docs/caso-de-estudio.md)
+- [ADRs](./docs/adr/)
+- [Fuentes de datos](./docs/datos.md)
+- [Despliegue](./docs/despliegue.md)
+
 ## Qué hay hecho
 
 - Mapa OpenLayers con clustering, capas base (mapa, relieve y satélite), geolocalización, pantalla completa y leyenda colapsable.

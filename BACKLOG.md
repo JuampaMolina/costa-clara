@@ -4,7 +4,7 @@ Listado de tickets para evolucionar la app desde la v0.1 actual hasta una v1.0 p
 
 > **Contexto:** v0.1 con 19 playas de demostración, mapa OpenLayers con clustering, filtros sincronizados con la URL y ficha lateral. Sin backend, sin deploy y sin e2e todavía.
 
-**Estado:** 19/36 cerrados · actualizado 2026-11-26.
+**Estado:** 22/36 cerrados · actualizado 2026-11-26.
 
 ## Hecho
 
@@ -12,10 +12,12 @@ Listado de tickets para evolucionar la app desde la v0.1 actual hasta una v1.0 p
 - ✅ **CC-02** CI con GitHub Actions (tests, build y e2e).
 - ✅ **CC-03** Playwright configurado + 30 e2e (desktop y móvil).
 - ✅ **CC-04** README, HANDOFF y BACKLOG al día.
+- ✅ **CC-05** ESLint 10 + Prettier + axe en CI.
 - ✅ **CC-06** 404 propia, títulos y metadatos dinámicos.
 - ✅ **CC-10** Fuentes y licencias documentadas en `docs/datos.md`.
 - ✅ **CC-11** Modelo v1 con muestras, servicios tipados y procedencia.
 - ✅ **CC-12** Importador CSV validado + ejemplo y fallback al seed.
+- ✅ **CC-13** Workflow mensual de importación y PR automático.
 - ✅ **CC-14** Histórico de muestras por playa.
 - ✅ **CC-15** Procedencia demo/oficial, fuente y licencia en la ficha.
 - ✅ **CC-16** Tests del importador con casos válidos y errores.
@@ -27,6 +29,7 @@ Listado de tickets para evolucionar la app desde la v0.1 actual hasta una v1.0 p
 - ✅ **CC-32** Leyenda colapsable y mapa a pantalla completa.
 - ✅ **CC-33** Sincronía lista↔mapa con marcador resaltado.
 - ✅ **CC-34** Alternativa textual, live regions y foco en el mapa.
+- ✅ **CC-54** Caso de estudio y 4 ADRs.
 
 ## Cómo leer esto
 
@@ -83,7 +86,7 @@ Reglas del proyecto que aplican a todos los tickets: UI en español, no inventar
 **Depende:** CC-03 para incluir e2e en el mismo workflow.
 
 ### CC-03 · Configurar Playwright y e2e de flujos críticos · P0 · M
-**Estado:** ✅ Hecho (2026-11-26) · 6 flujos × desktop/móvil.
+**Estado:** ✅ Hecho (2026-11-26) · 15 flujos ×2 (30 e2e).
 **Qué:** `playwright.config.ts` con `webServer` sobre `ng serve`, proyectos desktop y móvil, y specs de: buscar, filtrar por isla/calidad/bandera, seleccionar playa, recargar URL y estado vacío.
 **Hecho cuando:**
 - `npx playwright test` pasa en local y en CI.
@@ -99,6 +102,7 @@ Reglas del proyecto que aplican a todos los tickets: UI en español, no inventar
 - No quedan referencias a bugs ya arreglados ni a scripts temporales.
 
 ### CC-05 · Lint y formato en CI · P1 · S
+**Estado:** ✅ Hecho (2026-11-26) · ESLint 10 + angular-eslint 22 + Prettier + axe.
 **Qué:** añadir ESLint (config Angular + TS) y usar Prettier ya instalado; scripts `lint` y `format:check`.
 **Hecho cuando:**
 - `npm run lint` y `npm run format:check` pasan y están en CI.
@@ -141,6 +145,7 @@ Reglas del proyecto que aplican a todos los tickets: UI en español, no inventar
 - El seed demo se mantiene como fallback si no hay datos reales.
 
 ### CC-13 · Actualización programada y snapshot · P1 · M
+**Estado:** ✅ Hecho (2026-11-26) · workflow mensual + PR; fetch oficial pendiente de CC-10.
 **Qué:** workflow mensual que descarga la fuente, ejecuta el importador, valida y abre PR automático si hay cambios; guardar histórico de snapshots.
 **Hecho cuando:**
 - Un PR automático muestra el diff de datos y pasa CI.
@@ -162,7 +167,7 @@ Reglas del proyecto que aplican a todos los tickets: UI en español, no inventar
 - Cada muestra enlaza a su fuente.
 
 ### CC-16 · Tests del importador · P1 · S
-**Estado:** ✅ Hecho (2026-11-26) · 8 casos de validación.
+**Estado:** ✅ Hecho (2026-11-26) · 7 casos de validación.
 **Qué:** fixtures pequeños (válido, con acentos, duplicado, calidad desconocida, coordenada fuera de Baleares) y tests unitarios del pipeline.
 **Hecho cuando:**
 - Cobertura de las ramas de error y de normalización.
@@ -330,6 +335,7 @@ Reglas del proyecto que aplican a todos los tickets: UI en español, no inventar
 - Rich results válidos en el validador de Google.
 
 ### CC-54 · Caso de estudio y ADRs · P1 · M
+**Estado:** ✅ Hecho (2026-11-26) · `docs/caso-de-estudio.md` + 4 ADRs.
 **Qué:** documento de portfolio con problema, decisiones (OpenLayers vs MapLibre, seed vs backend, URL como estado), trade-offs, métricas y capturas; ADRs cortos en `docs/adr/`.
 **Hecho cuando:**
 - El caso se puede leer sin clonar el repo y enlaza a la demo.
