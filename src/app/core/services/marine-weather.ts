@@ -1,17 +1,22 @@
 import { Injectable } from '@angular/core';
 
 /**
- * Estado del mar y temperatura del agua en superficie (CC-27).
+ * Estado del mar y viento en superficie (CC-27).
  *
- * Fuente: Open-Meteo Marine, API abierta y sin clave de API
- * (https://marine-api.open-meteo.com/). Licencia: CC BY 4.0.
+ * Fuente: Open-Meteo, API abierta y sin clave de API
+ * (https://open-meteo.com/). Licencia: CC BY 4.0.
  *
- * Solo se envían las coordenadas de la playa; no se envía ningún dato del
- * usuario ni se guarda ninguna clave en el cliente. Si la API falla, se
- * devuelve un resultado de error tipado en lugar de lanzar una excepción.
+ * Se consultan dos endpoints en paralelo:
+ * - `https://marine-api.open-meteo.com/v1/marine` → oleaje, periodo y temperatura del agua.
+ * - `https://api.open-meteo.com/v1/forecast` → velocidad y dirección del viento a 10 m.
+ *
+ * Si uno de los dos falla, se devuelve `ok` con los campos que sí llegaron y `null`
+ * en el resto. Solo si ambos fallan se devuelve un error tipado. No se envían
+ * datos del usuario ni se guarda ninguna clave en el cliente.
  */
 
 export const MARINE_API_URL = 'https://marine-api.open-meteo.com/v1/marine';
+export const FORECAST_API_URL = 'https://api.open-meteo.com/v1/forecast';
 
 export const MARINE_SOURCE = {
   name: 'Open-Meteo Marine',
@@ -20,7 +25,9 @@ export const MARINE_SOURCE = {
 } as const;
 
 /** Variables consultadas en la respuesta `current` de Open-Meteo Marine. */
-const CURRENT_VARIABLES = 'wave_height,wave_period,sea_surface_temperature';
+const MARINE_CURRENT_VARIABLES = 'wave_height,wave_period,sea_surface_temperature';
+/** Variables consultadas en la respuesta `current` de Open-Meteo Forecast. */
+const FORECAST_CURRENT_VARIABLES = 'wind_speed_10m,wind_direction_10m';
 
 export interface MarineWeather {
   /** Altura de ola en metros, o `null` si no está disponible. */
@@ -29,6 +36,10 @@ export interface MarineWeather {
   wavePeriod: number | null;
   /** Temperatura del agua en superficie en °C, o `null` si no está disponible. */
   seaTemperature: number | null;
+  /** Velocidad del viento en km/h, o `null` si no está disponible. */
+  windSpeed: number | null;
+  /** Dirección del viento en grados (0–360), o `null` si no está disponible. */
+  windDirection: number | null;
   /** Instante de observación en ISO 8601 (hora local de Madrid), o `null`. */
   observedAt: string | null;
   /** Nombre de la fuente de los datos. */
@@ -40,61 +51,119 @@ export type MarineWeatherError = 'timeout' | 'http' | 'respuesta-invalida' | 're
 export type MarineWeatherResult =
   { status: 'ok'; data: MarineWeather } | { status: 'error'; reason: MarineWeatherError };
 
-interface MarineCurrentPayload {
-  time?: unknown;
-  wave_height?: unknown;
-  wave_period?: unknown;
-  sea_surface_temperature?: unknown;
-}
+type MarinePartial = Pick<
+  MarineWeather,
+  'waveHeight' | 'wavePeriod' | 'seaTemperature' | 'observedAt'
+>;
+type ForecastPartial = Pick<MarineWeather, 'windSpeed' | 'windDirection' | 'observedAt'>;
+
+type PartialResult<T> = { ok: true; data: T } | { ok: false; reason: MarineWeatherError };
 
 @Injectable({ providedIn: 'root' })
 export class MarineWeatherService {
   private readonly timeoutMs = 8000;
 
   async get(lat: number, lon: number): Promise<MarineWeatherResult> {
-    const url = this.buildUrl(lat, lon);
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), this.timeoutMs);
 
     try {
-      const response = await fetch(url, { signal: controller.signal });
+      const [marine, forecast] = await Promise.all([
+        this.getMarine(lat, lon, controller.signal),
+        this.getForecast(lat, lon, controller.signal),
+      ]);
 
-      if (!response.ok) {
-        return { status: 'error', reason: 'http' };
+      if (!marine.ok && !forecast.ok) {
+        return { status: 'error', reason: marine.reason };
       }
 
-      const payload = await this.readJson(response);
-      const current = this.readCurrent(payload);
-      if (!current) {
-        return { status: 'error', reason: 'respuesta-invalida' };
-      }
+      const marineData = marine.ok ? marine.data : null;
+      const forecastData = forecast.ok ? forecast.data : null;
 
       return {
         status: 'ok',
         data: {
-          waveHeight: readNumber(current.wave_height),
-          wavePeriod: readNumber(current.wave_period),
-          seaTemperature: readNumber(current.sea_surface_temperature),
-          observedAt: readString(current.time),
+          waveHeight: marineData?.waveHeight ?? null,
+          wavePeriod: marineData?.wavePeriod ?? null,
+          seaTemperature: marineData?.seaTemperature ?? null,
+          windSpeed: forecastData?.windSpeed ?? null,
+          windDirection: forecastData?.windDirection ?? null,
+          observedAt: marineData?.observedAt ?? forecastData?.observedAt ?? null,
           source: MARINE_SOURCE.name,
         },
       };
-    } catch (error) {
-      return { status: 'error', reason: isAbortError(error) ? 'timeout' : 'red' };
     } finally {
       clearTimeout(timeout);
     }
   }
 
-  private buildUrl(lat: number, lon: number): string {
-    const params = new URLSearchParams({
-      latitude: String(lat),
-      longitude: String(lon),
-      current: CURRENT_VARIABLES,
-      timezone: 'Europe/Madrid',
-    });
+  private async getMarine(
+    lat: number,
+    lon: number,
+    signal: AbortSignal,
+  ): Promise<PartialResult<MarinePartial>> {
+    try {
+      const response = await fetch(this.buildMarineUrl(lat, lon), { signal });
 
-    return `${MARINE_API_URL}?${params.toString()}`;
+      if (!response.ok) {
+        return { ok: false, reason: 'http' };
+      }
+
+      const current = this.readCurrent(await this.readJson(response));
+      if (!current) {
+        return { ok: false, reason: 'respuesta-invalida' };
+      }
+
+      return {
+        ok: true,
+        data: {
+          waveHeight: readNumber(current['wave_height']),
+          wavePeriod: readNumber(current['wave_period']),
+          seaTemperature: readNumber(current['sea_surface_temperature']),
+          observedAt: readString(current['time']),
+        },
+      };
+    } catch (error) {
+      return { ok: false, reason: isAbortError(error) ? 'timeout' : 'red' };
+    }
+  }
+
+  private async getForecast(
+    lat: number,
+    lon: number,
+    signal: AbortSignal,
+  ): Promise<PartialResult<ForecastPartial>> {
+    try {
+      const response = await fetch(this.buildForecastUrl(lat, lon), { signal });
+
+      if (!response.ok) {
+        return { ok: false, reason: 'http' };
+      }
+
+      const current = this.readCurrent(await this.readJson(response));
+      if (!current) {
+        return { ok: false, reason: 'respuesta-invalida' };
+      }
+
+      return {
+        ok: true,
+        data: {
+          windSpeed: readNumber(current['wind_speed_10m']),
+          windDirection: readNumber(current['wind_direction_10m']),
+          observedAt: readString(current['time']),
+        },
+      };
+    } catch (error) {
+      return { ok: false, reason: isAbortError(error) ? 'timeout' : 'red' };
+    }
+  }
+
+  private buildMarineUrl(lat: number, lon: number): string {
+    return buildUrl(MARINE_API_URL, lat, lon, MARINE_CURRENT_VARIABLES);
+  }
+
+  private buildForecastUrl(lat: number, lon: number): string {
+    return buildUrl(FORECAST_API_URL, lat, lon, FORECAST_CURRENT_VARIABLES);
   }
 
   private async readJson(response: Response): Promise<unknown> {
@@ -105,12 +174,23 @@ export class MarineWeatherService {
     }
   }
 
-  private readCurrent(payload: unknown): MarineCurrentPayload | null {
+  private readCurrent(payload: unknown): Record<string, unknown> | null {
     if (!isRecord(payload)) return null;
 
     const current = payload['current'];
-    return isRecord(current) ? (current as MarineCurrentPayload) : null;
+    return isRecord(current) ? current : null;
   }
+}
+
+function buildUrl(baseUrl: string, lat: number, lon: number, currentVariables: string): string {
+  const params = new URLSearchParams({
+    latitude: String(lat),
+    longitude: String(lon),
+    current: currentVariables,
+    timezone: 'Europe/Madrid',
+  });
+
+  return `${baseUrl}?${params.toString()}`;
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {

@@ -2,6 +2,7 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { parse } from 'csv-parse/sync';
 import { DataImportError, RawRow, buildDataset } from '../src/app/core/utils/data-import';
+import { writeSitemap } from './generate-sitemap';
 
 const root = resolve(import.meta.dirname, '..');
 
@@ -43,8 +44,11 @@ try {
   mkdirSync(dirname(outputPath), { recursive: true });
   writeFileSync(outputPath, content, 'utf8');
 
+  writeSitemap(beaches);
+
   console.log(`✓ ${beaches.length} playas importadas desde ${inputDir}`);
   console.log(`  Salida: ${outputPath}`);
+  console.log(`  Sitemap: public/sitemap.xml`);
 } catch (error) {
   if (error instanceof DataImportError) {
     console.error(error.message);

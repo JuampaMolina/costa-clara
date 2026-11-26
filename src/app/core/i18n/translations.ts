@@ -275,6 +275,16 @@ const ENTRIES = {
   'detail.marineWaves': ['Oleaje', 'Waves', 'Onatge'],
   'detail.marinePeriod': ['Periodo', 'Period', 'Període'],
   'detail.marineWaterTemp': ['Temp. agua', 'Water temp.', 'Temp. aigua'],
+  'detail.marineWind': ['Viento', 'Wind', 'Vent'],
+  'detail.marineWindDirection': ['Dirección', 'Direction', 'Direcció'],
+  'detail.windDir.N': ['N', 'N', 'N'],
+  'detail.windDir.NE': ['NE', 'NE', 'NE'],
+  'detail.windDir.E': ['E', 'E', 'E'],
+  'detail.windDir.SE': ['SE', 'SE', 'SE'],
+  'detail.windDir.S': ['S', 'S', 'S'],
+  'detail.windDir.SW': ['SO', 'SW', 'SO'],
+  'detail.windDir.W': ['O', 'W', 'O'],
+  'detail.windDir.NW': ['NO', 'NW', 'NO'],
   'detail.sourceLabel': ['Fuente:', 'Source:', 'Font:'],
   'detail.sourceNamed': ['Fuente: {name}', 'Source: {name}', 'Font: {name}'],
   'detail.latestSample': ['Última muestra', 'Latest sample', 'Última mostra'],
@@ -410,6 +420,18 @@ const ENTRIES = {
     'Compare {names} on Costa Clara',
     'Compara {names} a Costa Clara',
   ],
+
+  'pwa.offline': [
+    'Sin conexión: estás viendo la última versión guardada',
+    'Offline: you are viewing the last saved version',
+    'Sense connexió: estàs veient l’última versió desada',
+  ],
+  'pwa.updateReady': [
+    'Nueva versión disponible',
+    'New version available',
+    'Nova versió disponible',
+  ],
+  'pwa.updateAction': ['Actualizar', 'Update', 'Actualitza'],
 
   'notFound.pageTitle': [
     'Página no encontrada · Costa Clara',

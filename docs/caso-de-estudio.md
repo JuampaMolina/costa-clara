@@ -76,7 +76,12 @@ Límites que el código ya impone y que no son métricas de producto: coordenada
 
 ## Capturas
 
-CC-54 pide capturas. No hay imágenes en el repositorio, y no se fabrican para este documento.
+Capturas del dev server (seed de 19 playas), tomadas con Playwright el 2026-11-26. Las APIs de estado del mar y viento se interceptan en el script para que la imagen sea determinista y no dependa de la red; no contienen favoritos ni ubicación del usuario. El script que las genera es `scripts/capture-screenshots.ts`.
+
+| Vista | 1440 px | 390 px |
+| --- | --- | --- |
+| Home | ![Home a 1440 px](./capturas/home-1440.png) | ![Home a 390 px](./capturas/home-390.png) |
+| Ficha (Es Trenc) | ![Ficha a 1440 px](./capturas/ficha-1440.png) | ![Ficha a 390 px](./capturas/ficha-390.png) |
 
 Estas URLs de la demo respondieron HTTP 200 el 2026-11-26. Abren la vista sin clonar el repo:
 

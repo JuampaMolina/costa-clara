@@ -191,6 +191,8 @@ export const MOCK_MARINE_WEATHER: MarineWeather = {
   waveHeight: 0.45,
   wavePeriod: 5.2,
   seaTemperature: 23.4,
+  windSpeed: 12.8,
+  windDirection: 315,
   observedAt: '2026-09-14T11:30',
   source: MARINE_SOURCE.name,
 };

@@ -58,6 +58,18 @@ El token permite publicar en la cuenta: trátalo como una credencial de escritur
 
 Angular copia ese fichero a la raíz del build, así que recargar `/?isla=mallorca` o una URL profunda devuelve la app en vez de un 404.
 
+## Sitemap
+
+`public/sitemap.xml` se genera desde el dataset y no se edita a mano:
+
+```powershell
+npm run sitemap:generate
+```
+
+Incluye la home y una URL `/?playa=id` por cada playa activa, con `lastmod` al día en que se genera. La lógica está en `src/app/core/utils/sitemap.ts` (`buildSitemap`, pura y con tests) y el script en `scripts/generate-sitemap.ts`, que acepta `--date YYYY-MM-DD` y `--base-url <url>`.
+
+`npm run data:import` también regenera el sitemap tras importar, así que una actualización de datos deja `sitemap.xml` al día sin pasos extra.
+
 ## Verificación
 
 - `https://costa-clara-k23.pages.dev/` devuelve 200 y pinta el mapa.
