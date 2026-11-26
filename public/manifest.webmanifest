@@ -1,0 +1,26 @@
+{
+  "name": "Costa Clara · Playas de Baleares",
+  "short_name": "Costa Clara",
+  "description": "Consulta la calidad del agua, los servicios y la ubicación de las playas de Baleares en un mapa interactivo.",
+  "lang": "es",
+  "dir": "ltr",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "theme_color": "#0284c7",
+  "background_color": "#f8fafc",
+  "icons": [
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
