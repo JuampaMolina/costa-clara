@@ -44,6 +44,7 @@ import {
   sortBeaches,
 } from '../../core/utils/beach-filter';
 import { Coordinates, distanceKm, formatDistance } from '../../core/utils/geo';
+import { AnalyticsService } from '../../core/services/analytics';
 import { FavoritesStore } from '../../core/services/favorites';
 import { BeachCompare } from './beach-compare';
 import { BeachDetail } from './beach-detail';
@@ -71,6 +72,7 @@ export class BeachesPage {
   private readonly title = inject(Title);
   private readonly meta = inject(Meta);
   readonly favorites = inject(FavoritesStore);
+  private readonly analytics = inject(AnalyticsService);
   private readonly destroyRef = inject(DestroyRef);
 
   readonly dataStatus = DATA_STATUS;
@@ -338,7 +340,7 @@ export class BeachesPage {
     }
 
     this.searchDebounceTimer = setTimeout(() => {
-      this.query.set(value);
+      this.applySearch(value);
     }, SEARCH_DEBOUNCE_MS);
   }
 
@@ -360,18 +362,28 @@ export class BeachesPage {
 
   flushSearch(): void {
     clearTimeout(this.searchDebounceTimer);
-    this.query.set(this.queryInput());
+    this.applySearch(this.queryInput());
   }
 
   setIsland(value: string): void {
-    if (value === 'todas' || ISLAND_IDS.has(value)) {
+    if ((value === 'todas' || ISLAND_IDS.has(value)) && value !== this.island()) {
       this.island.set(value as IslandFilter);
+      this.analytics.track('filter', {
+        type: 'island',
+        value,
+        results: this.filteredBeaches().length,
+      });
     }
   }
 
   setQuality(value: string): void {
-    if (value === 'todas' || QUALITY_IDS.has(value)) {
+    if ((value === 'todas' || QUALITY_IDS.has(value)) && value !== this.quality()) {
       this.quality.set(value as QualityFilter);
+      this.analytics.track('filter', {
+        type: 'quality',
+        value,
+        results: this.filteredBeaches().length,
+      });
     }
   }
 
@@ -387,7 +399,13 @@ export class BeachesPage {
   }
 
   toggleBlueFlag(): void {
-    this.blueFlag.update((value) => !value);
+    const active = !this.blueFlag();
+    this.blueFlag.set(active);
+    this.analytics.track('filter', {
+      type: 'blue_flag',
+      active,
+      results: this.filteredBeaches().length,
+    });
   }
 
   toggleAdvancedFilters(): void {
@@ -395,11 +413,18 @@ export class BeachesPage {
   }
 
   toggleService(service: ServiceId): void {
+    const active = !this.selectedServices().includes(service);
     this.selectedServices.update((current) => {
       const next = current.includes(service)
         ? current.filter((item) => item !== service)
         : [...current, service];
       return this.availableServices.filter((item) => next.includes(item));
+    });
+    this.analytics.track('filter', {
+      type: 'service',
+      value: SERVICE_SLUGS[service],
+      active,
+      results: this.filteredBeaches().length,
     });
   }
 
@@ -408,17 +433,34 @@ export class BeachesPage {
   }
 
   setAccessibility(level: AccessibilityFilter): void {
-    if (this.availableAccessibility.includes(level)) {
+    if (this.availableAccessibility.includes(level) && level !== this.accessibility()) {
       this.accessibility.set(level);
+      this.analytics.track('filter', {
+        type: 'accessibility',
+        value: level,
+        results: this.filteredBeaches().length,
+      });
     }
   }
 
   toggleFavoritesFilter(): void {
-    this.showFavoritesOnly.update((value) => !value);
+    const active = !this.showFavoritesOnly();
+    this.showFavoritesOnly.set(active);
+    this.analytics.track('filter', {
+      type: 'favorites',
+      active,
+      results: this.filteredBeaches().length,
+    });
   }
 
   showAllBeaches(): void {
+    if (!this.showFavoritesOnly()) return;
     this.showFavoritesOnly.set(false);
+    this.analytics.track('filter', {
+      type: 'favorites',
+      active: false,
+      results: this.filteredBeaches().length,
+    });
   }
 
   isFavorite(id: string): boolean {
@@ -427,6 +469,10 @@ export class BeachesPage {
 
   toggleFavorite(beach: Beach): void {
     this.favorites.toggle(beach.id);
+    this.analytics.track('favorite', {
+      beach: beach.id,
+      active: this.favorites.isFavorite(beach.id),
+    });
   }
 
   isCompared(id: string): boolean {
@@ -600,6 +646,7 @@ export class BeachesPage {
   }
 
   clearFilters(): void {
+    const hadFilters = this.hasFilters();
     clearTimeout(this.searchDebounceTimer);
     this.queryInput.set('');
     this.query.set('');
@@ -609,6 +656,13 @@ export class BeachesPage {
     this.showFavoritesOnly.set(false);
     this.selectedServices.set([]);
     this.accessibility.set('todas');
+
+    if (hadFilters) {
+      this.analytics.track('filter', {
+        type: 'clear',
+        results: this.filteredBeaches().length,
+      });
+    }
   }
 
   qualityColor(quality: WaterQuality): string {
@@ -673,6 +727,19 @@ export class BeachesPage {
       : 'text-slate-500 hover:bg-slate-100 hover:text-slate-600';
 
     return `${this.actionIconBase} ${state}`;
+  }
+
+  private applySearch(value: string): void {
+    const trimmed = value.trim();
+    const previous = this.query().trim();
+    this.query.set(value);
+
+    if (trimmed.length > 0 && trimmed !== previous) {
+      this.analytics.track('search', {
+        queryLength: trimmed.length,
+        results: this.filteredBeaches().length,
+      });
+    }
   }
 
   private readIsland(): IslandFilter {

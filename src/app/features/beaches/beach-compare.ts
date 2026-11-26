@@ -3,6 +3,7 @@ import {
   Component,
   DestroyRef,
   ElementRef,
+  OnInit,
   afterNextRender,
   computed,
   inject,
@@ -19,6 +20,7 @@ import {
   ServiceId,
   WaterQuality,
 } from '../../core/models/beach';
+import { AnalyticsService } from '../../core/services/analytics';
 import {
   ACCESSIBILITY_LABELS,
   getAvailableServices,
@@ -459,7 +461,7 @@ const FOCUSABLE_SELECTOR =
     </div>
   `,
 })
-export class BeachCompare {
+export class BeachCompare implements OnInit {
   readonly beaches = input.required<Beach[]>();
   readonly shareUrl = input('');
   readonly userLocation = input<Coordinates | null>(null);
@@ -469,6 +471,7 @@ export class BeachCompare {
   readonly selected = output<Beach>();
   readonly closed = output<void>();
 
+  private readonly analytics = inject(AnalyticsService);
   private readonly destroyRef = inject(DestroyRef);
   private readonly dialogPanel = viewChild<ElementRef<HTMLElement>>('dialogPanel');
   private readonly closeButton = viewChild<ElementRef<HTMLButtonElement>>('closeButton');
@@ -493,6 +496,12 @@ export class BeachCompare {
     });
 
     this.destroyRef.onDestroy(() => clearTimeout(this.shareTimer));
+  }
+
+  ngOnInit(): void {
+    this.analytics.track('compare_open', {
+      count: this.beaches().length,
+    });
   }
 
   onBackdropClick(event: MouseEvent): void {
@@ -550,6 +559,11 @@ export class BeachCompare {
     if (typeof navigator !== 'undefined' && typeof navigator.share === 'function') {
       try {
         await navigator.share(data);
+        this.analytics.track('share', {
+          target: 'compare',
+          count: this.beaches().length,
+          method: 'web-share',
+        });
         return;
       } catch (error) {
         if ((error as { name?: string } | null)?.name === 'AbortError') return;
@@ -563,6 +577,11 @@ export class BeachCompare {
 
       await navigator.clipboard.writeText(url);
       this.setShareState('copied');
+      this.analytics.track('share', {
+        target: 'compare',
+        count: this.beaches().length,
+        method: 'clipboard',
+      });
     } catch {
       this.setShareState('error');
     }

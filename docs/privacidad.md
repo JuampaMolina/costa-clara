@@ -1,6 +1,6 @@
 # Privacidad y analítica
 
-> **Estado:** servicio de analítica implementado (CC-43); sin proveedor conectado por defecto.
+> **Estado:** servicio de analítica integrado en la interfaz (CC-43); sin proveedor conectado por defecto.
 
 Costa Clara mide solo lo imprescindible para saber si la app es útil, sin invadir la privacidad de quien la usa. La analítica es **sin cookies, sin datos personales y sin red por defecto**: por sí misma no llama a ningún servidor.
 
@@ -8,21 +8,21 @@ Costa Clara mide solo lo imprescindible para saber si la app es útil, sin invad
 
 El servicio [`analytics.ts`](../src/app/core/services/analytics.ts) registra seis eventos agregados:
 
-| Evento         | Cuándo se dispara              | Propiedades típicas                   |
-| -------------- | ------------------------------ | ------------------------------------- |
-| `search`       | Al buscar playas               | `query`, `island`                     |
-| `filter`       | Al aplicar filtros             | `service`, `accessibility`, `quality` |
-| `beach_open`   | Al abrir la ficha de una playa | `beach` (id), `island`                |
-| `compare_open` | Al abrir el comparador         | número de playas                      |
-| `share`        | Al compartir una playa         | `beach` (id)                          |
-| `favorite`     | Al marcar o desmarcar favorita | `beach` (id)                          |
+| Evento         | Cuándo se dispara                   | Propiedades típicas                         |
+| -------------- | ----------------------------------- | ------------------------------------------- |
+| `search`       | Al buscar playas (tras el debounce) | `queryLength`, `results` (sin texto crudo)  |
+| `filter`       | Al cambiar filtros                  | `type`, `value` o `active`, `results`       |
+| `beach_open`   | Al abrir la ficha de una playa      | `beach` (id), `island`                      |
+| `compare_open` | Al abrir el comparador              | `count` (número de playas)                  |
+| `share`        | Al compartir ficha o comparativa    | `beach` (id) o `target` + `count`, `method` |
+| `favorite`     | Al marcar o desmarcar favorita      | `beach` (id), `active`                      |
 
 Las propiedades son siempre escalares (texto, número o booleano) y el servicio descarta en tiempo de ejecución cualquier objeto anidado o valor no primitivo.
 
 ## Qué no se recoge
 
 - **Nada de cookies:** no se leen ni se escriben cookies propias ni de terceros.
-- **Nada de datos personales:** no se recoge IP, correo, nombre, ubicación exacta ni identificadores de usuario. Las coordenadas de la playa nunca se envían como parte de la analítica (solo el `id` estable de la playa).
+- **Nada de datos personales ni búsquedas crudas:** no se recoge IP, correo, nombre, ubicación exacta, identificadores de usuario ni el texto literal introducido en el buscador (solo su longitud y el número de resultados). Las coordenadas de la playa nunca se envían como parte de la analítica (solo el `id` estable de la playa).
 - **Nada de red por defecto:** `track` emite un `CustomEvent` (`costa-clara:analytics`) dentro de la página y no contacta con ningún servidor.
 
 ## Cómo funciona
@@ -37,7 +37,7 @@ Si un proveedor falla o lanza una excepción, se captura y la app sigue funciona
 
 ## Cómo conectar un proveedor (Plausible)
 
-Sin tocar el servicio, basta con cargar el script de [Plausible](https://plausible.io/) en `index.html` (por ejemplo, el snippet `plausible.js` con tu dominio). En cuanto `window.plausible` esté definido, los eventos de Costa Clara se reenvían automáticamente.
+Sin tocar el servicio, basta con cargar el script de [Plausible](https://plausible.io/) en `src/index.html` (`script.js` con tu dominio). En cuanto `window.plausible` esté definido, los eventos de Costa Clara se reenvían automáticamente.
 
 Ejemplo del snippet en `src/index.html`:
 
