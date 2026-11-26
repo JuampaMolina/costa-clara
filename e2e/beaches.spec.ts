@@ -397,3 +397,153 @@ test('incluye metadatos Open Graph / Twitter y sirve /og-image.png (CC-42)', asy
   expect(response.status()).toBe(200);
   expect(response.headers()['content-type']).toContain('image/png');
 });
+
+test('muestra el estado del mar si responde y lo oculta sin romper la ficha si falla (CC-27)', async ({
+  page,
+}) => {
+  await page.route('https://marine-api.open-meteo.com/v1/marine**', (route) =>
+    route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({
+        current: {
+          time: '2026-11-26T14:30',
+          wave_height: 0.75,
+          wave_period: 5.2,
+          sea_surface_temperature: null,
+        },
+      }),
+    }),
+  );
+
+  await page.goto('/?playa=es-trenc');
+
+  const marine = page.getByTestId('marine-weather');
+  await expect(marine).toBeVisible();
+  await expect(marine.getByRole('heading', { name: 'Estado del mar' })).toBeVisible();
+  await expect(marine.getByRole('link', { name: 'Open-Meteo Marine' })).toHaveAttribute(
+    'href',
+    'https://open-meteo.com/',
+  );
+  await expect(marine).toContainText('CC BY 4.0');
+  await expect(marine).toContainText('—');
+
+  await page.unroute('https://marine-api.open-meteo.com/v1/marine**');
+  await page.route('https://marine-api.open-meteo.com/v1/marine**', (route) =>
+    route.fulfill({ status: 503, body: '' }),
+  );
+
+  await page.getByRole('button', { name: /^Cala Macarella/ }).click();
+
+  await expect(page.getByRole('heading', { level: 2, name: 'Cala Macarella' })).toBeVisible();
+  await expect(page.getByTestId('marine-weather-loading')).toHaveCount(0);
+  await expect(page.getByTestId('marine-weather')).toHaveCount(0);
+});
+
+test('emite eventos de analítica sin PII ni texto de búsqueda crudo (CC-43)', async ({
+  page,
+  context,
+}) => {
+  await context.grantPermissions(['clipboard-read', 'clipboard-write']);
+  await page.route('https://marine-api.open-meteo.com/v1/marine**', (route) =>
+    route.fulfill({ status: 503, body: '' }),
+  );
+  await page.addInitScript(() => {
+    try {
+      Object.defineProperty(navigator, 'share', { value: undefined, configurable: true });
+    } catch {
+      // Fallback al portapapeles.
+    }
+
+    const events: Array<{ event: string; props: Record<string, string | number | boolean> }> = [];
+    (window as unknown as { __analyticsEvents: typeof events }).__analyticsEvents = events;
+    window.addEventListener('costa-clara:analytics', (event) => {
+      const custom = event as CustomEvent<{
+        event: string;
+        props: Record<string, string | number | boolean>;
+      }>;
+      events.push(custom.detail);
+    });
+  });
+
+  await page.goto('/');
+
+  const search = page.getByLabel('Buscar playa');
+  await search.fill('trenc');
+  await expect(page.getByTestId('result-count')).toHaveText('1 playa');
+
+  await page.getByRole('button', { name: 'Limpiar filtros' }).first().click();
+  await page.getByTestId('island-menorca').click();
+  await page.getByLabel('Calidad del agua').selectOption('excelente');
+  await page.getByLabel('Bandera azul').check();
+  await page.getByTestId('advanced-filters-toggle').click();
+  await page.getByTestId('service-socorrista').click();
+  await page.getByTestId('accessibility-adaptada').click();
+  await page.getByRole('button', { name: /Favoritas \(0\)/ }).click();
+  await page.getByRole('button', { name: 'Ver todas las playas' }).click();
+  await page.getByRole('button', { name: 'Limpiar filtros' }).first().click();
+
+  await page.getByTestId('favorite-es-trenc').click();
+  await page.getByRole('button', { name: /^Es Trenc/ }).click();
+  await page.getByTestId('detail-share').click();
+  await expect(page.getByText('Enlace copiado')).toBeVisible();
+  await page.getByRole('button', { name: 'Cerrar ficha' }).click();
+
+  await page.getByTestId('compare-es-trenc').click();
+  await page.getByTestId('compare-cala-macarella').click();
+  await page.getByTestId('open-compare').click();
+  await expect(page.getByRole('dialog', { name: 'Comparativa de playas' })).toBeVisible();
+
+  const events = await page.evaluate(
+    () =>
+      (
+        window as unknown as {
+          __analyticsEvents: Array<{
+            event: string;
+            props: Record<string, string | number | boolean>;
+          }>;
+        }
+      ).__analyticsEvents,
+  );
+
+  const searchEvents = events.filter((item) => item.event === 'search');
+  expect(searchEvents).toHaveLength(1);
+  expect(searchEvents[0].props).toEqual({ queryLength: 5, results: 1 });
+
+  const filterTypes = events
+    .filter((item) => item.event === 'filter')
+    .map((item) => item.props['type']);
+  expect(filterTypes).toEqual(
+    expect.arrayContaining([
+      'island',
+      'quality',
+      'blue_flag',
+      'service',
+      'accessibility',
+      'favorites',
+    ]),
+  );
+
+  expect(events).toEqual(
+    expect.arrayContaining([
+      expect.objectContaining({
+        event: 'beach_open',
+        props: { beach: 'es-trenc', island: 'mallorca' },
+      }),
+      expect.objectContaining({
+        event: 'favorite',
+        props: { beach: 'es-trenc', active: true },
+      }),
+      expect.objectContaining({
+        event: 'share',
+        props: { beach: 'es-trenc', method: 'clipboard' },
+      }),
+      expect.objectContaining({
+        event: 'compare_open',
+        props: { count: 2 },
+      }),
+    ]),
+  );
+
+  expect(JSON.stringify(events)).not.toContain('"trenc"');
+});
