@@ -58,6 +58,7 @@ export class BeachMap implements AfterViewInit, OnDestroy {
   private readonly mapReady = signal(false);
 
   private map?: Map;
+  private vectorSource?: VectorSource;
   private clusterSource?: Cluster;
   private resizeObserver?: ResizeObserver;
 
@@ -93,10 +94,10 @@ export class BeachMap implements AfterViewInit, OnDestroy {
   constructor() {
     effect(() => {
       const beaches = this.beaches();
-      if (!this.mapReady() || !this.clusterSource) return;
+      if (!this.mapReady() || !this.vectorSource) return;
 
-      this.clusterSource.clear();
-      this.clusterSource.addFeatures(
+      this.vectorSource.clear();
+      this.vectorSource.addFeatures(
         beaches.map((beach) => {
           const feature = new Feature({
             geometry: new Point(fromLonLat([beach.lon, beach.lat])),
@@ -106,7 +107,6 @@ export class BeachMap implements AfterViewInit, OnDestroy {
           return feature;
         })
       );
-      console.log('[map] features', this.clusterSource.getFeatures().length);
     });
 
     effect(() => {
@@ -123,8 +123,8 @@ export class BeachMap implements AfterViewInit, OnDestroy {
   ngAfterViewInit(): void {
     const target = this.mapEl().nativeElement;
 
-    const vectorSource = new VectorSource();
-    this.clusterSource = new Cluster({ distance: 42, source: vectorSource });
+    this.vectorSource = new VectorSource();
+    this.clusterSource = new Cluster({ distance: 42, source: this.vectorSource });
 
     this.map = new Map({
       target,

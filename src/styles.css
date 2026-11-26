@@ -46,11 +46,15 @@ body {
   background: #f0f9ff;
 }
 
-.ol-attribution {
-  top: 3.35rem;
+.ol-attribution,
+.ol-attribution.ol-uncollapsible {
+  top: auto;
   right: 0.75rem;
-  bottom: auto;
+  bottom: 0.75rem;
   left: auto;
+  height: auto;
+  border-radius: 0.5rem;
+  background: rgb(255 255 255 / 0.85);
 }
 
 .ol-attribution ul {
