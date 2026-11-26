@@ -39,19 +39,17 @@ Con **377.88 kB raw iniciales** tras el mapa diferido y los diccionarios i18n, e
 
 ## Validación en producción (2026-11-26)
 
-> La tabla siguiente se midió con el build de 687 kB, antes de diferir el mapa (CC-52). Tras el despliegue del mapa diferido se revalida en producción.
-
-Medido con **Lighthouse 13.6** contra `https://costa-clara-k23.pages.dev` (móvil, headless, Chromium de Playwright):
+Medido con **Lighthouse 13.6** contra `https://costa-clara-k23.pages.dev` (móvil, headless, Chromium de Playwright), con el build final (i18n + mapa diferido):
 
 | Métrica        | Valor     |
 | -------------- | --------- |
-| Performance    | **98**    |
+| Performance    | **100**   |
 | Accessibility  | **100**   |
 | Best practices | **100**   |
 | SEO            | **100**   |
-| LCP            | **1,8 s** |
-| TBT            | **40 ms** |
-| FCP            | **1,8 s** |
+| LCP            | **1,3 s** |
+| TBT            | **30 ms** |
+| FCP            | **1,3 s** |
 | CLS            | **0**     |
 
 **PWA / offline:** `navigator.serviceWorker.ready` = `ready`, controlador activo tras recarga y recarga con red desactivada mostrando el shell y las **19 playas**, sin errores de consola. Lighthouse 13 ya no incluye la categoría PWA; la instalabilidad se valida con manifest 192/512 `maskable`, service worker registrado y HTTPS de Cloudflare Pages.

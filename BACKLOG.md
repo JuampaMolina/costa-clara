@@ -310,7 +310,7 @@ Reglas del proyecto que aplican a todos los tickets: UI en español, no inventar
 - Una versión nueva muestra aviso de actualización sin romper la sesión.
 
 ### CC-41 · Rendimiento y bundle · P2 · M
-**Estado:** ✅ Hecho (2026-11-26) · 695→378 kB inicial + mapa diferido de 330 kB; Lighthouse 98.
+**Estado:** ✅ Hecho (2026-11-26) · 695→378 kB inicial + mapa diferido de 330 kB; Lighthouse 100, LCP 1,3 s, TBT 30 ms.
 **Qué:** medir y reducir el peso inicial; valorar carga diferida de OpenLayers/mapa, tree-shaking de estilos y presupuesto más estricto.
 **Hecho cuando:**
 - Hay medición antes/después documentada (LCP, TBT, kB iniciales).
