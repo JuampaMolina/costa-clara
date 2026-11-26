@@ -673,3 +673,56 @@ test('expone JSON-LD WebSite en home y canonical, og:url y JSON-LD dinámicos en
   );
   await expect(page.locator('script#beach-jsonld')).toHaveCount(0);
 });
+
+test('expone el manifest PWA con iconos válidos y enlaces en el documento (CC-40)', async ({
+  page,
+}) => {
+  await page.goto('/');
+
+  await expect(page.locator('link[rel="manifest"]')).toHaveAttribute(
+    'href',
+    'manifest.webmanifest',
+  );
+  await expect(page.locator('link[rel="apple-touch-icon"]')).toHaveAttribute(
+    'href',
+    'icons/icon-192.png',
+  );
+  await expect(page.locator('meta[name="theme-color"]')).toHaveAttribute('content', '#0284c7');
+
+  const manifestResponse = await page.request.get('/manifest.webmanifest');
+  expect(manifestResponse.status()).toBe(200);
+
+  const manifest = await manifestResponse.json();
+  expect(manifest).toMatchObject({
+    name: 'Costa Clara · Playas de Baleares',
+    short_name: 'Costa Clara',
+    lang: 'es',
+    start_url: '/',
+    display: 'standalone',
+    theme_color: '#0284c7',
+    background_color: '#f8fafc',
+  });
+
+  expect(manifest.icons).toEqual(
+    expect.arrayContaining([
+      expect.objectContaining({
+        src: '/icons/icon-192.png',
+        sizes: '192x192',
+        type: 'image/png',
+        purpose: 'any maskable',
+      }),
+      expect.objectContaining({
+        src: '/icons/icon-512.png',
+        sizes: '512x512',
+        type: 'image/png',
+        purpose: 'any maskable',
+      }),
+    ]),
+  );
+
+  for (const icon of manifest.icons as Array<{ src: string }>) {
+    const iconResponse = await page.request.get(icon.src);
+    expect(iconResponse.status()).toBe(200);
+    expect(iconResponse.headers()['content-type']).toContain('image/png');
+  }
+});
