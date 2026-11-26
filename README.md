@@ -57,6 +57,7 @@ Instrucciones y rotación del token en [docs/despliegue.md](./docs/despliegue.md
 - [ADRs](./docs/adr/)
 - [Fuentes de datos](./docs/datos.md)
 - [Privacidad](./docs/privacidad.md)
+- [Rendimiento](./docs/rendimiento.md)
 - [Despliegue](./docs/despliegue.md)
 
 ## Qué hay hecho
@@ -75,7 +76,8 @@ Instrucciones y rotación del token en [docs/despliegue.md](./docs/despliegue.md
 - Accesibilidad WCAG AA con axe, foco visible y `prefers-reduced-motion`.
 - Estado del mar en la ficha (Open-Meteo Marine) y analítica sin cookies/PII.
 - Reportar datos incorrectos y SEO técnico (sitemap, JSON-LD, canonical).
-- Tests: 59 unitarios y 56 e2e (desktop y móvil).
+- PWA instalable con offline y carga diferida de ficha/comparador.
+- Tests: 59 unitarios y 58 e2e (desktop y móvil).
 - Importador CSV con validación, fixture y fallback al dataset demo.
 - CI con tests, build y e2e; deploy automático en Cloudflare Pages.
 - Dataset semilla de 19 playas reales (calidad y servicios de ejemplo).

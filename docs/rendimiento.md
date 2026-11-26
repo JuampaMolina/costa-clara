@@ -36,6 +36,21 @@ En [`angular.json`](../angular.json) el presupuesto de producción exige:
 
 Con 687.08 kB raw iniciales tras incorporar `@angular/service-worker` (CC-40), el build de producción termina sin avisos de presupuesto y conserva 12.92 kB de margen antes del umbral de warning.
 
-## Validación de LCP y TBT en producción
+## Validación en producción (2026-11-26)
 
-> **Nota:** las métricas de laboratorio y campo (**LCP**, **TBT**, **CLS** e instalabilidad PWA) no se miden sobre `ng serve` en desarrollo porque el servidor local no aplica compresión Brotli/HTTP2 de Cloudflare Pages ni registra el Service Worker (`enabled: !isDevMode()`). **LCP y TBT se validarán con Lighthouse contra el despliegue en producción** (`https://costa-clara-k23.pages.dev`) una vez mergeada la rama.
+Medido con **Lighthouse 13.6** contra `https://costa-clara-k23.pages.dev` (móvil, headless, Chromium de Playwright):
+
+| Métrica | Valor |
+| --- | --- |
+| Performance | **98** |
+| Accessibility | **100** |
+| Best practices | **100** |
+| SEO | **100** |
+| LCP | **1,8 s** |
+| TBT | **40 ms** |
+| FCP | **1,8 s** |
+| CLS | **0** |
+
+**PWA / offline:** `navigator.serviceWorker.ready` = `ready`, controlador activo tras recarga y recarga con red desactivada mostrando el shell y las **19 playas**, sin errores de consola. Lighthouse 13 ya no incluye la categoría PWA; la instalabilidad se valida con manifest 192/512 `maskable`, service worker registrado y HTTPS de Cloudflare Pages.
+
+> Valores de una ejecución de laboratorio; no sustituyen datos de campo (CrUX).

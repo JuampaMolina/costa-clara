@@ -4,7 +4,7 @@ Listado de tickets para evolucionar la app desde la v0.1 actual hasta una v1.0 p
 
 > **Contexto:** v0.1 con 19 playas de demostración, mapa OpenLayers con clustering, filtros sincronizados con la URL y ficha lateral. Sin backend, sin deploy y sin e2e todavía.
 
-**Estado:** 32/36 cerrados · actualizado 2026-11-26.
+**Estado:** 34/36 cerrados · actualizado 2026-11-26.
 
 ## Hecho
 
@@ -36,6 +36,8 @@ Listado de tickets para evolucionar la app desde la v0.1 actual hasta una v1.0 p
 - ✅ **CC-32** Leyenda colapsable y mapa a pantalla completa.
 - ✅ **CC-33** Sincronía lista↔mapa con marcador resaltado.
 - ✅ **CC-34** Alternativa textual, live regions y foco en el mapa.
+- ✅ **CC-40** PWA instalable, service worker y offline validado.
+- ✅ **CC-41** Carga diferida y Lighthouse 98/100/100/100.
 - ✅ **CC-42** Imagen OG 1200×630 y metas Open Graph/Twitter.
 - ✅ **CC-50** Auditoría axe WCAG AA, foco, contraste y reduced motion.
 - ✅ **CC-53** robots, sitemap, JSON-LD, canonical y og:url.
@@ -298,6 +300,7 @@ Reglas del proyecto que aplican a todos los tickets: UI en español, no inventar
 ## E4 · PWA y rendimiento
 
 ### CC-40 · PWA instalable y offline · P1 · M
+**Estado:** ✅ Hecho (2026-11-26) · SW, manifest e iconos; offline validado en producción.
 **Qué:** manifest, iconos, service worker (Angular `ngsw` o Workbox) con shell offline y última respuesta de datos cacheada.
 **Hecho cuando:**
 - Lighthouse marca instalable.
@@ -305,6 +308,7 @@ Reglas del proyecto que aplican a todos los tickets: UI en español, no inventar
 - Una versión nueva muestra aviso de actualización sin romper la sesión.
 
 ### CC-41 · Rendimiento y bundle · P2 · M
+**Estado:** ✅ Hecho (2026-11-26) · 695→687 kB; LCP 1,8 s, TBT 40 ms, Lighthouse 98.
 **Qué:** medir y reducir el peso inicial; valorar carga diferida de OpenLayers/mapa, tree-shaking de estilos y presupuesto más estricto.
 **Hecho cuando:**
 - Hay medición antes/después documentada (LCP, TBT, kB iniciales).
