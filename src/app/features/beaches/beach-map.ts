@@ -25,12 +25,20 @@ import XYZ from 'ol/source/XYZ';
 import Cluster from 'ol/source/Cluster';
 import VectorSource from 'ol/source/Vector';
 import { Circle as CircleStyle, Fill, Stroke, Style, Text } from 'ol/style';
+import { Coordinate } from 'ol/coordinate';
 import { Beach, QUALITY_COLORS } from '../../core/models/beach';
 import { Coordinates } from '../../core/utils/geo';
 
 type BasemapId = 'osm' | 'topo' | 'satellite';
 
 const BASEMAP_STORAGE_KEY = 'costa-clara:basemap:v1';
+const ANIMATION_MS = 450;
+
+function prefersReducedMotion(): boolean {
+  return (
+    typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  );
+}
 
 @Component({
   selector: 'app-beach-map',
@@ -170,11 +178,7 @@ export class BeachMap implements AfterViewInit, OnDestroy {
 
       if (!this.mapReady() || !beach) return;
 
-      this.map?.getView().animate({
-        center: fromLonLat([beach.lon, beach.lat]),
-        zoom: 13.5,
-        duration: 450,
-      });
+      this.moveView(fromLonLat([beach.lon, beach.lat]), 13.5);
     });
 
     effect(() => {
@@ -186,7 +190,7 @@ export class BeachMap implements AfterViewInit, OnDestroy {
 
       const point = fromLonLat([location.lon, location.lat]);
       this.userSource.addFeature(new Feature({ geometry: new Point(point) }));
-      this.map?.getView().animate({ center: point, zoom: 12, duration: 450 });
+      this.moveView(point, 12);
     });
   }
 
@@ -234,9 +238,12 @@ export class BeachMap implements AfterViewInit, OnDestroy {
         this.vectorLayer,
         userLayer,
       ],
-      controls: defaultControls({ zoom: true, rotate: false }).extend([
-        new ScaleLine({ units: 'metric' }),
-      ]),
+      controls: defaultControls({
+        zoom: true,
+        rotate: false,
+        zoomOptions: { zoomInTipLabel: 'Acercar', zoomOutTipLabel: 'Alejar' },
+        attributionOptions: { tipLabel: 'Atribuciones' },
+      }).extend([new ScaleLine({ units: 'metric' })]),
       view: new View({
         center: fromLonLat([2.9, 39.55]),
         zoom: 8.4,
@@ -262,7 +269,7 @@ export class BeachMap implements AfterViewInit, OnDestroy {
             }
             this.map?.getView().fit(extent, {
               padding: [90, 90, 90, 90],
-              duration: 450,
+              duration: prefersReducedMotion() ? undefined : ANIMATION_MS,
               maxZoom: 14,
             });
           }
@@ -309,5 +316,18 @@ export class BeachMap implements AfterViewInit, OnDestroy {
 
     const value = localStorage.getItem(BASEMAP_STORAGE_KEY);
     return value === 'topo' || value === 'satellite' ? value : 'osm';
+  }
+
+  private moveView(center: Coordinate, zoom: number): void {
+    const view = this.map?.getView();
+    if (!view) return;
+
+    if (prefersReducedMotion()) {
+      view.setCenter(center);
+      view.setZoom(zoom);
+      return;
+    }
+
+    view.animate({ center, zoom, duration: ANIMATION_MS });
   }
 }
