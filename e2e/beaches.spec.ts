@@ -159,3 +159,47 @@ test('comparte la ficha copiando un enlace con los filtros', async ({ page, cont
   expect(copied).toContain('isla=mallorca');
   expect(copied).toContain('playa=es-trenc');
 });
+
+test('cambia la capa base y la recuerda al recargar', async ({ page }) => {
+  await page.goto('/');
+
+  const basemap = page.getByLabel('Capa del mapa');
+  await basemap.selectOption('satellite');
+  await expect(basemap).toHaveValue('satellite');
+
+  await page.reload();
+
+  await expect(page.getByLabel('Capa del mapa')).toHaveValue('satellite');
+});
+
+test('colapsa y expande la leyenda de calidad', async ({ page }) => {
+  await page.goto('/');
+
+  const toggle = page.getByRole('button', { name: 'Calidad' });
+  const initial = await toggle.getAttribute('aria-expanded');
+
+  await toggle.click();
+
+  await expect(toggle).toHaveAttribute('aria-expanded', initial === 'true' ? 'false' : 'true');
+
+  if (initial === 'true') {
+    await expect(page.getByTestId('quality-legend')).toHaveCount(0);
+  } else {
+    await expect(page.getByTestId('quality-legend')).toBeVisible();
+  }
+
+  await toggle.click();
+
+  await expect(toggle).toHaveAttribute('aria-expanded', initial ?? 'true');
+});
+
+test('ordena por distancia con la geolocalización', async ({ page, context }) => {
+  await context.grantPermissions(['geolocation']);
+  await context.setGeolocation({ latitude: 39.57, longitude: 2.65 });
+
+  await page.goto('/');
+  await page.getByRole('button', { name: 'Cerca de mí' }).click();
+
+  await expect(page.getByText('Ordenado por distancia a tu ubicación.')).toBeVisible();
+  await expect(page.getByTestId('distance-es-trenc')).toHaveText(/a .*(km|m)/);
+});

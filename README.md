@@ -51,14 +51,14 @@ Instrucciones y rotación del token en [docs/despliegue.md](./docs/despliegue.md
 
 ## Qué hay hecho
 
-- Mapa de Baleares con clustering de playas.
+- Mapa OpenLayers con clustering, capas base (mapa, relieve y satélite), geolocalización, pantalla completa y leyenda colapsable.
 - Filtros por texto, isla, calidad y bandera azul.
 - Estado de filtros y playa seleccionada en la URL (compartible).
 - Ficha de playa con calidad, servicios, última muestra, coordenadas y enlace a cómo llegar.
 - Favoritos guardados en `localStorage` y enlace para compartir la ficha.
 - Leyenda de calidad y diseño responsive.
 - Página 404 propia, título y metadatos dinámicos por playa.
-- Tests: 12 unitarios y 22 e2e (desktop y móvil).
+- Tests: 19 unitarios y 28 e2e (desktop y móvil).
 - CI con tests, build y e2e; deploy automático en Cloudflare Pages.
 - Dataset semilla de 19 playas reales (calidad y servicios de ejemplo).
 

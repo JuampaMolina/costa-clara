@@ -43,14 +43,14 @@ npm run deploy         # build + deploy manual (requiere token de Cloudflare)
 
 ## Qué funciona (v0.2)
 
-- Mapa de Baleares con OpenLayers, clustering y selección de playa.
+- Mapa de Baleares con OpenLayers, clustering, capas base (mapa/relieve/satélite), geolocalización, pantalla completa y selección de playa.
 - 19 playas reales en `src/app/core/data/beaches.seed.ts` (calidad y servicios de ejemplo).
 - Filtros por texto, isla, calidad y bandera azul, sincronizados con la URL (`?q=&isla=&calidad=&bandera=&playa=`).
 - Favoritos en `localStorage`, con filtro “Favoritas”, contador y sincronización entre pestañas.
 - Ficha con calidad, servicios, última muestra, coordenadas, enlace a Google Maps y botón para compartir (Web Share API + portapapeles).
 - Leyenda, diseño responsive y estado vacío.
 - Página 404 propia y título/descripción/Open Graph dinámicos al abrir una playa.
-- Tests: 12 unitarios y 22 e2e (11 flujos × desktop/móvil).
+- Tests: 19 unitarios y 28 e2e (14 flujos × desktop/móvil).
 - CI (`.github/workflows/ci.yml`) y deploy automático en `main` (`.github/workflows/deploy.yml`).
 
 ## Bugs conocidos

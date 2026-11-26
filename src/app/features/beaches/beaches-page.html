@@ -113,21 +113,55 @@
           </label>
         </div>
 
-        <div class="mt-3 flex items-center justify-between gap-2 text-xs">
+        <div class="mt-3 flex flex-wrap items-center justify-between gap-2 text-xs">
           <span class="text-slate-500" aria-live="polite" data-testid="result-count">
             <strong class="font-semibold text-slate-800">{{ filteredBeaches().length }}</strong>
             {{ filteredBeaches().length === 1 ? 'playa' : 'playas' }}
           </span>
-          @if (hasFilters()) {
+          <div class="flex items-center gap-3">
             <button
               type="button"
-              class="font-semibold text-sea-700 transition hover:text-sea-900"
-              (click)="clearFilters()"
+              class="inline-flex items-center gap-1 font-semibold text-sea-700 transition hover:text-sea-900"
+              (click)="requestLocation()"
             >
-              Limpiar filtros
+              <svg
+                viewBox="0 0 24 24"
+                class="h-3 w-3"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                aria-hidden="true"
+              >
+                <path
+                  d="M12 21s7-6.1 7-11a7 7 0 1 0-14 0c0 4.9 7 11 7 11z"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+                <circle cx="12" cy="10" r="2.5" />
+              </svg>
+              {{ locationStatus() === 'loading' ? 'Buscando…' : 'Cerca de mí' }}
             </button>
-          }
+            @if (hasFilters()) {
+              <button
+                type="button"
+                class="font-semibold text-sea-700 transition hover:text-sea-900"
+                (click)="clearFilters()"
+              >
+                Limpiar filtros
+              </button>
+            }
+          </div>
         </div>
+
+        @if (locationStatus() === 'error') {
+          <p class="mt-2 text-[11px] text-rose-600" role="status">
+            No hemos podido obtener tu ubicación.
+          </p>
+        } @else if (locationStatus() === 'ready') {
+          <p class="mt-2 text-[11px] text-slate-500" role="status">
+            Ordenado por distancia a tu ubicación.
+          </p>
+        }
       </section>
 
       <section
@@ -163,7 +197,10 @@
 
         <div class="max-h-[46dvh] overflow-y-auto p-2 lg:max-h-none lg:flex-1">
           @for (beach of filteredBeaches(); track beach.id) {
-            <div [class]="beachItemClass(selectedId() === beach.id)">
+            <div
+              [attr.id]="'beach-item-' + beach.id"
+              [class]="beachItemClass(selectedId() === beach.id)"
+            >
               <button
                 type="button"
                 class="flex min-w-0 flex-1 items-start gap-3 py-0.5 text-left"
@@ -179,6 +216,14 @@
                   <span class="block truncate text-xs text-slate-500">
                     {{ beach.municipality }} · {{ islandLabel(beach.island) }}
                   </span>
+                  @if (distanceLabel(beach); as distance) {
+                    <span
+                      class="block text-[10px] font-semibold text-sea-700"
+                      [attr.data-testid]="'distance-' + beach.id"
+                    >
+                      a {{ distance }}
+                    </span>
+                  }
                 </span>
                 @if (beach.blueFlag) {
                   <span
@@ -249,30 +294,95 @@
     </aside>
 
     <section
+      #mapSection
       class="relative min-h-[62dvh] overflow-hidden rounded-2xl border border-slate-200/80 bg-sky-100 shadow-sm lg:min-h-0"
     >
       <app-beach-map
         [beaches]="filteredBeaches()"
         [selected]="selectedBeach()"
-        (beachSelected)="selectBeach($event)"
+        [userLocation]="userLocation()"
+        (beachSelected)="selectBeachFromMap($event)"
       />
 
-      <div
-        class="pointer-events-none absolute left-3 top-3 z-10 rounded-xl border border-white/70 bg-white/90 px-3 py-2 shadow-sm backdrop-blur"
+      <button
+        type="button"
+        class="absolute right-3 top-3 z-20 rounded-lg border border-white/70 bg-white/90 p-2 text-slate-600 shadow-sm backdrop-blur transition hover:bg-white hover:text-slate-900"
+        [attr.aria-label]="isFullscreen() ? 'Salir de pantalla completa' : 'Pantalla completa'"
+        [attr.aria-pressed]="isFullscreen()"
+        (click)="toggleFullscreen()"
       >
-        <p class="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-400">Calidad</p>
-        <div class="mt-1.5 flex flex-wrap gap-x-3 gap-y-1">
-          @for (item of qualityLegend; track item.id) {
-            <span class="flex items-center gap-1.5 text-[11px] font-medium text-slate-600">
-              <span
-                class="h-2 w-2 rounded-full"
-                [style.background-color]="item.color"
-                aria-hidden="true"
-              ></span>
-              {{ item.label }}
-            </span>
-          }
-        </div>
+        @if (isFullscreen()) {
+          <svg
+            viewBox="0 0 24 24"
+            class="h-4 w-4"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            aria-hidden="true"
+          >
+            <path
+              d="M8 3v3a2 2 0 0 1-2 2H3M16 3v3a2 2 0 0 0 2 2h3M8 21v-3a2 2 0 0 0-2-2H3M16 21v-3a2 2 0 0 1 2-2h3"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+        } @else {
+          <svg
+            viewBox="0 0 24 24"
+            class="h-4 w-4"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            aria-hidden="true"
+          >
+            <path
+              d="M8 3H5a2 2 0 0 0-2 2v3M16 3h3a2 2 0 0 1 2 2v3M8 21H5a2 2 0 0 1-2-2v-3M16 21h3a2 2 0 0 0 2-2v-3"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+        }
+      </button>
+
+      <div
+        class="absolute left-3 top-3 z-10 rounded-xl border border-white/70 bg-white/90 px-3 py-2 shadow-sm backdrop-blur"
+      >
+        <button
+          type="button"
+          class="flex w-full items-center justify-between gap-3"
+          [attr.aria-expanded]="legendOpen()"
+          (click)="toggleLegend()"
+        >
+          <span class="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-400">
+            Calidad
+          </span>
+          <svg
+            viewBox="0 0 24 24"
+            class="h-3 w-3 text-slate-400 transition-transform"
+            [class.rotate-180]="legendOpen()"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            aria-hidden="true"
+          >
+            <path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </button>
+
+        @if (legendOpen()) {
+          <div class="mt-1.5 flex flex-wrap gap-x-3 gap-y-1" data-testid="quality-legend">
+            @for (item of qualityLegend; track item.id) {
+              <span class="flex items-center gap-1.5 text-[11px] font-medium text-slate-600">
+                <span
+                  class="h-2 w-2 rounded-full"
+                  [style.background-color]="item.color"
+                  aria-hidden="true"
+                ></span>
+                {{ item.label }}
+              </span>
+            }
+          </div>
+        }
       </div>
 
       @if (selectedBeach(); as beach) {
@@ -282,6 +392,12 @@
           (closed)="closeDetail()"
         />
       }
+
+      <p class="sr-only" aria-live="polite">
+        @if (selectedBeach(); as beach) {
+          Ficha abierta: {{ beach.name }}.
+        }
+      </p>
     </section>
   </main>
 </div>

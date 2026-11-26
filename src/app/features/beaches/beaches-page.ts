@@ -1,10 +1,13 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  DestroyRef,
+  ElementRef,
   computed,
   effect,
   inject,
   signal,
+  viewChild,
 } from '@angular/core';
 import { Meta, Title } from '@angular/platform-browser';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -18,6 +21,7 @@ import {
   WaterQuality,
 } from '../../core/models/beach';
 import { filterBeaches } from '../../core/utils/beach-filter';
+import { Coordinates, distanceKm, formatDistance } from '../../core/utils/geo';
 import { FavoritesStore } from '../../core/services/favorites';
 import { BeachDetail } from './beach-detail';
 import { BeachMap } from './beach-map';
@@ -41,6 +45,15 @@ export class BeachesPage {
   private readonly title = inject(Title);
   private readonly meta = inject(Meta);
   readonly favorites = inject(FavoritesStore);
+  private readonly destroyRef = inject(DestroyRef);
+
+  readonly mapSection = viewChild<ElementRef<HTMLElement>>('mapSection');
+  readonly userLocation = signal<Coordinates | null>(null);
+  readonly locationStatus = signal<'idle' | 'loading' | 'error' | 'ready'>('idle');
+  readonly isFullscreen = signal(false);
+  readonly legendOpen = signal(
+    typeof window === 'undefined' || !window.matchMedia('(max-width: 639px)').matches
+  );
 
   private readonly defaultTitle = 'Costa Clara · Playas de Baleares';
   private readonly defaultDescription =
@@ -93,9 +106,14 @@ export class BeachesPage {
       blueFlag: this.blueFlag(),
     });
 
-    return this.showFavoritesOnly()
+    const filtered = this.showFavoritesOnly()
       ? beaches.filter((beach) => this.favorites.isFavorite(beach.id))
       : beaches;
+
+    const location = this.userLocation();
+    return location
+      ? [...filtered].sort((a, b) => distanceKm(location, a) - distanceKm(location, b))
+      : filtered;
   });
 
   readonly selectedBeach = computed(() => {
@@ -130,6 +148,19 @@ export class BeachesPage {
   });
 
   constructor() {
+    const onFullscreenChange = (): void => {
+      this.isFullscreen.set(
+        typeof document !== 'undefined' && document.fullscreenElement !== null
+      );
+    };
+
+    if (typeof document !== 'undefined') {
+      document.addEventListener('fullscreenchange', onFullscreenChange);
+      this.destroyRef.onDestroy(() =>
+        document.removeEventListener('fullscreenchange', onFullscreenChange)
+      );
+    }
+
     effect(() => {
       const queryParams: Record<string, string | null> = {
         q: this.query().trim() || null,
@@ -207,6 +238,76 @@ export class BeachesPage {
 
   selectBeach(beach: Beach): void {
     this.selectedId.set(beach.id);
+
+    if (typeof window === 'undefined' || !window.matchMedia('(max-width: 1023px)').matches) {
+      return;
+    }
+
+    requestAnimationFrame(() => {
+      this.mapSection()?.nativeElement.scrollIntoView({
+        behavior: this.prefersReducedMotion() ? 'auto' : 'smooth',
+        block: 'start',
+      });
+    });
+  }
+
+  selectBeachFromMap(beach: Beach): void {
+    this.selectedId.set(beach.id);
+
+    if (typeof document === 'undefined') return;
+
+    requestAnimationFrame(() => {
+      document.getElementById(`beach-item-${beach.id}`)?.scrollIntoView({
+        behavior: this.prefersReducedMotion() ? 'auto' : 'smooth',
+        block: 'nearest',
+      });
+    });
+  }
+
+  requestLocation(): void {
+    if (this.locationStatus() === 'loading') return;
+
+    if (typeof navigator === 'undefined' || !navigator.geolocation) {
+      this.locationStatus.set('error');
+      return;
+    }
+
+    this.locationStatus.set('loading');
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        this.userLocation.set({
+          lon: position.coords.longitude,
+          lat: position.coords.latitude,
+        });
+        this.locationStatus.set('ready');
+      },
+      () => this.locationStatus.set('error'),
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 }
+    );
+  }
+
+  distanceLabel(beach: Beach): string | null {
+    const location = this.userLocation();
+    return location ? formatDistance(distanceKm(location, beach)) : null;
+  }
+
+  toggleLegend(): void {
+    this.legendOpen.update((value) => !value);
+  }
+
+  async toggleFullscreen(): Promise<void> {
+    const section = this.mapSection()?.nativeElement;
+    if (!section || typeof document === 'undefined') return;
+
+    try {
+      if (document.fullscreenElement) {
+        await document.exitFullscreen();
+      } else {
+        await section.requestFullscreen();
+      }
+    } catch {
+      // Algunos navegadores bloquean la API; la vista sigue funcionando.
+    }
   }
 
   closeDetail(): void {
@@ -261,5 +362,12 @@ export class BeachesPage {
   private readQuality(): QualityFilter {
     const value = this.route.snapshot.queryParamMap.get('calidad');
     return value && QUALITY_IDS.has(value) ? (value as WaterQuality) : 'todas';
+  }
+
+  private prefersReducedMotion(): boolean {
+    return (
+      typeof window !== 'undefined' &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    );
   }
 }

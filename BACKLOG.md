@@ -4,17 +4,22 @@ Listado de tickets para evolucionar la app desde la v0.1 actual hasta una v1.0 p
 
 > **Contexto:** v0.1 con 19 playas de demostración, mapa OpenLayers con clustering, filtros sincronizados con la URL y ficha lateral. Sin backend, sin deploy y sin e2e todavía.
 
-**Estado:** 7/36 cerrados · actualizado 2026-11-26.
+**Estado:** 12/36 cerrados · actualizado 2026-11-26.
 
 ## Hecho
 
 - ✅ **CC-01** Deploy en Cloudflare Pages (auto-deploy desde `main`).
 - ✅ **CC-02** CI con GitHub Actions (tests, build y e2e).
-- ✅ **CC-03** Playwright configurado + 22 e2e (desktop y móvil).
+- ✅ **CC-03** Playwright configurado + 28 e2e (desktop y móvil).
 - ✅ **CC-04** README, HANDOFF y BACKLOG al día.
 - ✅ **CC-06** 404 propia, títulos y metadatos dinámicos.
 - ✅ **CC-22** Favoritos con `localStorage`, filtro y sincronización entre pestañas.
 - ✅ **CC-26** Compartir ficha con Web Share API y fallback al portapapeles.
+- ✅ **CC-30** Geolocalización, orden por distancia y marcador de posición.
+- ✅ **CC-31** Capas base: mapa, relieve y satélite con atribución.
+- ✅ **CC-32** Leyenda colapsable y mapa a pantalla completa.
+- ✅ **CC-33** Sincronía lista↔mapa con marcador resaltado.
+- ✅ **CC-34** Alternativa textual, live regions y foco en el mapa.
 
 ## Cómo leer esto
 
@@ -217,6 +222,7 @@ Reglas del proyecto que aplican a todos los tickets: UI en español, no inventar
 ## E3 · Mapa
 
 ### CC-30 · Geolocalización y “cerca de mí” · P1 · M
+**Estado:** ✅ Hecho (2026-11-26) · orden por distancia y marcador azul.
 **Qué:** botón de ubicación con permiso explícito, ordenar por distancia y centrar el mapa.
 **Hecho cuando:**
 - Sin permiso o con error se muestra un aviso claro y la app sigue usable.
@@ -224,24 +230,28 @@ Reglas del proyecto que aplican a todos los tickets: UI en español, no inventar
 - No se envía la ubicación a ningún servidor.
 
 ### CC-31 · Capas base alternativas · P2 · M
+**Estado:** ✅ Hecho (2026-11-26) · OSM, OpenTopoMap y Esri con atribución.
 **Qué:** selector OSM / topográfico / satélite con atribución correcta y persistencia de la elección.
 **Hecho cuando:**
 - Cada capa muestra su atribución y cumple su licencia.
 - Cambiar de capa no pierde centro, zoom ni selección.
 
 ### CC-32 · Leyenda y mapa a pantalla completa en móvil · P1 · S
+**Estado:** ✅ Hecho (2026-11-26) · leyenda cerrada por defecto en móvil.
 **Qué:** leyenda colapsable, botón de pantalla completa y layout que no tape la ficha ni los controles.
 **Hecho cuando:**
 - En 390 px la leyenda no ocupa más de una línea cerrada.
 - Salir de pantalla completa restaura el layout y el tamaño del mapa.
 
 ### CC-33 · Sincronía lista ↔ mapa · P1 · S
+**Estado:** ✅ Hecho (2026-11-26) · halo del marcador y scroll a la ficha/lista.
 **Qué:** al seleccionar desde la lista, hacer scroll a la ficha y resaltar el marcador (halo/etiqueta); al seleccionar en el mapa, hacer scroll al item de la lista.
 **Hecho cuando:**
 - La selección es visible en ambos lados sin recargar.
 - El scroll respeta `prefers-reduced-motion` y no secuestra el foco.
 
 ### CC-34 · Accesibilidad del mapa · P1 · L
+**Estado:** ✅ Hecho (2026-11-26) · lista como alternativa, live regions y foco; axe en CC-50.
 **Qué:** alternativa textual navegable (lista ya existente como base), navegación por teclado entre playas, `aria-live` al cambiar la selección y anuncio de resultados.
 **Hecho cuando:**
 - Se puede recorrer y seleccionar playas solo con teclado.
