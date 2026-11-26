@@ -58,6 +58,7 @@ Instrucciones y rotación del token en [docs/despliegue.md](./docs/despliegue.md
 - [Fuentes de datos](./docs/datos.md)
 - [Privacidad](./docs/privacidad.md)
 - [Rendimiento](./docs/rendimiento.md)
+- [Storybook](./docs/storybook.md)
 - [Despliegue](./docs/despliegue.md)
 
 ## Qué hay hecho
@@ -77,6 +78,7 @@ Instrucciones y rotación del token en [docs/despliegue.md](./docs/despliegue.md
 - Estado del mar en la ficha (Open-Meteo Marine) y analítica sin cookies/PII.
 - Reportar datos incorrectos y SEO técnico (sitemap, JSON-LD, canonical).
 - PWA instalable con offline y carga diferida de ficha/comparador.
+- Storybook con 5 componentes y 20 stories.
 - Tests: 59 unitarios y 58 e2e (desktop y móvil).
 - Importador CSV con validación, fixture y fallback al dataset demo.
 - CI con tests, build y e2e; deploy automático en Cloudflare Pages.

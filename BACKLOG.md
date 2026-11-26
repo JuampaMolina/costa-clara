@@ -4,7 +4,7 @@ Listado de tickets para evolucionar la app desde la v0.1 actual hasta una v1.0 p
 
 > **Contexto:** v0.1 con 19 playas de demostración, mapa OpenLayers con clustering, filtros sincronizados con la URL y ficha lateral. Sin backend, sin deploy y sin e2e todavía.
 
-**Estado:** 34/36 cerrados · actualizado 2026-11-26.
+**Estado:** 35/36 cerrados · actualizado 2026-11-26.
 
 ## Hecho
 
@@ -40,6 +40,7 @@ Listado de tickets para evolucionar la app desde la v0.1 actual hasta una v1.0 p
 - ✅ **CC-41** Carga diferida y Lighthouse 98/100/100/100.
 - ✅ **CC-42** Imagen OG 1200×630 y metas Open Graph/Twitter.
 - ✅ **CC-50** Auditoría axe WCAG AA, foco, contraste y reduced motion.
+- ✅ **CC-51** Storybook 10 con 5 componentes y 20 stories.
 - ✅ **CC-53** robots, sitemap, JSON-LD, canonical y og:url.
 - ✅ **CC-54** Caso de estudio y 4 ADRs.
 
@@ -340,6 +341,7 @@ Reglas del proyecto que aplican a todos los tickets: UI en español, no inventar
 - Se corrige el foco al abrir/cerrar la ficha y se respeta `prefers-reduced-motion`.
 
 ### CC-51 · Storybook de componentes · P1 · M
+**Estado:** ✅ Hecho (2026-11-26) · Storybook 10.6.9, 5 componentes y 20 stories.
 **Qué:** Storybook para 5–6 piezas: pill de filtro, item de lista, ficha, leyenda, estado vacío y badge de calidad.
 **Hecho cuando:**
 - Las stories cubren estados normal/vacío/seleccionado y móvil.
