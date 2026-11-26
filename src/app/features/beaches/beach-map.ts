@@ -5,6 +5,7 @@ import {
   ElementRef,
   OnDestroy,
   effect,
+  inject,
   input,
   output,
   signal,
@@ -26,6 +27,7 @@ import Cluster from 'ol/source/Cluster';
 import VectorSource from 'ol/source/Vector';
 import { Circle as CircleStyle, Fill, Stroke, Style, Text } from 'ol/style';
 import { Coordinate } from 'ol/coordinate';
+import { TranslationService } from '../../core/i18n/translation.service';
 import { Beach, QUALITY_COLORS } from '../../core/models/beach';
 import { Coordinates } from '../../core/utils/geo';
 
@@ -45,27 +47,30 @@ function prefersReducedMotion(): boolean {
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <p id="map-help" class="sr-only">
-      Usa la lista de resultados para recorrer las playas con el teclado. El mapa muestra la misma
-      información.
+      {{ i18n.t('map.help') }}
     </p>
 
     <div
       #mapEl
       class="map"
       role="region"
-      aria-label="Mapa de playas de Baleares"
+      [attr.aria-label]="i18n.t('map.ariaLabel')"
       aria-describedby="map-help"
     ></div>
 
     <label class="absolute right-14 top-3 z-10">
-      <span class="sr-only">Capa del mapa</span>
+      <span class="sr-only">{{ i18n.t('map.layerLabel') }}</span>
       <select
         class="rounded-lg border border-slate-200 bg-white/95 px-2 py-1.5 text-xs font-medium text-slate-700 shadow-sm backdrop-blur outline-none transition focus:border-sea-400 focus:ring-2 focus:ring-sea-100"
         (change)="setBasemap($any($event.target).value)"
       >
-        <option value="osm" [selected]="basemap() === 'osm'">Mapa</option>
-        <option value="topo" [selected]="basemap() === 'topo'">Relieve</option>
-        <option value="satellite" [selected]="basemap() === 'satellite'">Satélite</option>
+        <option value="osm" [selected]="basemap() === 'osm'">{{ i18n.t('map.layerOsm') }}</option>
+        <option value="topo" [selected]="basemap() === 'topo'">
+          {{ i18n.t('map.layerTopo') }}
+        </option>
+        <option value="satellite" [selected]="basemap() === 'satellite'">
+          {{ i18n.t('map.layerSatellite') }}
+        </option>
       </select>
     </label>
   `,
@@ -94,6 +99,8 @@ export class BeachMap implements AfterViewInit, OnDestroy {
   readonly selected = input<Beach | null>(null);
   readonly userLocation = input<Coordinates | null>(null);
   readonly beachSelected = output<Beach>();
+
+  readonly i18n = inject(TranslationService);
 
   private readonly mapEl = viewChild.required<ElementRef<HTMLDivElement>>('mapEl');
   private readonly mapReady = signal(false);
@@ -192,6 +199,18 @@ export class BeachMap implements AfterViewInit, OnDestroy {
       this.userSource.addFeature(new Feature({ geometry: new Point(point) }));
       this.moveView(point, 12);
     });
+
+    effect(() => {
+      const zoomIn = this.i18n.t('map.zoomIn');
+      const zoomOut = this.i18n.t('map.zoomOut');
+      const attributions = this.i18n.t('map.attributions');
+      if (!this.mapReady()) return;
+
+      const root = this.mapEl().nativeElement;
+      root.querySelector('.ol-zoom-in')?.setAttribute('title', zoomIn);
+      root.querySelector('.ol-zoom-out')?.setAttribute('title', zoomOut);
+      root.querySelector('.ol-attribution button')?.setAttribute('title', attributions);
+    });
   }
 
   ngAfterViewInit(): void {
@@ -241,8 +260,11 @@ export class BeachMap implements AfterViewInit, OnDestroy {
       controls: defaultControls({
         zoom: true,
         rotate: false,
-        zoomOptions: { zoomInTipLabel: 'Acercar', zoomOutTipLabel: 'Alejar' },
-        attributionOptions: { tipLabel: 'Atribuciones' },
+        zoomOptions: {
+          zoomInTipLabel: this.i18n.t('map.zoomIn'),
+          zoomOutTipLabel: this.i18n.t('map.zoomOut'),
+        },
+        attributionOptions: { tipLabel: this.i18n.t('map.attributions') },
       }).extend([new ScaleLine({ units: 'metric' })]),
       view: new View({
         center: fromLonLat([2.9, 39.55]),

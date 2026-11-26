@@ -27,7 +27,9 @@
         </span>
         <span>
           <span class="block text-sm font-bold tracking-tight text-slate-900">Costa Clara</span>
-          <span class="block text-[11px] leading-4 text-slate-500">Playas de Baleares</span>
+          <span class="block text-[11px] leading-4 text-slate-500">
+            {{ i18n.t('header.subtitle') }}
+          </span>
         </span>
       </a>
 
@@ -36,15 +38,37 @@
           <span
             class="hidden rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-[11px] font-medium text-amber-700 sm:inline"
           >
-            Datos de demostración
+            {{ i18n.t('header.demoData') }}
           </span>
         } @else {
           <span
             class="hidden rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-[11px] font-medium text-emerald-700 sm:inline"
           >
-            Datos oficiales
+            {{ i18n.t('header.officialData') }}
           </span>
         }
+
+        <div
+          class="inline-flex items-center rounded-full border border-slate-200 bg-slate-100 p-0.5"
+          role="group"
+          [attr.aria-label]="i18n.t('header.languageSelector')"
+          data-testid="lang-selector"
+        >
+          @for (code of langs; track code) {
+            <button
+              type="button"
+              [attr.data-testid]="'lang-' + code"
+              [attr.aria-pressed]="i18n.lang() === code"
+              [attr.title]="i18n.langLabel(code)"
+              [attr.lang]="code"
+              [class]="langButtonClass(i18n.lang() === code)"
+              (click)="setLang(code)"
+            >
+              {{ code.toUpperCase() }}<span class="sr-only"> ({{ i18n.langLabel(code) }})</span>
+            </button>
+          }
+        </div>
+
         <span
           class="rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-semibold text-slate-600"
         >
@@ -61,9 +85,11 @@
     <aside class="flex min-h-0 flex-col gap-3">
       <section class="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-sm">
         <div>
-          <h1 class="text-xl font-semibold tracking-tight text-slate-900">Encuentra tu playa</h1>
+          <h1 class="text-xl font-semibold tracking-tight text-slate-900">
+            {{ i18n.t('filters.heading') }}
+          </h1>
           <p class="mt-0.5 text-sm leading-5 text-slate-500">
-            Calidad del agua, servicios y ubicación en un solo mapa.
+            {{ i18n.t('filters.subtitle') }}
           </p>
         </div>
 
@@ -83,8 +109,8 @@
             #searchInput
             type="search"
             class="w-full rounded-xl border border-slate-200 bg-slate-50 py-2.5 pl-10 pr-9 text-sm text-slate-800 outline-none transition placeholder:text-slate-500 focus:border-sea-400 focus:bg-white focus:ring-4 focus:ring-sea-100 [&::-webkit-search-cancel-button]:appearance-none"
-            placeholder="Buscar playa, cala, municipio o servicio"
-            aria-label="Buscar playa"
+            [placeholder]="i18n.t('filters.searchPlaceholder')"
+            [attr.aria-label]="i18n.t('filters.searchAria')"
             [value]="queryInput()"
             (input)="onQueryInput($any($event.target).value)"
             (keydown)="onSearchKeydown($event)"
@@ -93,7 +119,7 @@
             <button
               type="button"
               class="absolute right-2 top-1/2 grid h-7 w-7 -translate-y-1/2 place-items-center rounded-full text-slate-500 transition hover:bg-slate-200/70 hover:text-slate-700"
-              aria-label="Limpiar búsqueda"
+              [attr.aria-label]="i18n.t('filters.clearSearch')"
               data-testid="clear-search"
               (click)="clearSearch()"
             >
@@ -111,8 +137,12 @@
           }
         </div>
 
-        <div class="mt-3 flex flex-wrap gap-1.5" role="group" aria-label="Filtrar por isla">
-          @for (option of islandOptions; track option.id) {
+        <div
+          class="mt-3 flex flex-wrap gap-1.5"
+          role="group"
+          [attr.aria-label]="i18n.t('filters.islandGroupAria')"
+        >
+          @for (option of islandOptions(); track option.id) {
             <button
               type="button"
               [attr.data-testid]="'island-' + option.id"
@@ -127,13 +157,13 @@
         </div>
 
         <div class="mt-3 grid grid-cols-[1fr_auto] gap-2">
-          <label class="sr-only" for="quality-filter">Calidad del agua</label>
+          <label class="sr-only" for="quality-filter">{{ i18n.t('filters.qualityLabel') }}</label>
           <select
             id="quality-filter"
             class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 outline-none transition focus:border-sea-400 focus:ring-4 focus:ring-sea-100"
             (change)="setQuality($any($event.target).value)"
           >
-            @for (option of qualityOptions; track option.id) {
+            @for (option of qualityOptions(); track option.id) {
               <option [value]="option.id" [selected]="quality() === option.id">
                 {{ option.label }} ({{ qualityCounts()[option.id] }})
               </option>
@@ -149,7 +179,7 @@
               [checked]="blueFlag()"
               (change)="toggleBlueFlag()"
             />
-            <span class="whitespace-nowrap">Bandera azul</span>
+            <span class="whitespace-nowrap">{{ i18n.t('filters.blueFlag') }}</span>
           </label>
         </div>
 
@@ -174,7 +204,7 @@
               >
                 <path d="M4 6h16M7 12h10M10 18h4" stroke-linecap="round" />
               </svg>
-              Más filtros
+              {{ i18n.t('filters.moreFilters') }}
               @if (activeAdvancedCount() > 0) {
                 <span
                   data-testid="advanced-filters-badge"
@@ -198,7 +228,11 @@
 
             <span class="text-slate-500" aria-live="polite" data-testid="result-count">
               <strong class="font-semibold text-slate-800">{{ filteredBeaches().length }}</strong>
-              {{ filteredBeaches().length === 1 ? 'playa' : 'playas' }}
+              {{
+                filteredBeaches().length === 1
+                  ? i18n.t('filters.countSingular')
+                  : i18n.t('filters.countPlural')
+              }}
             </span>
           </div>
 
@@ -223,7 +257,11 @@
                 />
                 <circle cx="12" cy="10" r="2.5" />
               </svg>
-              {{ locationStatus() === 'loading' ? 'Buscando…' : 'Cerca de mí' }}
+              {{
+                locationStatus() === 'loading'
+                  ? i18n.t('filters.locating')
+                  : i18n.t('filters.nearMe')
+              }}
             </button>
             @if (hasFilters()) {
               <button
@@ -231,7 +269,7 @@
                 class="font-semibold text-sea-700 transition hover:text-sea-900"
                 (click)="clearFilters()"
               >
-                Limpiar filtros
+                {{ i18n.t('filters.clearFilters') }}
               </button>
             }
           </div>
@@ -246,14 +284,14 @@
             <div>
               <div class="flex items-center justify-between gap-2">
                 <span class="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-600">
-                  Servicios
+                  {{ i18n.t('filters.services') }}
                 </span>
-                <span class="text-[11px] text-slate-500">Coinciden todos</span>
+                <span class="text-[11px] text-slate-500">{{ i18n.t('filters.matchAll') }}</span>
               </div>
               <div
                 class="mt-2 flex flex-wrap gap-1.5"
                 role="group"
-                aria-label="Filtrar por servicios"
+                [attr.aria-label]="i18n.t('filters.servicesGroupAria')"
               >
                 @for (service of availableServices; track service) {
                   <button
@@ -276,12 +314,12 @@
 
             <div>
               <span class="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-600">
-                Accesibilidad
+                {{ i18n.t('filters.accessibility') }}
               </span>
               <div
                 class="mt-2 flex flex-wrap gap-1.5"
                 role="group"
-                aria-label="Filtrar por accesibilidad"
+                [attr.aria-label]="i18n.t('filters.accessibilityGroupAria')"
               >
                 @for (level of availableAccessibility; track level) {
                   <button
@@ -309,15 +347,15 @@
 
         @if (locationStatus() === 'error') {
           <p class="mt-2 text-[11px] text-rose-600" role="status">
-            No hemos podido obtener tu ubicación.
+            {{ i18n.t('filters.locationError') }}
           </p>
         } @else if (locationStatus() === 'ready' && sortBy() === 'distancia') {
           <p class="mt-2 text-[11px] text-slate-500" role="status">
-            Ordenado por distancia a tu ubicación.
+            {{ i18n.t('filters.locationSorted') }}
           </p>
         } @else if (locationStatus() === 'ready') {
           <p class="mt-2 text-[11px] text-slate-500" role="status">
-            Ubicación activa. Puedes elegir «Más cercanas» en el orden.
+            {{ i18n.t('filters.locationReady') }}
           </p>
         }
       </section>
@@ -325,12 +363,12 @@
       <section
         class="flex min-h-0 flex-1 flex-col overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-sm"
       >
-        <h2 class="sr-only">Resultados</h2>
+        <h2 class="sr-only">{{ i18n.t('results.heading') }}</h2>
         <div
           class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 px-3 py-2.5"
         >
           <div>
-            <label for="sort-filter" class="sr-only">Ordenar resultados</label>
+            <label for="sort-filter" class="sr-only">{{ i18n.t('results.sortLabel') }}</label>
             <select
               id="sort-filter"
               data-testid="sort-filter"
@@ -365,7 +403,7 @@
                 stroke-linejoin="round"
               />
             </svg>
-            Favoritas ({{ favorites.count() }})
+            {{ i18n.t('results.favorites', { count: favorites.count() }) }}
           </button>
         </div>
 
@@ -393,13 +431,16 @@
                   <span class="block truncate text-xs text-slate-500">
                     {{ beach.municipality }} · {{ islandLabel(beach.island) }}
                   </span>
-                  <span class="sr-only"> · Agua {{ qualityLabel(beach.quality) }}</span>
+                  <span class="sr-only">
+                    ·
+                    {{ i18n.t('results.waterQualitySr', { quality: qualityLabel(beach.quality) }) }}
+                  </span>
                   @if (distanceLabel(beach); as distance) {
                     <span
                       class="block text-[10px] font-semibold text-sea-700"
                       [attr.data-testid]="'distance-' + beach.id"
                     >
-                      a {{ distance }}
+                      {{ i18n.t('results.distanceAway', { distance }) }}
                     </span>
                   }
                 </span>
@@ -407,7 +448,7 @@
                   <span
                     class="mt-0.5 shrink-0 rounded-full bg-sky-50 px-2 py-0.5 text-[10px] font-semibold text-sky-700"
                   >
-                    Azul
+                    {{ i18n.t('results.blueBadge') }}
                   </span>
                 }
               </button>
@@ -419,8 +460,8 @@
                   [attr.aria-pressed]="isCompared(beach.id)"
                   [attr.aria-label]="
                     isCompared(beach.id)
-                      ? 'Quitar ' + beach.name + ' del comparador'
-                      : 'Añadir ' + beach.name + ' al comparador'
+                      ? i18n.t('results.removeCompare', { name: beach.name })
+                      : i18n.t('results.addCompare', { name: beach.name })
                   "
                   [attr.data-testid]="'compare-' + beach.id"
                   (click)="toggleCompare(beach)"
@@ -444,8 +485,8 @@
                   [attr.aria-pressed]="isFavorite(beach.id)"
                   [attr.aria-label]="
                     isFavorite(beach.id)
-                      ? 'Quitar ' + beach.name + ' de favoritas'
-                      : 'Añadir ' + beach.name + ' a favoritas'
+                      ? i18n.t('results.removeFavorite', { name: beach.name })
+                      : i18n.t('results.addFavorite', { name: beach.name })
                   "
                   [attr.data-testid]="'favorite-' + beach.id"
                   (click)="toggleFavorite(beach)"
@@ -470,23 +511,25 @@
           } @empty {
             <div class="px-4 py-10 text-center">
               @if (showFavoritesOnly() && favorites.count() === 0) {
-                <p class="text-sm font-semibold text-slate-700">Todavía no tienes favoritas</p>
+                <p class="text-sm font-semibold text-slate-700">
+                  {{ i18n.t('empty.noFavoritesTitle') }}
+                </p>
                 <p class="mt-1 text-xs text-slate-500">
-                  Pulsa el corazón de una playa para guardarla aquí. Se queda en este navegador.
+                  {{ i18n.t('empty.noFavoritesBody') }}
                 </p>
                 <button
                   type="button"
                   class="mt-4 rounded-xl bg-slate-900 px-3.5 py-2 text-xs font-semibold text-white transition hover:bg-slate-700"
                   (click)="showAllBeaches()"
                 >
-                  Ver todas las playas
+                  {{ i18n.t('empty.showAllBeaches') }}
                 </button>
               } @else if (query().trim().length > 0) {
                 <p class="text-sm font-semibold text-slate-700">
-                  No hay playas para «{{ query().trim() }}»
+                  {{ i18n.t('empty.noSearchTitle', { query: query().trim() }) }}
                 </p>
                 <p class="mt-1 text-xs text-slate-500">
-                  Prueba con otro nombre, municipio o quita algún filtro.
+                  {{ i18n.t('empty.noSearchBody') }}
                 </p>
                 <div class="mt-4 flex flex-wrap justify-center gap-2">
                   @if (hasNonQueryFilters()) {
@@ -495,7 +538,7 @@
                       class="rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs font-semibold text-slate-700 transition hover:bg-slate-50"
                       (click)="clearSearch()"
                     >
-                      Limpiar búsqueda
+                      {{ i18n.t('filters.clearSearch') }}
                     </button>
                   }
                   <button
@@ -503,16 +546,18 @@
                     class="rounded-xl bg-slate-900 px-3.5 py-2 text-xs font-semibold text-white transition hover:bg-slate-700"
                     (click)="clearFilters()"
                   >
-                    Limpiar filtros
+                    {{ i18n.t('filters.clearFilters') }}
                   </button>
                 </div>
               } @else {
-                <p class="text-sm font-semibold text-slate-700">No hay playas con esos filtros</p>
+                <p class="text-sm font-semibold text-slate-700">
+                  {{ i18n.t('empty.noFiltersTitle') }}
+                </p>
                 <p class="mt-1 text-xs text-slate-500">
                   {{
                     activeAdvancedCount() > 0
-                      ? 'Prueba a quitar algún servicio o cambiar de isla.'
-                      : 'Prueba a quitar algún filtro o buscar otra cosa.'
+                      ? i18n.t('empty.noFiltersAdvancedBody')
+                      : i18n.t('empty.noFiltersDefaultBody')
                   }}
                 </p>
                 <button
@@ -520,7 +565,7 @@
                   class="mt-4 rounded-xl bg-slate-900 px-3.5 py-2 text-xs font-semibold text-white transition hover:bg-slate-700"
                   (click)="clearFilters()"
                 >
-                  Limpiar filtros
+                  {{ i18n.t('filters.clearFilters') }}
                 </button>
               }
             </div>
@@ -533,17 +578,44 @@
       #mapSection
       class="relative min-h-[62dvh] overflow-hidden rounded-2xl border border-slate-200/80 bg-sky-100 shadow-sm lg:min-h-0"
     >
-      <app-beach-map
-        [beaches]="filteredBeaches()"
-        [selected]="selectedBeach()"
-        [userLocation]="userLocation()"
-        (beachSelected)="selectBeachFromMap($event)"
-      />
+      @defer (on immediate) {
+        <app-beach-map
+          [beaches]="filteredBeaches()"
+          [selected]="selectedBeach()"
+          [userLocation]="userLocation()"
+          (beachSelected)="selectBeachFromMap($event)"
+        />
+      } @placeholder {
+        <div
+          class="grid h-full min-h-[420px] w-full place-items-center bg-sky-100"
+          role="status"
+          aria-live="polite"
+        >
+          <p class="text-sm font-medium text-slate-600">{{ i18n.t('map.loading') }}</p>
+        </div>
+      } @loading (after 100ms; minimum 150ms) {
+        <div
+          class="grid h-full min-h-[420px] w-full place-items-center bg-sky-100"
+          role="status"
+          aria-live="polite"
+        >
+          <p class="text-sm font-medium text-slate-600">{{ i18n.t('map.loading') }}</p>
+        </div>
+      } @error {
+        <div class="grid h-full min-h-[420px] w-full place-items-center bg-sky-100 p-6 text-center">
+          <div>
+            <p class="text-sm font-semibold text-slate-900">{{ i18n.t('map.loadErrorTitle') }}</p>
+            <p class="mt-1 text-xs text-slate-600">{{ i18n.t('detail.loadErrorBody') }}</p>
+          </div>
+        </div>
+      }
 
       <button
         type="button"
         class="absolute right-3 top-3 z-20 rounded-lg border border-white/70 bg-white/90 p-2 text-slate-600 shadow-sm backdrop-blur transition hover:bg-white hover:text-slate-900"
-        [attr.aria-label]="isFullscreen() ? 'Salir de pantalla completa' : 'Pantalla completa'"
+        [attr.aria-label]="
+          isFullscreen() ? i18n.t('map.fullscreenExit') : i18n.t('map.fullscreenEnter')
+        "
         [attr.aria-pressed]="isFullscreen()"
         (click)="toggleFullscreen()"
       >
@@ -590,7 +662,7 @@
           (click)="toggleLegend()"
         >
           <span class="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-500">
-            Calidad
+            {{ i18n.t('map.legend') }}
           </span>
           <svg
             viewBox="0 0 24 24"
@@ -607,7 +679,7 @@
 
         @if (legendOpen()) {
           <div class="mt-1.5 flex flex-wrap gap-x-3 gap-y-1" data-testid="quality-legend">
-            @for (item of qualityLegend; track item.id) {
+            @for (item of qualityLegend(); track item.id) {
               <span class="flex items-center gap-1.5 text-[11px] font-medium text-slate-600">
                 <span
                   class="h-2 w-2 rounded-full"
@@ -636,7 +708,7 @@
             role="status"
             aria-live="polite"
           >
-            <p class="text-sm font-medium text-slate-600">Cargando ficha…</p>
+            <p class="text-sm font-medium text-slate-600">{{ i18n.t('detail.loading') }}</p>
           </div>
         } @loading (after 100ms; minimum 150ms) {
           <div
@@ -644,21 +716,23 @@
             role="status"
             aria-live="polite"
           >
-            <p class="text-sm font-medium text-slate-600">Cargando ficha…</p>
+            <p class="text-sm font-medium text-slate-600">{{ i18n.t('detail.loading') }}</p>
           </div>
         } @error {
           <div
             class="absolute inset-x-3 bottom-3 top-3 z-30 rounded-2xl border border-slate-200/80 bg-white/95 p-5 shadow-2xl backdrop-blur sm:left-auto sm:top-auto sm:w-[370px]"
             role="alert"
           >
-            <p class="text-sm font-semibold text-slate-900">No se pudo cargar la ficha</p>
-            <p class="mt-1 text-xs text-slate-600">Comprueba tu conexión e inténtalo de nuevo.</p>
+            <p class="text-sm font-semibold text-slate-900">
+              {{ i18n.t('detail.loadErrorTitle') }}
+            </p>
+            <p class="mt-1 text-xs text-slate-600">{{ i18n.t('detail.loadErrorBody') }}</p>
             <button
               type="button"
               class="mt-3 rounded-xl bg-slate-900 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-slate-700"
               (click)="closeDetail()"
             >
-              Cerrar
+              {{ i18n.t('detail.close') }}
             </button>
           </div>
         }
@@ -666,7 +740,7 @@
 
       <p class="sr-only" aria-live="polite">
         @if (selectedBeach(); as beach) {
-          Ficha abierta: {{ beach.name }}.
+          {{ i18n.t('detail.openedAnnouncement', { name: beach.name }) }}
         }
       </p>
     </section>
@@ -675,7 +749,7 @@
   @if (comparedBeaches().length > 0 && !compareOpen() && !selectedBeach()) {
     <div
       role="region"
-      aria-label="Comparador de playas"
+      [attr.aria-label]="i18n.t('compare.regionAria')"
       data-testid="compare-tray"
       class="fixed inset-x-3 bottom-3 z-40 rounded-2xl border border-slate-700/70 bg-slate-900/95 px-4 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] text-white shadow-2xl backdrop-blur sm:inset-x-auto sm:bottom-4 sm:left-1/2 sm:w-[min(92vw,680px)] sm:-translate-x-1/2"
     >
@@ -683,7 +757,12 @@
         <div class="min-w-0 flex-1">
           <div class="flex flex-wrap items-center gap-1.5">
             <span class="text-xs font-semibold text-white tabular-nums">
-              Comparar ({{ comparedBeaches().length }}/3)
+              {{
+                i18n.t('compare.trayTitle', {
+                  count: comparedBeaches().length,
+                  max: maxCompareBeaches,
+                })
+              }}
             </span>
             @for (beach of comparedBeaches(); track beach.id) {
               <span
@@ -693,7 +772,7 @@
                 <button
                   type="button"
                   class="grid h-4 w-4 shrink-0 place-items-center rounded-full text-slate-300 transition hover:bg-slate-700 hover:text-white"
-                  [attr.aria-label]="'Quitar ' + beach.name + ' del comparador'"
+                  [attr.aria-label]="i18n.t('results.removeCompare', { name: beach.name })"
                   (click)="removeFromCompare(beach.id)"
                 >
                   ×
@@ -710,7 +789,7 @@
             class="rounded-lg px-2 py-1.5 text-xs font-semibold text-slate-300 transition hover:bg-slate-800 hover:text-white"
             (click)="clearCompare()"
           >
-            Vaciar
+            {{ i18n.t('compare.clear') }}
           </button>
 
           <button
@@ -726,9 +805,9 @@
             (click)="openCompare()"
           >
             @if (comparedBeaches().length < 2) {
-              Añade 1 playa más
+              {{ i18n.t('compare.addOneMore') }}
             } @else {
-              Comparar ({{ comparedBeaches().length }})
+              {{ i18n.t('compare.openButton', { count: comparedBeaches().length }) }}
             }
           </button>
         </div>
@@ -767,7 +846,7 @@
         <div
           class="rounded-2xl border border-slate-200 bg-white px-5 py-4 text-sm font-medium text-slate-700 shadow-2xl"
         >
-          Preparando comparador…
+          {{ i18n.t('compare.preparing') }}
         </div>
       </div>
     } @loading (after 100ms; minimum 150ms) {
@@ -779,7 +858,7 @@
         <div
           class="rounded-2xl border border-slate-200 bg-white px-5 py-4 text-sm font-medium text-slate-700 shadow-2xl"
         >
-          Cargando comparador…
+          {{ i18n.t('compare.loading') }}
         </div>
       </div>
     } @error {
@@ -793,15 +872,15 @@
           class="w-full max-w-sm rounded-2xl border border-slate-200 bg-white p-5 text-center shadow-2xl"
         >
           <p id="compare-error-title" class="text-sm font-semibold text-slate-900">
-            No se pudo cargar el comparador
+            {{ i18n.t('compare.loadErrorTitle') }}
           </p>
-          <p class="mt-1 text-xs text-slate-600">Comprueba tu conexión e inténtalo de nuevo.</p>
+          <p class="mt-1 text-xs text-slate-600">{{ i18n.t('detail.loadErrorBody') }}</p>
           <button
             type="button"
             class="mt-4 rounded-xl bg-slate-900 px-3.5 py-2 text-xs font-semibold text-white transition hover:bg-slate-700"
             (click)="closeCompare()"
           >
-            Cerrar
+            {{ i18n.t('detail.close') }}
           </button>
         </div>
       </div>

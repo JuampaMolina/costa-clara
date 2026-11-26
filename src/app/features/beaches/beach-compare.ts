@@ -12,22 +12,16 @@ import {
   signal,
   viewChild,
 } from '@angular/core';
-import {
-  Beach,
-  ISLANDS,
-  QUALITY_COLORS,
-  QUALITY_LABELS,
-  ServiceId,
-  WaterQuality,
-} from '../../core/models/beach';
+import { TranslationService } from '../../core/i18n/translation.service';
+import { Beach, QUALITY_COLORS, ServiceId, WaterQuality } from '../../core/models/beach';
 import { AnalyticsService } from '../../core/services/analytics';
 import {
-  ACCESSIBILITY_LABELS,
+  MAX_COMPARE_BEACHES,
   getAvailableServices,
   getBeachAccessibility,
 } from '../../core/utils/beach-filter';
 import { QualityTrend, getBeachSamples, getSamplesTrend } from '../../core/utils/beach-history';
-import { Coordinates, distanceKm, formatDistance } from '../../core/utils/geo';
+import { Coordinates, distanceKm } from '../../core/utils/geo';
 
 const FOCUSABLE_SELECTOR =
   'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
@@ -57,9 +51,16 @@ const FOCUSABLE_SELECTOR =
         >
           <div>
             <h2 id="compare-title" class="text-lg font-semibold tracking-tight text-slate-900">
-              Comparativa de playas
+              {{ i18n.t('compare.dialogTitle') }}
             </h2>
-            <p class="text-xs text-slate-500">{{ beaches().length }} de 3 playas</p>
+            <p class="text-xs text-slate-500">
+              {{
+                i18n.t('compare.countOfMax', {
+                  count: beaches().length,
+                  max: maxCompareBeaches,
+                })
+              }}
+            </p>
           </div>
 
           <div class="flex items-center gap-2">
@@ -83,7 +84,7 @@ const FOCUSABLE_SELECTOR =
                   stroke-linejoin="round"
                 />
               </svg>
-              Copiar enlace
+              {{ i18n.t('compare.copyLink') }}
             </button>
 
             <button
@@ -92,14 +93,14 @@ const FOCUSABLE_SELECTOR =
               class="rounded-lg px-2.5 py-1.5 text-xs font-semibold text-slate-600 transition hover:bg-slate-100 hover:text-slate-900"
               (click)="cleared.emit()"
             >
-              Vaciar
+              {{ i18n.t('compare.clear') }}
             </button>
 
             <button
               #closeButton
               type="button"
               data-testid="compare-close"
-              aria-label="Cerrar comparador"
+              [attr.aria-label]="i18n.t('compare.closeAria')"
               class="grid h-8 w-8 place-items-center rounded-full text-slate-500 transition hover:bg-slate-100 hover:text-slate-900"
               (click)="closed.emit()"
             >
@@ -124,7 +125,11 @@ const FOCUSABLE_SELECTOR =
             aria-live="polite"
             data-testid="compare-share-status"
           >
-            {{ shareState() === 'error' ? 'No se pudo copiar el enlace' : 'Enlace copiado' }}
+            {{
+              shareState() === 'error'
+                ? i18n.t('detail.linkCopyError')
+                : i18n.t('detail.linkCopied')
+            }}
           </p>
         }
 
@@ -136,12 +141,14 @@ const FOCUSABLE_SELECTOR =
               data-testid="compare-table"
             >
               <caption class="sr-only">
-                Comparativa de playas seleccionadas
+                {{
+                  i18n.t('compare.tableCaption')
+                }}
               </caption>
               <thead>
                 <tr class="border-b border-slate-200 align-top">
                   <th scope="col" class="w-40 pb-3 pr-3 text-xs font-semibold text-slate-500">
-                    <span class="sr-only">Atributo</span>
+                    <span class="sr-only">{{ i18n.t('compare.attributeHeader') }}</span>
                   </th>
                   @for (beach of beaches(); track beach.id) {
                     <th scope="col" class="pb-3 pl-3">
@@ -161,11 +168,11 @@ const FOCUSABLE_SELECTOR =
                         <button
                           type="button"
                           class="shrink-0 rounded-lg px-2 py-1 text-xs font-semibold text-slate-500 transition hover:bg-slate-100 hover:text-slate-800"
-                          [attr.aria-label]="'Quitar ' + beach.name + ' del comparador'"
+                          [attr.aria-label]="i18n.t('results.removeCompare', { name: beach.name })"
                           [attr.data-testid]="'compare-remove-' + beach.id"
                           (click)="removed.emit(beach.id)"
                         >
-                          Quitar
+                          {{ i18n.t('compare.remove') }}
                         </button>
                       </div>
                     </th>
@@ -176,7 +183,7 @@ const FOCUSABLE_SELECTOR =
               <tbody class="divide-y divide-slate-100">
                 <tr>
                   <th scope="row" class="py-3 pr-3 text-xs font-semibold text-slate-600">
-                    Calidad del agua
+                    {{ i18n.t('compare.waterQuality') }}
                   </th>
                   @for (beach of beaches(); track beach.id) {
                     <td class="py-3 pl-3">
@@ -194,7 +201,7 @@ const FOCUSABLE_SELECTOR =
 
                 <tr>
                   <th scope="row" class="py-3 pr-3 text-xs font-semibold text-slate-600">
-                    Tendencia
+                    {{ i18n.t('compare.trend') }}
                   </th>
                   @for (beach of beaches(); track beach.id) {
                     <td class="py-3 pl-3">
@@ -205,7 +212,7 @@ const FOCUSABLE_SELECTOR =
 
                 <tr>
                   <th scope="row" class="py-3 pr-3 text-xs font-semibold text-slate-600">
-                    Bandera azul
+                    {{ i18n.t('compare.blueFlag') }}
                   </th>
                   @for (beach of beaches(); track beach.id) {
                     <td class="py-3 pl-3">
@@ -213,10 +220,11 @@ const FOCUSABLE_SELECTOR =
                         <span
                           class="inline-flex items-center rounded-full bg-sky-50 px-2.5 py-0.5 text-xs font-semibold text-sky-700"
                         >
-                          Sí{{ beach.blueFlagYear ? ' (' + beach.blueFlagYear + ')' : '' }}
+                          {{ i18n.t('compare.yes')
+                          }}{{ beach.blueFlagYear ? ' (' + beach.blueFlagYear + ')' : '' }}
                         </span>
                       } @else {
-                        <span class="text-slate-500">No</span>
+                        <span class="text-slate-500">{{ i18n.t('compare.no') }}</span>
                       }
                     </td>
                   }
@@ -224,7 +232,7 @@ const FOCUSABLE_SELECTOR =
 
                 <tr>
                   <th scope="row" class="py-3 pr-3 text-xs font-semibold text-slate-600">
-                    Isla y municipio
+                    {{ i18n.t('compare.islandAndMunicipality') }}
                   </th>
                   @for (beach of beaches(); track beach.id) {
                     <td class="py-3 pl-3 text-slate-700">
@@ -236,11 +244,11 @@ const FOCUSABLE_SELECTOR =
                 @if (userLocation()) {
                   <tr>
                     <th scope="row" class="py-3 pr-3 text-xs font-semibold text-slate-600">
-                      Distancia
+                      {{ i18n.t('compare.distance') }}
                     </th>
                     @for (beach of beaches(); track beach.id) {
                       <td class="py-3 pl-3 font-medium text-sea-700">
-                        a {{ distanceLabel(beach) }}
+                        {{ i18n.t('results.distanceAway', { distance: distanceLabel(beach) }) }}
                       </td>
                     }
                   </tr>
@@ -248,7 +256,7 @@ const FOCUSABLE_SELECTOR =
 
                 <tr>
                   <th scope="row" class="py-3 pr-3 text-xs font-semibold text-slate-600">
-                    Accesibilidad
+                    {{ i18n.t('compare.accessibility') }}
                   </th>
                   @for (beach of beaches(); track beach.id) {
                     <td class="py-3 pl-3 text-slate-700">
@@ -263,7 +271,7 @@ const FOCUSABLE_SELECTOR =
                       scope="row"
                       class="py-2 pr-3 text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-600"
                     >
-                      Servicios
+                      {{ i18n.t('compare.services') }}
                     </th>
                     <td [attr.colspan]="beaches().length" class="py-2 pl-3"></td>
                   </tr>
@@ -278,11 +286,11 @@ const FOCUSABLE_SELECTOR =
                             <span
                               class="inline-flex items-center gap-1 font-medium text-emerald-700"
                             >
-                              <span aria-hidden="true">✓</span> Sí
+                              <span aria-hidden="true">✓</span> {{ i18n.t('compare.yes') }}
                             </span>
                           } @else {
                             <span class="inline-flex items-center gap-1 text-slate-500">
-                              <span aria-hidden="true">—</span> No
+                              <span aria-hidden="true">—</span> {{ i18n.t('compare.no') }}
                             </span>
                           }
                         </td>
@@ -292,17 +300,17 @@ const FOCUSABLE_SELECTOR =
                 } @else {
                   <tr>
                     <th scope="row" class="py-3 pr-3 text-xs font-semibold text-slate-600">
-                      Servicios
+                      {{ i18n.t('compare.services') }}
                     </th>
                     <td [attr.colspan]="beaches().length" class="py-3 pl-3 text-xs text-slate-500">
-                      Ninguna tiene servicios registrados
+                      {{ i18n.t('compare.noneHaveServices') }}
                     </td>
                   </tr>
                 }
 
                 <tr>
                   <th scope="row" class="py-3 pr-3 text-xs font-semibold text-slate-600">
-                    Última muestra
+                    {{ i18n.t('compare.latestSample') }}
                   </th>
                   @for (beach of beaches(); track beach.id) {
                     <td class="py-3 pl-3 text-slate-700">{{ sampleDate(beach) }}</td>
@@ -311,7 +319,7 @@ const FOCUSABLE_SELECTOR =
 
                 <tr>
                   <th scope="row" class="py-3 pr-3 text-xs font-semibold text-slate-600">
-                    Acciones
+                    {{ i18n.t('compare.actions') }}
                   </th>
                   @for (beach of beaches(); track beach.id) {
                     <td class="py-3 pl-3">
@@ -321,7 +329,7 @@ const FOCUSABLE_SELECTOR =
                           class="rounded-lg bg-slate-900 px-2.5 py-1.5 text-xs font-semibold text-white transition hover:bg-slate-700"
                           (click)="selected.emit(beach)"
                         >
-                          Ver en el mapa
+                          {{ i18n.t('compare.viewOnMap') }}
                         </button>
                         <a
                           [href]="mapsUrl(beach)"
@@ -329,7 +337,7 @@ const FOCUSABLE_SELECTOR =
                           rel="noopener noreferrer"
                           class="inline-flex items-center gap-1 rounded-lg border border-slate-200 px-2.5 py-1.5 text-xs font-semibold text-slate-700 transition hover:border-slate-300 hover:bg-slate-50"
                         >
-                          Cómo llegar
+                          {{ i18n.t('detail.directions') }}
                         </a>
                       </div>
                     </td>
@@ -358,17 +366,19 @@ const FOCUSABLE_SELECTOR =
                   <button
                     type="button"
                     class="shrink-0 rounded-lg border border-slate-200 bg-white px-2.5 py-1 text-xs font-semibold text-slate-600 transition hover:bg-slate-100"
-                    [attr.aria-label]="'Quitar ' + beach.name + ' del comparador'"
+                    [attr.aria-label]="i18n.t('results.removeCompare', { name: beach.name })"
                     [attr.data-testid]="'compare-card-remove-' + beach.id"
                     (click)="removed.emit(beach.id)"
                   >
-                    Quitar
+                    {{ i18n.t('compare.remove') }}
                   </button>
                 </div>
 
                 <dl class="mt-3 grid grid-cols-2 gap-2.5 text-xs">
                   <div>
-                    <dt class="font-semibold text-slate-600">Calidad del agua</dt>
+                    <dt class="font-semibold text-slate-600">
+                      {{ i18n.t('compare.waterQuality') }}
+                    </dt>
                     <dd class="mt-0.5 flex items-center gap-1.5 font-medium text-slate-800">
                       <span
                         class="h-2 w-2 shrink-0 rounded-full"
@@ -380,46 +390,55 @@ const FOCUSABLE_SELECTOR =
                   </div>
 
                   <div>
-                    <dt class="font-semibold text-slate-600">Tendencia</dt>
+                    <dt class="font-semibold text-slate-600">{{ i18n.t('compare.trend') }}</dt>
                     <dd class="mt-0.5">
                       <span [class]="trendClass(beach)">{{ trendLabel(beach) }}</span>
                     </dd>
                   </div>
 
                   <div>
-                    <dt class="font-semibold text-slate-600">Bandera azul</dt>
+                    <dt class="font-semibold text-slate-600">{{ i18n.t('compare.blueFlag') }}</dt>
                     <dd class="mt-0.5 font-medium text-slate-800">
                       @if (beach.blueFlag) {
-                        Sí{{ beach.blueFlagYear ? ' (' + beach.blueFlagYear + ')' : '' }}
+                        {{ i18n.t('compare.yes')
+                        }}{{ beach.blueFlagYear ? ' (' + beach.blueFlagYear + ')' : '' }}
                       } @else {
-                        No
+                        {{ i18n.t('compare.no') }}
                       }
                     </dd>
                   </div>
 
                   <div>
-                    <dt class="font-semibold text-slate-600">Accesibilidad</dt>
+                    <dt class="font-semibold text-slate-600">
+                      {{ i18n.t('compare.accessibility') }}
+                    </dt>
                     <dd class="mt-0.5 font-medium text-slate-800">
                       {{ accessibilityLabel(beach) }}
                     </dd>
                   </div>
 
                   <div>
-                    <dt class="font-semibold text-slate-600">Última muestra</dt>
+                    <dt class="font-semibold text-slate-600">
+                      {{ i18n.t('compare.latestSample') }}
+                    </dt>
                     <dd class="mt-0.5 font-medium text-slate-800">{{ sampleDate(beach) }}</dd>
                   </div>
 
                   @if (userLocation()) {
                     <div>
-                      <dt class="font-semibold text-slate-600">Distancia</dt>
-                      <dd class="mt-0.5 font-medium text-sea-700">a {{ distanceLabel(beach) }}</dd>
+                      <dt class="font-semibold text-slate-600">
+                        {{ i18n.t('compare.distance') }}
+                      </dt>
+                      <dd class="mt-0.5 font-medium text-sea-700">
+                        {{ i18n.t('results.distanceAway', { distance: distanceLabel(beach) }) }}
+                      </dd>
                     </div>
                   }
                 </dl>
 
                 <div class="mt-3 border-t border-slate-200/70 pt-3">
                   <p class="text-[11px] font-semibold uppercase tracking-[0.1em] text-slate-600">
-                    Servicios
+                    {{ i18n.t('compare.services') }}
                   </p>
                   <div class="mt-1.5 flex flex-wrap gap-1.5">
                     @for (service of beach.services; track service) {
@@ -429,7 +448,7 @@ const FOCUSABLE_SELECTOR =
                         {{ service }}
                       </span>
                     } @empty {
-                      <span class="text-xs text-slate-600">Sin servicios registrados</span>
+                      <span class="text-xs text-slate-600">{{ i18n.t('compare.noServices') }}</span>
                     }
                   </div>
                 </div>
@@ -442,7 +461,7 @@ const FOCUSABLE_SELECTOR =
                     class="rounded-lg bg-slate-900 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-slate-700"
                     (click)="selected.emit(beach)"
                   >
-                    Ver en el mapa
+                    {{ i18n.t('compare.viewOnMap') }}
                   </button>
                   <a
                     [href]="mapsUrl(beach)"
@@ -450,7 +469,7 @@ const FOCUSABLE_SELECTOR =
                     rel="noopener noreferrer"
                     class="inline-flex items-center gap-1 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 transition hover:bg-slate-100"
                   >
-                    Cómo llegar
+                    {{ i18n.t('detail.directions') }}
                   </a>
                 </div>
               </article>
@@ -470,6 +489,9 @@ export class BeachCompare implements OnInit {
   readonly cleared = output<void>();
   readonly selected = output<Beach>();
   readonly closed = output<void>();
+
+  readonly i18n = inject(TranslationService);
+  readonly maxCompareBeaches = MAX_COMPARE_BEACHES;
 
   private readonly analytics = inject(AnalyticsService);
   private readonly destroyRef = inject(DestroyRef);
@@ -551,8 +573,8 @@ export class BeachCompare implements OnInit {
       .map((beach) => beach.name)
       .join(' vs ');
     const data = {
-      title: `Comparativa: ${names} · Costa Clara`,
-      text: `Compara ${names} en Costa Clara`,
+      title: this.i18n.t('compare.shareTitle', { names }),
+      text: this.i18n.t('compare.shareText', { names }),
       url,
     };
 
@@ -588,7 +610,7 @@ export class BeachCompare implements OnInit {
   }
 
   qualityLabel(quality: WaterQuality): string {
-    return QUALITY_LABELS[quality];
+    return this.i18n.qualityLabel(quality);
   }
 
   qualityColor(quality: WaterQuality): string {
@@ -596,11 +618,11 @@ export class BeachCompare implements OnInit {
   }
 
   islandLabel(islandId: Beach['island']): string {
-    return ISLANDS.find((island) => island.id === islandId)?.label ?? islandId;
+    return this.i18n.islandLabel(islandId);
   }
 
   accessibilityLabel(beach: Beach): string {
-    return ACCESSIBILITY_LABELS[getBeachAccessibility(beach)];
+    return this.i18n.accessibilityLabel(getBeachAccessibility(beach));
   }
 
   hasService(beach: Beach, service: ServiceId): boolean {
@@ -609,17 +631,13 @@ export class BeachCompare implements OnInit {
 
   distanceLabel(beach: Beach): string {
     const location = this.userLocation();
-    return location ? formatDistance(distanceKm(location, beach)) : '';
+    return location ? this.i18n.formatDistance(distanceKm(location, beach)) : '';
   }
 
   sampleDate(beach: Beach): string {
-    if (!beach.lastSample) return 'Sin datos';
+    if (!beach.lastSample) return this.i18n.qualityLabel('sin-datos');
 
-    return new Date(`${beach.lastSample}T00:00:00`).toLocaleDateString('es-ES', {
-      day: '2-digit',
-      month: 'short',
-      year: 'numeric',
-    });
+    return this.i18n.formatDate(beach.lastSample);
   }
 
   mapsUrl(beach: Beach): string {
@@ -627,17 +645,7 @@ export class BeachCompare implements OnInit {
   }
 
   trendLabel(beach: Beach): string {
-    const trend = this.getTrend(beach);
-    switch (trend) {
-      case 'mejora':
-        return '↑ Mejora';
-      case 'empeora':
-        return '↓ Empeora';
-      case 'estable':
-        return '→ Estable';
-      default:
-        return 'Sin tendencia';
-    }
+    return this.i18n.trendLabel(this.getTrend(beach));
   }
 
   trendClass(beach: Beach): string {

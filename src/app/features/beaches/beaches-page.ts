@@ -11,6 +11,8 @@ import {
 } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { BEACHES, DATA_STATUS } from '../../core/data/beaches';
+import { TranslationService } from '../../core/i18n/translation.service';
+import { DEFAULT_LANG, Lang, SUPPORTED_LANGS } from '../../core/i18n/translations';
 import {
   Beach,
   ISLANDS,
@@ -21,7 +23,6 @@ import {
   WaterQuality,
 } from '../../core/models/beach';
 import {
-  ACCESSIBILITY_LABELS,
   AccessibilityFilter,
   BeachFilters,
   BeachSort,
@@ -42,7 +43,7 @@ import {
   servicesToParam,
   sortBeaches,
 } from '../../core/utils/beach-filter';
-import { Coordinates, distanceKm, formatDistance } from '../../core/utils/geo';
+import { Coordinates, distanceKm } from '../../core/utils/geo';
 import { AnalyticsService } from '../../core/services/analytics';
 import { FavoritesStore } from '../../core/services/favorites';
 import { SeoService } from '../../core/services/seo';
@@ -54,7 +55,8 @@ type IslandFilter = IslandId | 'todas';
 type QualityFilter = WaterQuality | 'todas';
 
 const ISLAND_IDS = new Set<string>(ISLANDS.map((island) => island.id));
-const QUALITY_IDS = new Set<string>(Object.keys(QUALITY_LABELS));
+const QUALITY_KEYS = Object.keys(QUALITY_LABELS) as WaterQuality[];
+const QUALITY_IDS = new Set<string>(QUALITY_KEYS);
 const VALID_BEACH_IDS = new Set<string>(BEACHES.map((beach) => beach.id));
 const SEARCH_DEBOUNCE_MS = 250;
 const COMPARE_WARNING_MS = 3500;
@@ -70,11 +72,14 @@ export class BeachesPage {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly seo = inject(SeoService);
+  readonly i18n = inject(TranslationService);
   readonly favorites = inject(FavoritesStore);
   private readonly analytics = inject(AnalyticsService);
   private readonly destroyRef = inject(DestroyRef);
 
   readonly dataStatus = DATA_STATUS;
+  readonly langs = SUPPORTED_LANGS;
+  readonly maxCompareBeaches = MAX_COMPARE_BEACHES;
 
   readonly mapSection = viewChild<ElementRef<HTMLElement>>('mapSection');
   readonly searchInput = viewChild<ElementRef<HTMLInputElement>>('searchInput');
@@ -127,32 +132,39 @@ export class BeachesPage {
   private searchDebounceTimer?: ReturnType<typeof setTimeout>;
   private compareWarningTimer?: ReturnType<typeof setTimeout>;
 
-  readonly islandOptions: ReadonlyArray<{ id: IslandFilter; label: string }> = [
-    { id: 'todas', label: 'Todas' },
-    ...ISLANDS,
-  ];
-
-  readonly qualityOptions: ReadonlyArray<{ id: QualityFilter; label: string }> = [
-    { id: 'todas', label: 'Todas' },
-    ...Object.entries(QUALITY_LABELS).map(([id, label]) => ({
-      id: id as WaterQuality,
-      label,
+  readonly islandOptions = computed<ReadonlyArray<{ id: IslandFilter; label: string }>>(() => [
+    { id: 'todas', label: this.i18n.islandLabel('todas') },
+    ...ISLANDS.map((island) => ({
+      id: island.id,
+      label: this.i18n.islandLabel(island.id),
     })),
-  ];
-
-  readonly sortOptions = computed<ReadonlyArray<{ id: BeachSort; label: string }>>(() => [
-    { id: 'nombre', label: 'Orden: Nombre (A–Z)' },
-    { id: 'calidad', label: 'Orden: Mejor calidad' },
-    { id: 'muestra', label: 'Orden: Muestra más reciente' },
-    { id: 'isla', label: 'Orden: Isla (A–Z)' },
-    ...(this.userLocation() ? [{ id: 'distancia' as const, label: 'Orden: Más cercanas' }] : []),
   ]);
 
-  readonly qualityLegend = Object.entries(QUALITY_LABELS).map(([id, label]) => ({
-    id: id as WaterQuality,
-    label,
-    color: QUALITY_COLORS[id as WaterQuality],
-  }));
+  readonly qualityOptions = computed<ReadonlyArray<{ id: QualityFilter; label: string }>>(() => [
+    { id: 'todas', label: this.i18n.qualityLabel('todas') },
+    ...QUALITY_KEYS.map((id) => ({
+      id,
+      label: this.i18n.qualityLabel(id),
+    })),
+  ]);
+
+  readonly sortOptions = computed<ReadonlyArray<{ id: BeachSort; label: string }>>(() => [
+    { id: 'nombre', label: this.i18n.t('results.sortName') },
+    { id: 'calidad', label: this.i18n.t('results.sortQuality') },
+    { id: 'muestra', label: this.i18n.t('results.sortSample') },
+    { id: 'isla', label: this.i18n.t('results.sortIsland') },
+    ...(this.userLocation()
+      ? [{ id: 'distancia' as const, label: this.i18n.t('results.sortDistance') }]
+      : []),
+  ]);
+
+  readonly qualityLegend = computed(() =>
+    QUALITY_KEYS.map((id) => ({
+      id,
+      label: this.i18n.qualityLabel(id),
+      color: QUALITY_COLORS[id],
+    })),
+  );
 
   private readonly pillBase = 'rounded-full px-3 py-1.5 text-xs font-semibold transition';
   private readonly pillActive = 'bg-slate-900 text-white shadow-sm';
@@ -241,6 +253,7 @@ export class BeachesPage {
     const services = servicesToParam(this.selectedServices());
     const sort = this.sortBy();
     const compare = compareIdsToParam(this.compareIds());
+    const lang = this.i18n.lang();
 
     if (query) url.searchParams.set('q', query);
     if (this.island() !== 'todas') url.searchParams.set('isla', this.island());
@@ -254,11 +267,14 @@ export class BeachesPage {
     // Las favoritas son locales: no se incluyen en el enlace compartido.
     if (beach) url.searchParams.set('playa', beach.id);
     if (compare) url.searchParams.set('comparar', compare);
+    if (lang !== DEFAULT_LANG) url.searchParams.set('lang', lang);
 
     return url.toString();
   });
 
   constructor() {
+    this.i18n.syncFromUrl(this.route.snapshot.queryParamMap.get('lang'));
+
     const onFullscreenChange = (): void => {
       this.isFullscreen.set(typeof document !== 'undefined' && document.fullscreenElement !== null);
     };
@@ -277,6 +293,7 @@ export class BeachesPage {
     });
 
     effect(() => {
+      const lang = this.i18n.lang();
       const queryParams: Record<string, string | null> = {
         q: this.query().trim() || null,
         isla: this.island() === 'todas' ? null : this.island(),
@@ -288,6 +305,7 @@ export class BeachesPage {
         orden: this.sortBy() === 'nombre' ? null : this.sortBy(),
         playa: this.selectedId(),
         comparar: compareIdsToParam(this.compareIds()),
+        lang: lang === DEFAULT_LANG ? null : lang,
       };
 
       const current = this.route.snapshot.queryParamMap;
@@ -307,6 +325,18 @@ export class BeachesPage {
     effect(() => {
       this.seo.update(this.selectedBeach());
     });
+  }
+
+  setLang(lang: Lang): void {
+    this.i18n.setLang(lang);
+  }
+
+  langButtonClass(active: boolean): string {
+    const base =
+      'rounded-full px-2 py-1 text-[11px] font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sea-500';
+    return active
+      ? `${base} bg-slate-900 text-white shadow-xs`
+      : `${base} text-slate-700 hover:text-slate-900`;
   }
 
   onQueryInput(value: string): void {
@@ -465,7 +495,7 @@ export class BeachesPage {
     }
 
     if (this.compareIds().length >= MAX_COMPARE_BEACHES) {
-      const message = 'Máximo 3 playas a la vez. Quita una para añadir otra.';
+      const message = this.i18n.t('compare.maxWarning');
       this.compareWarning.set(message);
       this.compareAnnouncement.set(message);
       clearTimeout(this.compareWarningTimer);
@@ -480,7 +510,11 @@ export class BeachesPage {
     clearTimeout(this.compareWarningTimer);
     this.compareIds.update((ids) => [...ids, beach.id]);
     this.compareAnnouncement.set(
-      `Añadida ${beach.name} al comparador (${this.compareIds().length} de ${MAX_COMPARE_BEACHES}).`,
+      this.i18n.t('compare.addedAnnouncement', {
+        name: beach.name,
+        count: this.compareIds().length,
+        max: MAX_COMPARE_BEACHES,
+      }),
     );
   }
 
@@ -497,8 +531,8 @@ export class BeachesPage {
       this.compareOpen.set(false);
       this.compareAnnouncement.set(
         next.length === 1
-          ? 'Queda 1 playa en el comparador. Añade otra para comparar.'
-          : 'Comparador vaciado.',
+          ? this.i18n.t('compare.oneLeftAnnouncement')
+          : this.i18n.t('compare.clearedAnnouncement'),
       );
       if (next.length === 1 && typeof requestAnimationFrame !== 'undefined') {
         requestAnimationFrame(() => this.openCompareButton()?.nativeElement.focus());
@@ -507,7 +541,9 @@ export class BeachesPage {
     }
 
     if (beach) {
-      this.compareAnnouncement.set(`Quitada ${beach.name} del comparador.`);
+      this.compareAnnouncement.set(
+        this.i18n.t('compare.removedAnnouncement', { name: beach.name }),
+      );
     }
   }
 
@@ -516,7 +552,7 @@ export class BeachesPage {
     this.compareOpen.set(false);
     this.compareWarning.set(null);
     clearTimeout(this.compareWarningTimer);
-    this.compareAnnouncement.set('Comparador vaciado.');
+    this.compareAnnouncement.set(this.i18n.t('compare.clearedAnnouncement'));
   }
 
   openCompare(): void {
@@ -590,7 +626,7 @@ export class BeachesPage {
 
   distanceLabel(beach: Beach): string | null {
     const location = this.userLocation();
-    return location ? formatDistance(distanceKm(location, beach)) : null;
+    return location ? this.i18n.formatDistance(distanceKm(location, beach)) : null;
   }
 
   toggleLegend(): void {
@@ -649,15 +685,15 @@ export class BeachesPage {
   }
 
   qualityLabel(quality: WaterQuality): string {
-    return QUALITY_LABELS[quality];
+    return this.i18n.qualityLabel(quality);
   }
 
   islandLabel(island: IslandId): string {
-    return ISLANDS.find((item) => item.id === island)?.label ?? island;
+    return this.i18n.islandLabel(island);
   }
 
   accessibilityLabel(level: AccessibilityFilter): string {
-    return ACCESSIBILITY_LABELS[level];
+    return this.i18n.accessibilityLabel(level);
   }
 
   serviceSlug(service: ServiceId): string {

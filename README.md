@@ -77,22 +77,23 @@ Instrucciones y rotación del token en [docs/despliegue.md](./docs/despliegue.md
 - Accesibilidad WCAG AA con axe, foco visible y `prefers-reduced-motion`.
 - Estado del mar en la ficha (Open-Meteo Marine) y analítica sin cookies/PII.
 - Reportar datos incorrectos y SEO técnico (sitemap, JSON-LD, canonical).
-- PWA instalable con offline y carga diferida de ficha/comparador.
+- PWA instalable con offline y carga diferida de ficha, comparador y mapa.
 - Storybook con 5 componentes y 20 stories.
-- Tests: 59 unitarios y 58 e2e (desktop y móvil).
+- i18n ES/EN/CA con selector, `?lang=` y persistencia.
+- Tests: 66 unitarios y 60 e2e (desktop y móvil).
 - Importador CSV con validación, fixture y fallback al dataset demo.
 - CI con tests, build y e2e; deploy automático en Cloudflare Pages.
 - Dataset semilla de 19 playas reales (calidad y servicios de ejemplo).
 
 ## Próximos pasos
 
-1. Conectar la fuente oficial y automatizar la actualización (CC-13).
-2. PWA offline.
-3. Comparador de playas.
-4. Accesibilidad del mapa y auditoría axe.
-5. Storybook para los componentes de UI.
+1. Conectar la fuente oficial real y regenerar el sitemap con el nuevo dataset.
+2. Backend/PostGIS si el dataset crece (hoy es estático).
+3. Fotos de playas con licencia y AVIF/WebP.
+4. i18n del contenido del dataset (hoy solo se traduce la UI).
+5. Medición de campo (CrUX) y mantenimiento de dependencias.
 
-El detalle, prioridades y criterios de aceptación están en [BACKLOG.md](./BACKLOG.md).
+El backlog de 36 tickets está cerrado; el detalle queda en [BACKLOG.md](./BACKLOG.md).
 
 ## Datos
 

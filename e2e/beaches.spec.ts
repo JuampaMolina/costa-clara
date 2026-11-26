@@ -726,3 +726,60 @@ test('expone el manifest PWA con iconos válidos y enlaces en el documento (CC-4
     expect(iconResponse.headers()['content-type']).toContain('image/png');
   }
 });
+
+test('cambia idioma ES/EN/CA, sincroniza ?lang= y persiste tras recarga (CC-52)', async ({
+  page,
+}) => {
+  await page.route('https://marine-api.open-meteo.com/v1/marine**', (route) =>
+    route.fulfill({ status: 503, body: '' }),
+  );
+
+  await page.goto('/');
+
+  await expect(page.locator('html')).toHaveAttribute('lang', 'es');
+  await expect(page.getByTestId('lang-es')).toHaveAttribute('aria-pressed', 'true');
+  await expect(page).not.toHaveURL(/lang=/);
+
+  await page.getByTestId('lang-en').click();
+
+  await expect(page.locator('html')).toHaveAttribute('lang', 'en');
+  await expect(page.getByTestId('lang-en')).toHaveAttribute('aria-pressed', 'true');
+  await expect(page).toHaveURL(/lang=en/);
+  await expect(page.getByRole('heading', { name: 'Find your beach' })).toBeVisible();
+  await expect(page.getByTestId('result-count')).toHaveText('19 beaches');
+  await expect(page).toHaveTitle('Costa Clara · Balearic Beaches');
+
+  await page.getByRole('button', { name: /^Es Trenc/ }).click();
+  const detail = page.locator('app-beach-detail');
+  await expect(detail.getByText('Quality history')).toBeVisible();
+  await expect(detail.getByText('↑ Improving')).toBeVisible();
+  await expect(detail.getByRole('link', { name: /Directions/ })).toBeVisible();
+  await page.getByRole('button', { name: 'Close details' }).click();
+
+  await page.reload();
+  await expect(page.locator('html')).toHaveAttribute('lang', 'en');
+  await expect(page.getByRole('heading', { name: 'Find your beach' })).toBeVisible();
+  await expect(page).toHaveURL(/lang=en/);
+
+  await page.goto('/');
+  await expect(page.locator('html')).toHaveAttribute('lang', 'en');
+  await expect(page.getByRole('heading', { name: 'Find your beach' })).toBeVisible();
+  await expect(page).toHaveURL(/lang=en/);
+
+  await page.getByTestId('lang-ca').click();
+  await expect(page.locator('html')).toHaveAttribute('lang', 'ca');
+  await expect(page.getByTestId('lang-ca')).toHaveAttribute('aria-pressed', 'true');
+  await expect(page).toHaveURL(/lang=ca/);
+  await expect(page.getByRole('heading', { name: 'Troba la teva platja' })).toBeVisible();
+  await expect(page.getByTestId('result-count')).toHaveText('19 platges');
+  await expect(page.getByTestId('island-ibiza')).toContainText('Eivissa');
+  await expect(page).toHaveTitle('Costa Clara · Platges de les Balears');
+
+  await page.getByTestId('lang-es').click();
+  await expect(page.locator('html')).toHaveAttribute('lang', 'es');
+  await expect(page.getByTestId('lang-es')).toHaveAttribute('aria-pressed', 'true');
+  await expect(page).not.toHaveURL(/lang=/);
+  await expect(page.getByRole('heading', { name: 'Encuentra tu playa' })).toBeVisible();
+  await expect(page.getByTestId('result-count')).toHaveText('19 playas');
+  await expect(page).toHaveTitle('Costa Clara · Playas de Baleares');
+});

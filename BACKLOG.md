@@ -4,7 +4,7 @@ Listado de tickets para evolucionar la app desde la v0.1 actual hasta una v1.0 p
 
 > **Contexto:** v0.1 con 19 playas de demostración, mapa OpenLayers con clustering, filtros sincronizados con la URL y ficha lateral. Sin backend, sin deploy y sin e2e todavía.
 
-**Estado:** 35/36 cerrados · actualizado 2026-11-26.
+**Estado:** 36/36 cerrados · actualizado 2026-11-26.
 
 ## Hecho
 
@@ -41,6 +41,7 @@ Listado de tickets para evolucionar la app desde la v0.1 actual hasta una v1.0 p
 - ✅ **CC-42** Imagen OG 1200×630 y metas Open Graph/Twitter.
 - ✅ **CC-50** Auditoría axe WCAG AA, foco, contraste y reduced motion.
 - ✅ **CC-51** Storybook 10 con 5 componentes y 20 stories.
+- ✅ **CC-52** i18n ES/EN/CA con selector, `?lang=` y persistencia.
 - ✅ **CC-53** robots, sitemap, JSON-LD, canonical y og:url.
 - ✅ **CC-54** Caso de estudio y 4 ADRs.
 
@@ -309,7 +310,7 @@ Reglas del proyecto que aplican a todos los tickets: UI en español, no inventar
 - Una versión nueva muestra aviso de actualización sin romper la sesión.
 
 ### CC-41 · Rendimiento y bundle · P2 · M
-**Estado:** ✅ Hecho (2026-11-26) · 695→687 kB; LCP 1,8 s, TBT 40 ms, Lighthouse 98.
+**Estado:** ✅ Hecho (2026-11-26) · 695→378 kB inicial + mapa diferido de 330 kB; Lighthouse 98.
 **Qué:** medir y reducir el peso inicial; valorar carga diferida de OpenLayers/mapa, tree-shaking de estilos y presupuesto más estricto.
 **Hecho cuando:**
 - Hay medición antes/después documentada (LCP, TBT, kB iniciales).
@@ -348,6 +349,7 @@ Reglas del proyecto que aplican a todos los tickets: UI en español, no inventar
 - `npm run storybook` y build estático funcionan.
 
 ### CC-52 · Internacionalización ES/EN/CA · P2 · L
+**Estado:** ✅ Hecho (2026-11-26) · diccionarios ES/EN/CA, selector, `?lang=` y persistencia; datos del dataset sin traducir.
 **Qué:** externalizar textos y añadir catalán e inglés con Angular i18n o un diccionario propio, manteniendo español por defecto.
 **Hecho cuando:**
 - No quedan textos hardcodeados en templates.

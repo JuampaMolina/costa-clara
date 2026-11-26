@@ -1,11 +1,6 @@
-import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
-import {
-  BeachSample,
-  QUALITY_COLORS,
-  QUALITY_LABELS,
-  QUALITY_RANK,
-  WaterQuality,
-} from '../../core/models/beach';
+import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
+import { TranslationService } from '../../core/i18n/translation.service';
+import { BeachSample, QUALITY_COLORS, QUALITY_RANK, WaterQuality } from '../../core/models/beach';
 import { getSamplesTrend } from '../../core/utils/beach-history';
 
 interface HistoryPoint {
@@ -28,23 +23,10 @@ const CHART_PADDING_Y = 14;
     <div class="mt-4 rounded-2xl border border-slate-100 bg-slate-50/70 p-3">
       <div class="flex items-center justify-between gap-2">
         <h3 class="text-[11px] font-semibold uppercase tracking-wide text-slate-500">
-          Histórico de calidad
+          {{ i18n.t('history.title') }}
         </h3>
         <span [class]="trendClass()">
-          @switch (trend()) {
-            @case ('mejora') {
-              ↑ Mejora
-            }
-            @case ('empeora') {
-              ↓ Empeora
-            }
-            @case ('estable') {
-              → Estable
-            }
-            @default {
-              Sin tendencia
-            }
-          }
+          {{ i18n.trendLabel(trend()) }}
         </span>
       </div>
 
@@ -102,6 +84,7 @@ const CHART_PADDING_Y = 14;
 })
 export class BeachHistory {
   readonly samples = input.required<BeachSample[]>();
+  readonly i18n = inject(TranslationService);
 
   readonly ordered = computed(() =>
     [...this.samples()].sort((a, b) => a.date.localeCompare(b.date)),
@@ -140,9 +123,14 @@ export class BeachHistory {
   readonly summary = computed(() => {
     const first = this.first();
     const latest = this.latest();
-    if (!first || !latest) return 'Sin histórico de calidad.';
+    if (!first || !latest) return this.i18n.t('history.emptySummary');
 
-    return `Histórico de ${this.ordered().length} muestras, de ${this.formatDate(first.date)} a ${this.formatDate(latest.date)}. Última: ${QUALITY_LABELS[latest.quality]}.`;
+    return this.i18n.t('history.summary', {
+      count: this.ordered().length,
+      from: this.formatDate(first.date),
+      to: this.formatDate(latest.date),
+      latest: this.label(latest.quality),
+    });
   });
 
   readonly trendClass = computed(() => {
@@ -162,7 +150,7 @@ export class BeachHistory {
   });
 
   label(quality: WaterQuality): string {
-    return QUALITY_LABELS[quality];
+    return this.i18n.qualityLabel(quality);
   }
 
   color(quality: WaterQuality): string {
@@ -170,12 +158,6 @@ export class BeachHistory {
   }
 
   formatDate(date: string | undefined): string {
-    if (!date) return '';
-
-    return new Date(`${date}T00:00:00`).toLocaleDateString('es-ES', {
-      day: '2-digit',
-      month: 'short',
-      year: 'numeric',
-    });
+    return this.i18n.formatDate(date);
   }
 }
