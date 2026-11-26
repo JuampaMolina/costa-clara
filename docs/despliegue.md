@@ -1,45 +1,52 @@
 # Despliegue en Cloudflare Pages
 
-El repo se despliega como sitio estático: Angular genera `dist/costa-clara/browser` y Cloudflare Pages lo sirve con CDN y HTTPS.
+**Estado:** desplegado y automatizado.
 
-## Opción A · Integración Git (recomendada)
+- **Producción:** <https://costa-clara-k23.pages.dev>
+- **Proyecto Cloudflare:** `costa-clara` (Direct Upload)
+- **Workflow:** [`.github/workflows/deploy.yml`](../.github/workflows/deploy.yml)
+- **Build:** `npm run build` → `dist/costa-clara/browser`
 
-1. Entra en <https://dash.cloudflare.com> → **Workers & Pages** → **Create** → **Pages** → **Connect to Git**.
-2. Autoriza GitHub y elige el repo `JuampaMolina/costa-clara`.
-3. Configura el build:
+## Cómo funciona
 
-   | Ajuste | Valor |
-   | --- | --- |
-   | Production branch | `main` |
-   | Framework preset | `Angular` (o `None`) |
-   | Build command | `npm run build` |
-   | Build output directory | `dist/costa-clara/browser` |
-   | Root directory | `/` |
-   | Variable de entorno | `NODE_VERSION=22` |
+Cada push a `main` (o una ejecución manual del workflow) hace:
 
-4. **Save and Deploy**. El primer build tarda unos minutos.
-5. Cada push a `main` publica producción; cada PR genera una preview con su propia URL.
+1. `npm ci`
+2. `npm run build`
+3. `npx wrangler pages deploy dist/costa-clara/browser --project-name costa-clara --branch main`
 
-Con esta opción no hay tokens en GitHub: Cloudflare habla directamente con el repo.
+El workflow `.github/workflows/ci.yml` se ejecuta en paralelo y valida tests y build antes de dar el commit por bueno. La concurrencia `deploy-production` cancela despliegues antiguos si llegan pushes seguidos.
 
-## Opción B · Wrangler desde local o CI
+### Secretos del repositorio
 
-Si prefieres desplegar por CLI, crea un token en **My Profile → API Tokens** con permiso `Cloudflare Pages: Edit` y exporta:
+| Secreto | Contenido |
+| --- | --- |
+| `CLOUDFLARE_API_TOKEN` | Token con permiso **Cloudflare Pages: Edit** |
+| `CLOUDFLARE_ACCOUNT_ID` | `d4b54619e679a7915a78109c61fe2075` |
+
+Los secretos se configuran con `gh secret set` o desde **Settings → Secrets and variables → Actions**. Nunca se commitean.
+
+## Deploy manual
 
 ```powershell
 $env:CLOUDFLARE_API_TOKEN = '<token>'
 $env:CLOUDFLARE_ACCOUNT_ID = '<account-id>'
+npm run deploy
 ```
 
-Primer despliegue manual:
+El script `deploy` compila y sube el resultado. Wrangler está en `devDependencies` para que la versión sea reproducible.
 
-```powershell
-npx wrangler pages project create costa-clara --production-branch main
-npm run build
-npx wrangler pages deploy dist/costa-clara/browser --project-name costa-clara
-```
+## Rotación del token
 
-Para automatizarlo en GitHub Actions, añade los secretos `CLOUDFLARE_API_TOKEN` y `CLOUDFLARE_ACCOUNT_ID` al repo y un workflow que ejecute el build y `wrangler pages deploy`. No subas tokens al repo.
+El token permite publicar en la cuenta: trátalo como una credencial de escritura.
+
+1. Crea un token nuevo en **My Profile → API Tokens** con permiso `Cloudflare Pages: Edit` y, si es posible, limitado a la cuenta.
+2. Actualiza el secreto:
+   ```powershell
+   gh secret set CLOUDFLARE_API_TOKEN --body '<token-nuevo>'
+   ```
+3. Revoca el token anterior en el dashboard.
+4. Lanza el workflow **Deploy** con `workflow_dispatch` para comprobar que sigue publicando.
 
 ## Rutas SPA
 
@@ -49,18 +56,22 @@ Para automatizarlo en GitHub Actions, añade los secretos `CLOUDFLARE_API_TOKEN`
 /*    /index.html   200
 ```
 
-Angular copia ese fichero a la raíz del build, así que recargar `/?isla=mallorca` o una URL profunda devuelve la app en vez de un 404. No hace falta configurar nada más en Pages.
+Angular copia ese fichero a la raíz del build, así que recargar `/?isla=mallorca` o una URL profunda devuelve la app en vez de un 404.
 
-## Verificación tras el primer deploy
+## Verificación
 
-- La home carga por HTTPS y el mapa pinta los marcadores.
-- Recargar con `?isla=menorca&calidad=excelente` mantiene los filtros.
-- Abrir una URL inexistente muestra la app (pendiente la página 404 propia, ticket CC-06).
-- En DevTools → Network, los assets llevan hash y `cache-control` de larga duración.
-- El build de Cloudflare termina con el mismo tamaño que en local (~600 kB inicial).
+- `https://costa-clara-k23.pages.dev/` devuelve 200 y pinta el mapa.
+- `/?isla=menorca&calidad=excelente` mantiene los filtros al recargar.
+- Una ruta inexistente devuelve la app (la página 404 propia es el ticket CC-06).
+- En **Workers & Pages → costa-clara → Deployments** aparece un deployment `production` por cada push.
+- El build tarda ~3 s y el bundle inicial ronda los 596 kB (límite de warning: 700 kB).
+
+## Alternativa: integración Git del dashboard
+
+También se puede conectar el repo desde **Workers & Pages → Create → Pages → Connect to Git**. Si se hace, hay que desactivar o borrar `deploy.yml` para no desplegar dos veces. Con la integración Git, Cloudflare necesita su propia autorización de GitHub y no usa los secretos de Actions.
 
 ## Notas
 
-- No se necesita backend ni base de datos.
-- Si el build falla por Node, confirma `NODE_VERSION=22` en las variables del proyecto.
-- El plan gratuito de Pages cubre builds ilimitados en repos públicos y ancho de banda generoso; revisa límites actuales antes de publicar tráfico alto.
+- Direct Upload no crea previews por PR; si se quieren, se puede añadir un workflow que despliegue con `--branch=${{ github.head_ref }}` y comente la URL en el PR.
+- No hay backend ni base de datos: todo el sitio es estático.
+- El plan gratuito de Pages cubre builds ilimitados en repos públicos; revisa los límites actuales antes de asumir tráfico alto.
