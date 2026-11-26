@@ -9,7 +9,6 @@ import {
   signal,
   viewChild,
 } from '@angular/core';
-import { Meta, Title } from '@angular/platform-browser';
 import { ActivatedRoute, Router } from '@angular/router';
 import { BEACHES, DATA_STATUS } from '../../core/data/beaches';
 import {
@@ -46,6 +45,7 @@ import {
 import { Coordinates, distanceKm, formatDistance } from '../../core/utils/geo';
 import { AnalyticsService } from '../../core/services/analytics';
 import { FavoritesStore } from '../../core/services/favorites';
+import { SeoService } from '../../core/services/seo';
 import { BeachCompare } from './beach-compare';
 import { BeachDetail } from './beach-detail';
 import { BeachMap } from './beach-map';
@@ -69,8 +69,7 @@ const COMPARE_WARNING_MS = 3500;
 export class BeachesPage {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
-  private readonly title = inject(Title);
-  private readonly meta = inject(Meta);
+  private readonly seo = inject(SeoService);
   readonly favorites = inject(FavoritesStore);
   private readonly analytics = inject(AnalyticsService);
   private readonly destroyRef = inject(DestroyRef);
@@ -90,10 +89,6 @@ export class BeachesPage {
 
   readonly availableServices = getAvailableServices(BEACHES);
   readonly availableAccessibility = getAvailableAccessibilityLevels(BEACHES);
-
-  private readonly defaultTitle = 'Costa Clara · Playas de Baleares';
-  private readonly defaultDescription =
-    'Mapa interactivo de las playas de Baleares: calidad del agua, servicios, bandera azul y cómo llegar.';
 
   private readonly initialQuery = this.route.snapshot.queryParamMap.get('q') ?? '';
   private readonly initialServices = parseServicesParam(
@@ -278,6 +273,7 @@ export class BeachesPage {
     this.destroyRef.onDestroy(() => {
       clearTimeout(this.searchDebounceTimer);
       clearTimeout(this.compareWarningTimer);
+      this.seo.clearBeachJsonLd();
     });
 
     effect(() => {
@@ -309,24 +305,7 @@ export class BeachesPage {
     });
 
     effect(() => {
-      const beach = this.selectedBeach();
-
-      if (!beach) {
-        this.title.setTitle(this.defaultTitle);
-        this.meta.updateTag({ name: 'description', content: this.defaultDescription });
-        this.meta.updateTag({ property: 'og:title', content: this.defaultTitle });
-        this.meta.updateTag({ property: 'og:description', content: this.defaultDescription });
-        return;
-      }
-
-      const quality = QUALITY_LABELS[beach.quality].toLowerCase();
-      const description = `${beach.name} (${this.islandLabel(beach.island)}, ${beach.municipality}): calidad del agua ${quality}, servicios y cómo llegar.`;
-      const beachTitle = `${beach.name} · Costa Clara`;
-
-      this.title.setTitle(beachTitle);
-      this.meta.updateTag({ name: 'description', content: description });
-      this.meta.updateTag({ property: 'og:title', content: beachTitle });
-      this.meta.updateTag({ property: 'og:description', content: description });
+      this.seo.update(this.selectedBeach());
     });
   }
 

@@ -547,3 +547,129 @@ test('emite eventos de analítica sin PII ni texto de búsqueda crudo (CC-43)', 
 
   expect(JSON.stringify(events)).not.toContain('"trenc"');
 });
+
+test('incluye enlace para reportar un dato con issue prellenado y sin PII (CC-28)', async ({
+  page,
+}) => {
+  await page.route('https://marine-api.open-meteo.com/v1/marine**', (route) =>
+    route.fulfill({ status: 503, body: '' }),
+  );
+
+  await page.goto('/?playa=es-trenc');
+
+  const reportLink = page.getByTestId('report-data');
+  await expect(reportLink).toBeVisible();
+  await expect(reportLink).toHaveText('Reportar un dato');
+  await expect(reportLink).toHaveAttribute('target', '_blank');
+  await expect(reportLink).toHaveAttribute('rel', /noopener/);
+
+  const href = await reportLink.getAttribute('href');
+  expect(href).toBeTruthy();
+
+  const parsed = new URL(href!);
+  expect(`${parsed.origin}${parsed.pathname}`).toBe(
+    'https://github.com/JuampaMolina/costa-clara/issues/new',
+  );
+  expect(parsed.searchParams.get('title')).toContain('Es Trenc');
+  expect(parsed.searchParams.get('title')).toContain('es-trenc');
+
+  const body = parsed.searchParams.get('body') ?? '';
+  expect(body).toContain('Es Trenc');
+  expect(body).toContain('es-trenc');
+  expect(body).toContain('Campo a revisar');
+  expect(body).toContain('https://costa-clara-k23.pages.dev/?playa=es-trenc');
+});
+
+test('sirve robots.txt y sitemap.xml con la home y las 19 playas (CC-53)', async ({ page }) => {
+  const robots = await page.request.get('/robots.txt');
+  expect(robots.status()).toBe(200);
+  const robotsText = await robots.text();
+  expect(robotsText).toContain('Allow: /');
+  expect(robotsText).toContain('Sitemap: https://costa-clara-k23.pages.dev/sitemap.xml');
+
+  const sitemap = await page.request.get('/sitemap.xml');
+  expect(sitemap.status()).toBe(200);
+  const sitemapXml = await sitemap.text();
+  expect(sitemapXml).toContain('<loc>https://costa-clara-k23.pages.dev/</loc>');
+  expect(sitemapXml).toContain('<loc>https://costa-clara-k23.pages.dev/?playa=es-trenc</loc>');
+  expect(sitemapXml).toContain(
+    '<loc>https://costa-clara-k23.pages.dev/?playa=cala-macarella</loc>',
+  );
+  expect(sitemapXml).toContain('<lastmod>2026-11-26</lastmod>');
+  expect(sitemapXml).toContain('<changefreq>monthly</changefreq>');
+  expect(sitemapXml.match(/<url>/g)).toHaveLength(20);
+});
+
+test('expone JSON-LD WebSite en home y canonical, og:url y JSON-LD dinámicos en la ficha (CC-53)', async ({
+  page,
+}) => {
+  await page.route('https://marine-api.open-meteo.com/v1/marine**', (route) =>
+    route.fulfill({ status: 503, body: '' }),
+  );
+
+  await page.goto('/?isla=mallorca');
+
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
+    'href',
+    'https://costa-clara-k23.pages.dev/',
+  );
+  await expect(page.locator('meta[property="og:url"]')).toHaveAttribute(
+    'content',
+    'https://costa-clara-k23.pages.dev/',
+  );
+  await expect(page.locator('script#beach-jsonld')).toHaveCount(0);
+
+  const websiteJsonRaw = await page.locator('script#website-jsonld').textContent();
+  expect(websiteJsonRaw).toBeTruthy();
+  const websiteJson = JSON.parse(websiteJsonRaw!);
+  expect(websiteJson['@type']).toBe('WebSite');
+  expect(websiteJson.url).toBe('https://costa-clara-k23.pages.dev/');
+  expect(websiteJson.potentialAction['@type']).toBe('SearchAction');
+  expect(websiteJson.potentialAction.target.urlTemplate).toBe(
+    'https://costa-clara-k23.pages.dev/?q={search_term_string}',
+  );
+
+  await page.getByRole('button', { name: /^Es Trenc/ }).click();
+
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
+    'href',
+    'https://costa-clara-k23.pages.dev/?playa=es-trenc',
+  );
+  await expect(page.locator('meta[property="og:url"]')).toHaveAttribute(
+    'content',
+    'https://costa-clara-k23.pages.dev/?playa=es-trenc',
+  );
+
+  const beachJsonRaw = await page.locator('script#beach-jsonld').textContent();
+  expect(beachJsonRaw).toBeTruthy();
+  const beachJson = JSON.parse(beachJsonRaw!);
+  expect(beachJson['@type']).toEqual(['TouristAttraction', 'Beach']);
+  expect(beachJson.name).toBe('Es Trenc');
+  expect(beachJson.url).toBe('https://costa-clara-k23.pages.dev/?playa=es-trenc');
+  expect(beachJson.image).toBe('https://costa-clara-k23.pages.dev/og-image.png');
+  expect(beachJson.geo).toEqual({
+    '@type': 'GeoCoordinates',
+    latitude: 39.3406,
+    longitude: 2.9828,
+  });
+  expect(beachJson.address).toEqual({
+    '@type': 'PostalAddress',
+    addressLocality: 'Campos',
+    addressRegion: 'Illes Balears',
+    addressCountry: 'ES',
+  });
+  expect(beachJson.isAccessibleForFree).toBe(true);
+  expect(beachJson.publicAccess).toBe(true);
+
+  await page.getByRole('button', { name: 'Cerrar ficha' }).click();
+
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
+    'href',
+    'https://costa-clara-k23.pages.dev/',
+  );
+  await expect(page.locator('meta[property="og:url"]')).toHaveAttribute(
+    'content',
+    'https://costa-clara-k23.pages.dev/',
+  );
+  await expect(page.locator('script#beach-jsonld')).toHaveCount(0);
+});
