@@ -1,5 +1,7 @@
 # Costa Clara
 
+[![CI](https://github.com/JuampaMolina/costa-clara/actions/workflows/ci.yml/badge.svg)](https://github.com/JuampaMolina/costa-clara/actions/workflows/ci.yml)
+
 Observatorio de playas y calidad del agua de Baleares. Un mapa interactivo para consultar el estado de las playas, sus servicios y su ubicación.
 
 > **Si eres el agente que continúa el proyecto, lee [HANDOFF.md](./HANDOFF.md) antes de tocar código.**
@@ -31,6 +33,16 @@ npm start        # servidor de desarrollo
 npm run build    # build de producción
 npm test         # tests unitarios
 ```
+
+## Despliegue
+
+Producción en **Cloudflare Pages** (pendiente de conectar la cuenta). Build estático:
+
+- Comando: `npm run build`
+- Salida: `dist/costa-clara/browser`
+- Rutas SPA: `public/_redirects` ya incluido
+
+Instrucciones completas en [docs/despliegue.md](./docs/despliegue.md).
 
 ## Qué hay hecho
 
