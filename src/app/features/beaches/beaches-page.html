@@ -91,11 +91,12 @@
           <select
             id="quality-filter"
             class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-700 outline-none transition focus:border-sea-400 focus:ring-4 focus:ring-sea-100"
-            [value]="quality()"
             (change)="setQuality($any($event.target).value)"
           >
             @for (option of qualityOptions; track option.id) {
-              <option [value]="option.id">{{ option.label }}</option>
+              <option [value]="option.id" [selected]="quality() === option.id">
+                {{ option.label }}
+              </option>
             }
           </select>
 
@@ -113,7 +114,7 @@
         </div>
 
         <div class="mt-3 flex items-center justify-between gap-2 text-xs">
-          <span class="text-slate-500" aria-live="polite">
+          <span class="text-slate-500" aria-live="polite" data-testid="result-count">
             <strong class="font-semibold text-slate-800">{{ filteredBeaches().length }}</strong>
             {{ filteredBeaches().length === 1 ? 'playa' : 'playas' }}
           </span>

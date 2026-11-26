@@ -43,6 +43,11 @@ __screenshots__/
 .wrangler/
 deploy.log
 
+# Playwright
+/playwright-report
+/test-results
+/blob-report
+
 # System files
 .DS_Store
 Thumbs.db

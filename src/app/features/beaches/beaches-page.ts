@@ -6,6 +6,7 @@ import {
   inject,
   signal,
 } from '@angular/core';
+import { Meta, Title } from '@angular/platform-browser';
 import { ActivatedRoute, Router } from '@angular/router';
 import { BEACHES } from '../../core/data/beaches.seed';
 import {
@@ -36,6 +37,12 @@ const QUALITY_IDS = new Set<string>(Object.keys(QUALITY_LABELS));
 export class BeachesPage {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
+  private readonly title = inject(Title);
+  private readonly meta = inject(Meta);
+
+  private readonly defaultTitle = 'Costa Clara · Playas de Baleares';
+  private readonly defaultDescription =
+    'Mapa interactivo de las playas de Baleares: calidad del agua, servicios, bandera azul y cómo llegar.';
 
   readonly query = signal(this.route.snapshot.queryParamMap.get('q') ?? '');
   readonly island = signal<IslandFilter>(this.readIsland());
@@ -107,6 +114,27 @@ export class BeachesPage {
         queryParams,
         replaceUrl: true,
       });
+    });
+
+    effect(() => {
+      const beach = this.selectedBeach();
+
+      if (!beach) {
+        this.title.setTitle(this.defaultTitle);
+        this.meta.updateTag({ name: 'description', content: this.defaultDescription });
+        this.meta.updateTag({ property: 'og:title', content: this.defaultTitle });
+        this.meta.updateTag({ property: 'og:description', content: this.defaultDescription });
+        return;
+      }
+
+      const quality = QUALITY_LABELS[beach.quality].toLowerCase();
+      const description = `${beach.name} (${this.islandLabel(beach.island)}, ${beach.municipality}): calidad del agua ${quality}, servicios y cómo llegar.`;
+      const beachTitle = `${beach.name} · Costa Clara`;
+
+      this.title.setTitle(beachTitle);
+      this.meta.updateTag({ name: 'description', content: description });
+      this.meta.updateTag({ property: 'og:title', content: beachTitle });
+      this.meta.updateTag({ property: 'og:description', content: description });
     });
   }
 

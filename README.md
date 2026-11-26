@@ -35,6 +35,7 @@ Abre `http://localhost:4200`.
 npm start        # servidor de desarrollo
 npm run build    # build de producción
 npm test         # tests unitarios
+npm run test:e2e # tests e2e con Playwright (desktop + móvil)
 npm run deploy   # build + deploy manual a Cloudflare Pages
 ```
 
@@ -55,6 +56,9 @@ Instrucciones y rotación del token en [docs/despliegue.md](./docs/despliegue.md
 - Estado de filtros y playa seleccionada en la URL (compartible).
 - Ficha de playa con calidad, servicios, última muestra, coordenadas y enlace a cómo llegar.
 - Leyenda de calidad y diseño responsive.
+- Página 404 propia, título y metadatos dinámicos por playa.
+- Tests: 8 unitarios y 16 e2e (desktop y móvil).
+- CI con tests, build y e2e; deploy automático en Cloudflare Pages.
 - Dataset semilla de 19 playas reales (calidad y servicios de ejemplo).
 
 ## Próximos pasos
@@ -62,9 +66,11 @@ Instrucciones y rotación del token en [docs/despliegue.md](./docs/despliegue.md
 1. Importador de datos abiertos (CSV/JSON) y modelo de datos definitivo.
 2. Ficha completa con histórico de calidad y gráficas.
 3. Favoritos + PWA offline.
-4. Tests e2e con Playwright.
+4. Comparador de playas y enlaces compartibles.
 5. Accesibilidad del mapa (navegación por teclado y alternativa textual).
 6. Storybook para los componentes de UI.
+
+El detalle, prioridades y criterios de aceptación están en [BACKLOG.md](./BACKLOG.md).
 
 ## Datos
 

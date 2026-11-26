@@ -4,6 +4,15 @@ Listado de tickets para evolucionar la app desde la v0.1 actual hasta una v1.0 p
 
 > **Contexto:** v0.1 con 19 playas de demostración, mapa OpenLayers con clustering, filtros sincronizados con la URL y ficha lateral. Sin backend, sin deploy y sin e2e todavía.
 
+**Estado:** 4/36 cerrados · actualizado 2026-11-26.
+
+## Hecho
+
+- ✅ **CC-01** Deploy en Cloudflare Pages (auto-deploy desde `main`).
+- ✅ **CC-02** CI con GitHub Actions (tests, build y e2e).
+- ✅ **CC-03** Playwright configurado + 16 e2e (desktop y móvil).
+- ✅ **CC-06** 404 propia, títulos y metadatos dinámicos.
+
 ## Cómo leer esto
 
 | Campo | Valores |
@@ -42,6 +51,7 @@ Reglas del proyecto que aplican a todos los tickets: UI en español, no inventar
 ## E0 · Fundaciones y publicación
 
 ### CC-01 · Desplegar en Cloudflare Pages · P0 · M
+**Estado:** ✅ Hecho (2026-11-26) · <https://costa-clara-k23.pages.dev>
 **Qué:** conectar el repo a Cloudflare Pages con build `npm run build` y salida `dist/costa-clara/browser`, preview por PR y producción en `main`.
 **Hecho cuando:**
 - URL pública estable en producción y una preview por PR.
@@ -50,6 +60,7 @@ Reglas del proyecto que aplican a todos los tickets: UI en español, no inventar
 **Depende:** repo en GitHub (crear remoto si aún no existe).
 
 ### CC-02 · CI con GitHub Actions · P0 · S
+**Estado:** ✅ Hecho (2026-11-26) · tests, build y e2e en cada push/PR.
 **Qué:** workflow en `.github/workflows/ci.yml` que en cada push/PR ejecute instalación con cache, tests unitarios, build de producción y (cuando exista) e2e.
 **Hecho cuando:**
 - El check es obligatorio para mergear.
@@ -57,6 +68,7 @@ Reglas del proyecto que aplican a todos los tickets: UI en español, no inventar
 **Depende:** CC-03 para incluir e2e en el mismo workflow.
 
 ### CC-03 · Configurar Playwright y e2e de flujos críticos · P0 · M
+**Estado:** ✅ Hecho (2026-11-26) · 6 flujos × desktop/móvil.
 **Qué:** `playwright.config.ts` con `webServer` sobre `ng serve`, proyectos desktop y móvil, y specs de: buscar, filtrar por isla/calidad/bandera, seleccionar playa, recargar URL y estado vacío.
 **Hecho cuando:**
 - `npx playwright test` pasa en local y en CI.
@@ -77,6 +89,7 @@ Reglas del proyecto que aplican a todos los tickets: UI en español, no inventar
 - Reglas mínimas: imports sin usar, `console.log` prohibido en `src/` salvo logger, orden de imports.
 
 ### CC-06 · 404, títulos y metadatos base · P0 · S
+**Estado:** ✅ Hecho (2026-11-26) · pendiente canonical y sitemap (CC-53).
 **Qué:** ruta wildcard con página 404 útil, `TitleStrategy` para títulos por ruta/playa, descripción, canonical y Open Graph básicos.
 **Hecho cuando:**
 - Una URL inválida muestra una página con enlace al mapa.
