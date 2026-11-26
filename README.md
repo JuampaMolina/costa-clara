@@ -71,7 +71,8 @@ Instrucciones y rotación del token en [docs/despliegue.md](./docs/despliegue.md
 - Leyenda de calidad y diseño responsive.
 - Página 404 propia, título y metadatos dinámicos por playa.
 - Imagen OG 1200×630 y metas Open Graph/Twitter.
-- Tests: 42 unitarios y 40 e2e (desktop y móvil).
+- Accesibilidad WCAG AA con axe, foco visible y `prefers-reduced-motion`.
+- Tests: 42 unitarios y 46 e2e (desktop y móvil).
 - Importador CSV con validación, fixture y fallback al dataset demo.
 - CI con tests, build y e2e; deploy automático en Cloudflare Pages.
 - Dataset semilla de 19 playas reales (calidad y servicios de ejemplo).

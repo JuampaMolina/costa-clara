@@ -4,7 +4,7 @@ Listado de tickets para evolucionar la app desde la v0.1 actual hasta una v1.0 p
 
 > **Contexto:** v0.1 con 19 playas de demostración, mapa OpenLayers con clustering, filtros sincronizados con la URL y ficha lateral. Sin backend, sin deploy y sin e2e todavía.
 
-**Estado:** 27/36 cerrados · actualizado 2026-11-26.
+**Estado:** 28/36 cerrados · actualizado 2026-11-26.
 
 ## Hecho
 
@@ -34,6 +34,7 @@ Listado de tickets para evolucionar la app desde la v0.1 actual hasta una v1.0 p
 - ✅ **CC-33** Sincronía lista↔mapa con marcador resaltado.
 - ✅ **CC-34** Alternativa textual, live regions y foco en el mapa.
 - ✅ **CC-42** Imagen OG 1200×630 y metas Open Graph/Twitter.
+- ✅ **CC-50** Auditoría axe WCAG AA, foco, contraste y reduced motion.
 - ✅ **CC-54** Caso de estudio y 4 ADRs.
 
 ## Cómo leer esto
@@ -321,6 +322,7 @@ Reglas del proyecto que aplican a todos los tickets: UI en español, no inventar
 ## E5 · Calidad y portfolio
 
 ### CC-50 · Auditoría de accesibilidad WCAG AA · P1 · M
+**Estado:** ✅ Hecho (2026-11-26) · 0 critical/serious; 46 e2e con axe.
 **Qué:** axe + revisión manual de contraste, foco, labels, jerarquía de encabezados, zoom 200 % y lector de pantalla en el flujo principal.
 **Hecho cuando:**
 - 0 violaciones críticas/serias de axe en home, ficha y estados vacíos.
