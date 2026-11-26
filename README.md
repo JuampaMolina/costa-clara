@@ -77,10 +77,10 @@ Instrucciones y rotación del token en [docs/despliegue.md](./docs/despliegue.md
 - Accesibilidad WCAG AA con axe, foco visible y `prefers-reduced-motion`.
 - Estado del mar en la ficha (Open-Meteo Marine) y analítica sin cookies/PII.
 - Reportar datos incorrectos y SEO técnico (sitemap, JSON-LD, canonical).
-- PWA instalable con offline y carga diferida de ficha, comparador y mapa.
-- Storybook con 5 componentes y 20 stories.
+- PWA instalable con offline, banner sin conexión y aviso de nueva versión.
+- Mar con oleaje, periodo, temperatura y viento reales; sitemap regenerable.
 - i18n ES/EN/CA con selector, `?lang=` y persistencia.
-- Tests: 66 unitarios y 60 e2e (desktop y móvil).
+- Tests: 80 unitarios y 62 e2e (desktop y móvil).
 - Importador CSV con validación, fixture y fallback al dataset demo.
 - CI con tests, build y e2e; deploy automático en Cloudflare Pages.
 - Dataset semilla de 19 playas reales (calidad y servicios de ejemplo).

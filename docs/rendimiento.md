@@ -11,6 +11,7 @@
 | `@defer` comparador + ficha         | 641.18 kB / 163.93 kB                        | 39.77 kB / 7.02 kB        | **680.95 kB / 170.94 kB**          | `beach-detail` (19.01 kB / 6.00 kB), `beach-compare` (17.28 kB / 4.68 kB), común (482 B) | −19.05 kB         |
 | **Después** (`@defer` + PWA SW)     | 647.30 kB / 165.44 kB                        | 39.77 kB / 7.02 kB        | **687.08 kB / 172.46 kB**          | `beach-detail` (19.01 kB / 5.98 kB), `beach-compare` (17.28 kB / 4.70 kB), común (482 B) | **−12.92 kB**     |
 | **Después + mapa diferido** (CC-52) | 337.43 kB / 88.06 kB                         | 40.45 kB / 7.08 kB        | **377.88 kB / 95.14 kB**           | `beach-map` 329.54 kB, `beach-detail` 19.41 kB, `beach-compare` 18.65 kB, común 482 B    | **−322.12 kB**    |
+| **Después + polish** (CC-40/27/53/54) | —                                          | —                         | **381.00 kB / —**                  | mismos chunks + banner PWA/viento/sitemap                                                 | **−319.00 kB**    |
 
 ### Desglose de chunks finales
 
@@ -35,7 +36,7 @@ En [`angular.json`](../angular.json) el presupuesto de producción exige:
 - **Bundle inicial (`initial`):** aviso a partir de **700 kB** (`maximumWarning: "700kB"`) y error a partir de **1.2 MB** (`maximumError: "1.2MB"`).
 - **Estilos de componente (`anyComponentStyle`):** aviso a partir de **4 kB** y error a partir de **8 kB**.
 
-Con **377.88 kB raw iniciales** tras el mapa diferido y los diccionarios i18n, el build de producción termina sin avisos de presupuesto y conserva 322.12 kB de margen antes del umbral de warning. El chunk del mapa (329.54 kB) se carga aparte y no cuenta en el inicial.
+Con **381.00 kB raw iniciales** tras el polish (avisos PWA, viento y sitemap), el build de producción termina sin avisos de presupuesto y conserva 319.00 kB de margen antes del umbral de warning. El chunk del mapa (329.54 kB) se carga aparte y no cuenta en el inicial.
 
 ## Validación en producción (2026-11-26)
 
@@ -47,9 +48,9 @@ Medido con **Lighthouse 13.6** contra `https://costa-clara-k23.pages.dev` (móvi
 | Accessibility  | **100**   |
 | Best practices | **100**   |
 | SEO            | **100**   |
-| LCP            | **1,3 s** |
+| LCP            | **1,5 s** |
 | TBT            | **30 ms** |
-| FCP            | **1,3 s** |
+| FCP            | **1,5 s** |
 | CLS            | **0**     |
 
 **PWA / offline:** `navigator.serviceWorker.ready` = `ready`, controlador activo tras recarga y recarga con red desactivada mostrando el shell y las **19 playas**, sin errores de consola. Lighthouse 13 ya no incluye la categoría PWA; la instalabilidad se valida con manifest 192/512 `maskable`, service worker registrado y HTTPS de Cloudflare Pages.

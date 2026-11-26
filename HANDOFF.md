@@ -56,9 +56,10 @@ npm run deploy         # build + deploy manual (requiere token de Cloudflare)
 - Importador CSV con validación (`npm run data:import`), fixture de ejemplo y fallback al seed.
 - Leyenda, diseño responsive y estado vacío.
 - Página 404 propia y título/descripción/Open Graph dinámicos al abrir una playa; imagen OG 1200×630.
-- Tests: 66 unitarios y 60 e2e (20 flujos × desktop/móvil + axe y SEO).
+- Tests: 80 unitarios y 62 e2e (31 flujos × desktop/móvil + axe, SEO y PWA).
 - i18n ES/EN/CA con selector, `?lang=` y persistencia.
 - Storybook 10 con 5 componentes y 20 stories (`npm run storybook`).
+- PWA con banner offline y aviso de actualización; mar con viento real; sitemap regenerable.
 - CI (`.github/workflows/ci.yml`) y deploy automático en `main` (`.github/workflows/deploy.yml`).
 
 ## Bugs conocidos
@@ -124,7 +125,7 @@ El backlog de 36 tickets está cerrado.
 - **No añadir backend todavía.** El seed en TS es suficiente. Si se añade Supabase/PostGIS, documenta variables de entorno y no subas secretos.
 - **No cambiar el stack** (Angular/OpenLayers/Tailwind) ni migrar a otro framework.
 - **Tailwind 4** se configura con `.postcssrc.json` y `@import "tailwindcss"` en `src/styles.css`. No hace falta `tailwind.config.js`.
-- **Presupuesto de bundle:** 700 kB warning / 1.2 MB error. Ahora mismo ~378 kB inicial + 330 kB de mapa diferido.
+- **Presupuesto de bundle:** 700 kB warning / 1.2 MB error. Ahora mismo ~381 kB inicial + 330 kB de mapa diferido.
 - **No tocar el CV** de `C:\Users\Juampa\.t3\projects\cv`; es otro repo.
 
 ## Criterio de “terminado”
