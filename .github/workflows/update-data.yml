@@ -1,0 +1,62 @@
+name: Actualizar datos
+
+on:
+  schedule:
+    - cron: "0 6 1 * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  update-data:
+    name: Importar datos y abrir PR
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Node 22
+        uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Instalar dependencias
+        run: npm ci
+
+      - name: Comprobar fuente
+        id: check
+        run: |
+          if [ ! -f data/raw/beaches.csv ]; then
+            echo "Sin fuente configurada"
+            echo "present=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          echo "present=true" >> "$GITHUB_OUTPUT"
+
+      - name: Fecha de la actualización
+        id: date
+        run: echo "date=$(date +%Y-%m)" >> "$GITHUB_OUTPUT"
+
+      - name: Importar datos
+        if: steps.check.outputs.present == 'true'
+        run: npm run data:import
+
+      - name: Abrir PR si cambian los datos
+        if: steps.check.outputs.present == 'true'
+        uses: peter-evans/create-pull-request@v8
+        with:
+          commit-message: "data: actualización ${{ steps.date.outputs.date }}"
+          branch: "data/update-${{ steps.date.outputs.date }}"
+          base: main
+          title: "Datos: actualización ${{ steps.date.outputs.date }}"
+          body: |
+            Actualización programada de los datos de playas, generada por
+            `npm run data:import` desde `data/raw/`.
+
+            - Revisa el diff de `src/app/core/data/beaches.generated.ts` antes de fusionar.
+            - Checklist de revisión: [docs/actualizacion-datos.md](docs/actualizacion-datos.md).
+          add-paths: src/app/core/data/beaches.generated.ts
+          delete-branch: true
