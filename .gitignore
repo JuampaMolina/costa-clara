@@ -49,7 +49,9 @@ deploy.log
 /blob-report
 
 # Datos generados de ejemplo
-/data/generated
+/data/generated/*
+# ... salvo el PoC de viabilidad de datos reales (commiteado como evidencia)
+!/data/generated/beaches-osm.json
 
 # System files
 .DS_Store

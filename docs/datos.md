@@ -1,6 +1,20 @@
 # Fuentes de datos y licencias
 
-> **Estado:** investigación inicial. La app sigue usando datos de demostración hasta verificar la licencia y el acceso a las muestras de la fuente principal.
+> **Estado:** investigación verificada (nov 2026). Se confirmó la viabilidad de una API propia con
+> OSM + EEA; la bandera azul (ADEAC) queda **bloqueada sin permiso**. Detalle completo en
+> [docs/datos-reales.md](datos-reales.md). La app sigue usando datos de demostración (`demo`) hasta
+> conectar la calidad real (CC-13).
+
+## Confirmado (26–27 nov 2026)
+
+| Fuente | Licencia | ¿Reutilizable? | Uso |
+| --- | --- | --- | --- |
+| OpenStreetMap (Overpass) | ODbL 1.0 | ✅ con atribución | Playas, servicios, geometría (639 playas Baleares) |
+| EEA Bathing Water Directive | CC BY 4.0 | ✅ | Clasificación anual de calidad por zona |
+| Censo Aguas de Baño (MITECO) | Atribución MITECO / CC BY 4.0 | ✅ | Zonas de baño (identificación/geometría) |
+| GOIB / IDEIB | CC BY (GOIB); por capa (IDEIB) | ✅ | Cartografía, características físicas de playas |
+| NÁYADE (Sanidad) | Sin términos abiertos | ❌ (solo visor) | Verificación manual |
+| Bandera Azul (ADEAC) | Todos los derechos reservados | ❌ sin permiso escrito | No publicar el listado |
 
 ## Candidatas
 
@@ -15,9 +29,14 @@
 
 ## Decisión
 
-- **No se sustituye el seed** hasta confirmar que la fuente principal permite reutilizar los datos y ofrece muestras con fecha y calidad.
+- **No se sustituye el seed** hasta conectar la calidad real (CC-13). El PoC de esta rama demuestra el
+  flujo OSM→`ServiceId` sin forzar `dataStatus: real`.
 - El importador exige `source_name`, `source_url`, `source_license` y `updated_at`; sin esos campos no genera datos.
-- La prioridad es **NÁYADE / Censo de aguas de baño** para calidad y **ADEAC** para bandera azul. IDEIB queda para cartografía.
+- **Calidad:** prioridad **EEA (CC BY 4.0)** — clasificación anual por zona; NÁYADE es la fuente primaria
+  española pero **no es abierta** (verificación manual); el Censo MITECO da geometría/identificación.
+- **Playas y servicios:** **OSM (ODbL)** — 639 playas muestreadas en Baleares.
+- **Bandera azul (ADEAC):** **no reutilizable sin permiso escrito** (aviso legal §4); no publicar el listado.
+- **Cartografía/municipios:** GOIB/IDEIB (CC BY / por capa) + Nominatim para municipio/isla.
 - Los datos de demostración se mantienen etiquetados como tales (`dataStatus: 'demo'`). Al importar, el modelo pasa a `real` y la ficha muestra fuente, licencia y fecha.
 
 ## Flujo previsto

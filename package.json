@@ -13,6 +13,7 @@
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
     "data:import": "tsx scripts/import-data.ts",
+    "data:sample": "tsx scripts/sample-osm.ts",
     "data:example": "tsx scripts/import-data.ts --input data/raw/example --output data/generated/example.ts",
     "deploy": "npm run build && wrangler pages deploy dist/costa-clara/browser --project-name costa-clara --branch main",
     "storybook": "ng run costa-clara:storybook",

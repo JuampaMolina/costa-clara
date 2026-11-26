@@ -1,0 +1,209 @@
+{
+  "meta": {
+    "title": "Muestra de viabilidad de playas de Baleares (PoC OSM)",
+    "generated_by": "scripts/sample-osm.ts",
+    "beaches_count": 11,
+    "total_osm_beaches": 639,
+    "named_osm_beaches": 471,
+    "per_island": {
+      "mallorca": 324,
+      "menorca": 149,
+      "ibiza": 132,
+      "formentera": 34
+    },
+    "missing_from_seed": [],
+    "note": "Datos reales de geometría/nombre/servicios (OSM, ODbL). Calidad del agua sin datos: se conecta EEA/NÁYADE por separado y no se fuerza dataStatus real."
+  },
+  "sources": [
+    {
+      "name": "OpenStreetMap",
+      "url": "https://www.openstreetmap.org/copyright",
+      "license": "ODbL 1.0",
+      "attribution": "© OpenStreetMap contributors"
+    }
+  ],
+  "beaches": [
+    {
+      "id": "es-trenc",
+      "name": "Platja d'es Trenc",
+      "municipality": "Campos",
+      "island": "mallorca",
+      "lon": 2.98276,
+      "lat": 39.34332,
+      "services": [
+        "Acceso adaptado"
+      ],
+      "description": "superficie sand; zona nudista",
+      "osm": {
+        "type": "way",
+        "id": 38827140
+      },
+      "quality": "sin-datos",
+      "quality_note": "Pendiente de EEA/NÁYADE (CC-13); no se inventa calidad."
+    },
+    {
+      "id": "cala-varques",
+      "name": "Cala Varques",
+      "municipality": "Manacor",
+      "island": "mallorca",
+      "lon": 3.29599,
+      "lat": 39.49997,
+      "services": [],
+      "description": "superficie sand; zona nudista",
+      "osm": {
+        "type": "way",
+        "id": 162755141
+      },
+      "quality": "sin-datos",
+      "quality_note": "Pendiente de EEA/NÁYADE (CC-13); no se inventa calidad."
+    },
+    {
+      "id": "cala-macarella",
+      "name": "Cala Macarella",
+      "municipality": "Ciutadella de Menorca",
+      "island": "menorca",
+      "lon": 3.93711,
+      "lat": 39.93868,
+      "services": [],
+      "description": "superficie sand",
+      "osm": {
+        "type": "way",
+        "id": 25903957
+      },
+      "quality": "sin-datos",
+      "quality_note": "Pendiente de EEA/NÁYADE (CC-13); no se inventa calidad."
+    },
+    {
+      "id": "son-bou",
+      "name": "Son Bou",
+      "municipality": "Alaior",
+      "island": "menorca",
+      "lon": 4.07235,
+      "lat": 39.89916,
+      "services": [],
+      "description": "Playa (sin descripción adicional en OSM)",
+      "osm": {
+        "type": "way",
+        "id": 168680340
+      },
+      "quality": "sin-datos",
+      "quality_note": "Pendiente de EEA/NÁYADE (CC-13); no se inventa calidad."
+    },
+    {
+      "id": "cala-en-turqueta",
+      "name": "Cala en Turqueta",
+      "municipality": "Ciutadella de Menorca",
+      "island": "menorca",
+      "lon": 3.91535,
+      "lat": 39.93237,
+      "services": [
+        "Socorrista"
+      ],
+      "description": "superficie sand",
+      "osm": {
+        "type": "relation",
+        "id": 9918554
+      },
+      "quality": "sin-datos",
+      "quality_note": "Pendiente de EEA/NÁYADE (CC-13); no se inventa calidad."
+    },
+    {
+      "id": "punta-prima",
+      "name": "Platja de Punta Prima",
+      "municipality": "Sant Lluís",
+      "island": "menorca",
+      "lon": 4.28077,
+      "lat": 39.81375,
+      "services": [],
+      "description": "Playa (sin descripción adicional en OSM)",
+      "osm": {
+        "type": "relation",
+        "id": 1581445
+      },
+      "quality": "sin-datos",
+      "quality_note": "Pendiente de EEA/NÁYADE (CC-13); no se inventa calidad."
+    },
+    {
+      "id": "cala-comte",
+      "name": "Platges de Comte",
+      "municipality": "Sant Josep de sa Talaia",
+      "island": "ibiza",
+      "lon": 1.22028,
+      "lat": 38.96261,
+      "services": [],
+      "description": "superficie sand",
+      "osm": {
+        "type": "way",
+        "id": 170709932
+      },
+      "quality": "sin-datos",
+      "quality_note": "Pendiente de EEA/NÁYADE (CC-13); no se inventa calidad."
+    },
+    {
+      "id": "cala-dhort",
+      "name": "Cala d'Hort",
+      "municipality": "Sant Josep de sa Talaia",
+      "island": "ibiza",
+      "lon": 1.22404,
+      "lat": 38.88994,
+      "services": [],
+      "description": "Playa (sin descripción adicional en OSM)",
+      "osm": {
+        "type": "way",
+        "id": 172420703
+      },
+      "quality": "sin-datos",
+      "quality_note": "Pendiente de EEA/NÁYADE (CC-13); no se inventa calidad."
+    },
+    {
+      "id": "platja-den-bossa",
+      "name": "Platja d'en Bossa",
+      "municipality": "Sant Josep de sa Talaia",
+      "island": "ibiza",
+      "lon": 1.409,
+      "lat": 38.88549,
+      "services": [],
+      "description": "superficie sand",
+      "osm": {
+        "type": "way",
+        "id": 119370890
+      },
+      "quality": "sin-datos",
+      "quality_note": "Pendiente de EEA/NÁYADE (CC-13); no se inventa calidad."
+    },
+    {
+      "id": "cala-saona",
+      "name": "Platja cala Saona",
+      "municipality": "Formentera",
+      "island": "formentera",
+      "lon": 1.38932,
+      "lat": 38.69314,
+      "services": [
+        "Socorrista"
+      ],
+      "description": "superficie sand",
+      "osm": {
+        "type": "way",
+        "id": 111410410
+      },
+      "quality": "sin-datos",
+      "quality_note": "Pendiente de EEA/NÁYADE (CC-13); no se inventa calidad."
+    },
+    {
+      "id": "platja-de-migjorn",
+      "name": "Platja de Migjorn",
+      "municipality": "Formentera",
+      "island": "formentera",
+      "lon": 1.45532,
+      "lat": 38.68501,
+      "services": [],
+      "description": "superficie sand",
+      "osm": {
+        "type": "way",
+        "id": 1381403167
+      },
+      "quality": "sin-datos",
+      "quality_note": "Pendiente de EEA/NÁYADE (CC-13); no se inventa calidad."
+    }
+  ]
+}
