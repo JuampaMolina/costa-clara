@@ -335,12 +335,13 @@ test('compara 2-3 playas, limita la 4ª, soporta teclado y URL ?comparar= (CC-21
   await expect(page.getByTestId('open-compare')).toHaveText('Añade 1 playa más');
 
   await page.getByRole('button', { name: /^Cala Macarella/ }).click();
-  await page.getByTestId('detail-compare').dispatchEvent('click');
+  await page.getByTestId('detail-compare').click();
   await expect(page.getByTestId('compare-cala-macarella')).toHaveAttribute('aria-pressed', 'true');
-  await expect(page.getByTestId('open-compare')).toBeEnabled();
   await expect(page).toHaveURL(/comparar=es-trenc,cala-macarella/);
 
   await page.getByRole('button', { name: 'Cerrar ficha' }).click();
+  await expect(tray).toBeVisible();
+  await expect(page.getByTestId('open-compare')).toBeEnabled();
   await page.getByTestId('compare-ses-illetes').click();
   await expect(page).toHaveURL(/comparar=es-trenc,cala-macarella,ses-illetes/);
 

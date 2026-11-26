@@ -635,7 +635,7 @@
     </section>
   </main>
 
-  @if (comparedBeaches().length > 0 && !compareOpen()) {
+  @if (comparedBeaches().length > 0 && !compareOpen() && !selectedBeach()) {
     <div
       role="region"
       aria-label="Comparador de playas"
