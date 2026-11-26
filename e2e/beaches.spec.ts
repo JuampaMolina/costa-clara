@@ -16,7 +16,7 @@ test('busca por texto y limpia los filtros', async ({ page }) => {
 
   await expect(page.getByTestId('result-count')).toHaveText('1 playa');
   await expect(page).toHaveURL(/q=trenc/);
-  await expect(page.getByRole('button', { name: /Es Trenc/ })).toBeVisible();
+  await expect(page.getByRole('button', { name: /^Es Trenc/ })).toBeVisible();
 
   await page.getByRole('button', { name: 'Limpiar filtros' }).first().click();
 
@@ -34,14 +34,14 @@ test('restaura isla y calidad desde la URL', async ({ page }) => {
   );
   await expect(page.getByLabel('Calidad del agua')).toHaveValue('excelente');
   await expect(page.getByTestId('result-count')).toHaveText('2 playas');
-  await expect(page.getByRole('button', { name: /Cala Macarella/ })).toBeVisible();
-  await expect(page.getByRole('button', { name: /Son Bou/ })).toHaveCount(0);
+  await expect(page.getByRole('button', { name: /^Cala Macarella/ })).toBeVisible();
+  await expect(page.getByRole('button', { name: /^Son Bou/ })).toHaveCount(0);
 });
 
 test('abre la ficha, sincroniza la URL y la cierra', async ({ page }) => {
   await page.goto('/');
 
-  await page.getByRole('button', { name: /Cala Macarella/ }).click();
+  await page.getByRole('button', { name: /^Cala Macarella/ }).click();
 
   const detailTitle = page.getByRole('heading', { level: 2, name: 'Cala Macarella' });
   await expect(detailTitle).toBeVisible();
@@ -87,7 +87,7 @@ test('muestra el estado vacío y permite limpiar', async ({ page }) => {
 test('actualiza el título y los metadatos al abrir una playa', async ({ page }) => {
   await page.goto('/');
 
-  await page.getByRole('button', { name: /Es Trenc/ }).click();
+  await page.getByRole('button', { name: /^Es Trenc/ }).click();
 
   await expect(page).toHaveTitle('Es Trenc · Costa Clara');
   await expect(page.locator('meta[name="description"]')).toHaveAttribute(
@@ -107,4 +107,55 @@ test('muestra la página 404 en rutas desconocidas', async ({ page }) => {
   await page.getByRole('link', { name: /Volver al mapa/ }).click();
 
   await expect(page.getByRole('heading', { name: 'Encuentra tu playa' })).toBeVisible();
+});
+
+test('guarda una playa como favorita y la conserva al recargar', async ({ page }) => {
+  await page.goto('/');
+
+  const favorite = page.getByTestId('favorite-es-trenc');
+  await expect(favorite).toHaveAttribute('aria-pressed', 'false');
+
+  await favorite.click();
+  await expect(favorite).toHaveAttribute('aria-pressed', 'true');
+
+  await page.reload();
+  await expect(page.getByTestId('favorite-es-trenc')).toHaveAttribute('aria-pressed', 'true');
+
+  await page.getByRole('button', { name: /Favoritas \(1\)/ }).click();
+
+  await expect(page.getByTestId('result-count')).toHaveText('1 playa');
+  await expect(page.getByRole('button', { name: /^Es Trenc/ })).toBeVisible();
+});
+
+test('explica cómo añadir favoritas cuando no hay ninguna', async ({ page }) => {
+  await page.goto('/');
+
+  await page.getByRole('button', { name: /Favoritas \(0\)/ }).click();
+
+  await expect(page.getByText('Todavía no tienes favoritas')).toBeVisible();
+
+  await page.getByRole('button', { name: 'Ver todas las playas' }).click();
+
+  await expect(page.getByTestId('result-count')).toHaveText('19 playas');
+});
+
+test('comparte la ficha copiando un enlace con los filtros', async ({ page, context }) => {
+  await context.grantPermissions(['clipboard-read', 'clipboard-write']);
+  await page.addInitScript(() => {
+    try {
+      Object.defineProperty(navigator, 'share', { value: undefined, configurable: true });
+    } catch {
+      // Sin Web Share API se usa el portapapeles.
+    }
+  });
+
+  await page.goto('/?isla=mallorca');
+  await page.getByRole('button', { name: /^Es Trenc/ }).click();
+  await page.getByTestId('detail-share').click();
+
+  await expect(page.getByText('Enlace copiado')).toBeVisible();
+
+  const copied = await page.evaluate(() => navigator.clipboard.readText());
+  expect(copied).toContain('isla=mallorca');
+  expect(copied).toContain('playa=es-trenc');
 });

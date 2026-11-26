@@ -46,10 +46,11 @@ npm run deploy         # build + deploy manual (requiere token de Cloudflare)
 - Mapa de Baleares con OpenLayers, clustering y selección de playa.
 - 19 playas reales en `src/app/core/data/beaches.seed.ts` (calidad y servicios de ejemplo).
 - Filtros por texto, isla, calidad y bandera azul, sincronizados con la URL (`?q=&isla=&calidad=&bandera=&playa=`).
-- Ficha con calidad, servicios, última muestra, coordenadas y enlace a Google Maps.
+- Favoritos en `localStorage`, con filtro “Favoritas”, contador y sincronización entre pestañas.
+- Ficha con calidad, servicios, última muestra, coordenadas, enlace a Google Maps y botón para compartir (Web Share API + portapapeles).
 - Leyenda, diseño responsive y estado vacío.
 - Página 404 propia y título/descripción/Open Graph dinámicos al abrir una playa.
-- Tests: 8 unitarios y 16 e2e (6 flujos × desktop/móvil).
+- Tests: 12 unitarios y 22 e2e (11 flujos × desktop/móvil).
 - CI (`.github/workflows/ci.yml`) y deploy automático en `main` (`.github/workflows/deploy.yml`).
 
 ## Bugs conocidos
@@ -71,6 +72,7 @@ src/app/
   core/
     data/beaches.seed.ts       # dataset de demostración
     models/beach.ts            # tipos, islas, calidades, colores
+    services/favorites.ts      # favoritos en localStorage + tests
     utils/beach-filter.ts      # filtrado puro + tests
   features/beaches/
     beaches-page.ts/html/scss  # estado, filtros, URL, títulos
@@ -91,7 +93,7 @@ BACKLOG.md                     # 36 tickets priorizados
 
 1. **Datos reales:** investigar fuentes/licencias (CC-10), modelo v1 (CC-11) e importador CSV/JSON (CC-12).
 2. **Ficha:** histórico de calidad con gráfica (CC-14, CC-20).
-3. **Producto:** favoritos (CC-22), compartir (CC-26) y comparador (CC-21).
+3. **Producto:** comparador (CC-21) y orden/facetas (CC-23).
 4. **Calidad:** accesibilidad del mapa (CC-34) y auditoría axe (CC-50).
 5. **PWA y portfolio:** offline (CC-40) y caso de estudio (CC-54).
 

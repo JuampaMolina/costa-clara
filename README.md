@@ -55,9 +55,10 @@ Instrucciones y rotación del token en [docs/despliegue.md](./docs/despliegue.md
 - Filtros por texto, isla, calidad y bandera azul.
 - Estado de filtros y playa seleccionada en la URL (compartible).
 - Ficha de playa con calidad, servicios, última muestra, coordenadas y enlace a cómo llegar.
+- Favoritos guardados en `localStorage` y enlace para compartir la ficha.
 - Leyenda de calidad y diseño responsive.
 - Página 404 propia, título y metadatos dinámicos por playa.
-- Tests: 8 unitarios y 16 e2e (desktop y móvil).
+- Tests: 12 unitarios y 22 e2e (desktop y móvil).
 - CI con tests, build y e2e; deploy automático en Cloudflare Pages.
 - Dataset semilla de 19 playas reales (calidad y servicios de ejemplo).
 
@@ -65,8 +66,8 @@ Instrucciones y rotación del token en [docs/despliegue.md](./docs/despliegue.md
 
 1. Importador de datos abiertos (CSV/JSON) y modelo de datos definitivo.
 2. Ficha completa con histórico de calidad y gráficas.
-3. Favoritos + PWA offline.
-4. Comparador de playas y enlaces compartibles.
+3. PWA offline.
+4. Comparador de playas.
 5. Accesibilidad del mapa (navegación por teclado y alternativa textual).
 6. Storybook para los componentes de UI.
 

@@ -4,15 +4,17 @@ Listado de tickets para evolucionar la app desde la v0.1 actual hasta una v1.0 p
 
 > **Contexto:** v0.1 con 19 playas de demostración, mapa OpenLayers con clustering, filtros sincronizados con la URL y ficha lateral. Sin backend, sin deploy y sin e2e todavía.
 
-**Estado:** 5/36 cerrados · actualizado 2026-11-26.
+**Estado:** 7/36 cerrados · actualizado 2026-11-26.
 
 ## Hecho
 
 - ✅ **CC-01** Deploy en Cloudflare Pages (auto-deploy desde `main`).
 - ✅ **CC-02** CI con GitHub Actions (tests, build y e2e).
-- ✅ **CC-03** Playwright configurado + 16 e2e (desktop y móvil).
+- ✅ **CC-03** Playwright configurado + 22 e2e (desktop y móvil).
 - ✅ **CC-04** README, HANDOFF y BACKLOG al día.
 - ✅ **CC-06** 404 propia, títulos y metadatos dinámicos.
+- ✅ **CC-22** Favoritos con `localStorage`, filtro y sincronización entre pestañas.
+- ✅ **CC-26** Compartir ficha con Web Share API y fallback al portapapeles.
 
 ## Cómo leer esto
 
@@ -165,6 +167,7 @@ Reglas del proyecto que aplican a todos los tickets: UI en español, no inventar
 - En móvil la tabla se convierte en tarjetas apiladas.
 
 ### CC-22 · Favoritos · P1 · M
+**Estado:** ✅ Hecho (2026-11-26) · localStorage, filtro y sync entre pestañas.
 **Qué:** marcar playas como favoritas en `localStorage`, filtro “Favoritas” y contador. Sin cuentas ni backend.
 **Hecho cuando:**
 - Persisten tras recargar y se sincronizan entre pestañas (`storage` event).
@@ -190,6 +193,7 @@ Reglas del proyecto que aplican a todos los tickets: UI en español, no inventar
 - Los filtros se combinan con los existentes y se pueden limpiar de una vez.
 
 ### CC-26 · Compartir ficha · P1 · S
+**Estado:** ✅ Hecho (2026-11-26) · Web Share API + copia al portapapeles.
 **Qué:** botón compartir con Web Share API y fallback “copiar enlace”, compartiendo la URL con `?playa=`.
 **Hecho cuando:**
 - En móvil abre la hoja nativa; en desktop copia y confirma visualmente.

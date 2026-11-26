@@ -133,50 +133,115 @@
       <section
         class="flex min-h-0 flex-1 flex-col overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-sm"
       >
-        <div class="flex items-center justify-between border-b border-slate-100 px-4 py-3">
+        <div class="flex items-center justify-between gap-2 border-b border-slate-100 px-4 py-3">
           <span class="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-400">
             Resultados
           </span>
-          <span class="text-[11px] text-slate-400">Orden alfabético</span>
+          <button
+            type="button"
+            [class]="favoritesPillClass()"
+            [attr.aria-pressed]="showFavoritesOnly()"
+            (click)="toggleFavoritesFilter()"
+          >
+            <svg
+              viewBox="0 0 24 24"
+              class="h-3 w-3"
+              [attr.fill]="showFavoritesOnly() ? 'currentColor' : 'none'"
+              stroke="currentColor"
+              stroke-width="2"
+              aria-hidden="true"
+            >
+              <path
+                d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+            Favoritas ({{ favorites.count() }})
+          </button>
         </div>
 
         <div class="max-h-[46dvh] overflow-y-auto p-2 lg:max-h-none lg:flex-1">
           @for (beach of filteredBeaches(); track beach.id) {
-            <button
-              type="button"
-              [class]="beachItemClass(selectedId() === beach.id)"
-              (click)="selectBeach(beach)"
-            >
-              <span
-                class="mt-1.5 h-2 w-2 shrink-0 rounded-full ring-2 ring-white"
-                [style.background-color]="qualityColor(beach.quality)"
-                aria-hidden="true"
-              ></span>
-              <span class="min-w-0 flex-1">
-                <span class="block truncate text-sm font-semibold text-slate-800">{{ beach.name }}</span>
-                <span class="block truncate text-xs text-slate-500">
-                  {{ beach.municipality }} · {{ islandLabel(beach.island) }}
-                </span>
-              </span>
-              @if (beach.blueFlag) {
-                <span
-                  class="mt-0.5 rounded-full bg-sky-50 px-2 py-0.5 text-[10px] font-semibold text-sky-700"
-                >
-                  Azul
-                </span>
-              }
-            </button>
-          } @empty {
-            <div class="px-4 py-10 text-center">
-              <p class="text-sm font-semibold text-slate-700">No hay playas con esos filtros</p>
-              <p class="mt-1 text-xs text-slate-500">Prueba a quitar algún filtro o buscar otra cosa.</p>
+            <div [class]="beachItemClass(selectedId() === beach.id)">
               <button
                 type="button"
-                class="mt-4 rounded-xl bg-slate-900 px-3.5 py-2 text-xs font-semibold text-white transition hover:bg-slate-700"
-                (click)="clearFilters()"
+                class="flex min-w-0 flex-1 items-start gap-3 py-0.5 text-left"
+                (click)="selectBeach(beach)"
               >
-                Limpiar filtros
+                <span
+                  class="mt-1.5 h-2 w-2 shrink-0 rounded-full ring-2 ring-white"
+                  [style.background-color]="qualityColor(beach.quality)"
+                  aria-hidden="true"
+                ></span>
+                <span class="min-w-0 flex-1">
+                  <span class="block truncate text-sm font-semibold text-slate-800">{{ beach.name }}</span>
+                  <span class="block truncate text-xs text-slate-500">
+                    {{ beach.municipality }} · {{ islandLabel(beach.island) }}
+                  </span>
+                </span>
+                @if (beach.blueFlag) {
+                  <span
+                    class="mt-0.5 rounded-full bg-sky-50 px-2 py-0.5 text-[10px] font-semibold text-sky-700"
+                  >
+                    Azul
+                  </span>
+                }
               </button>
+
+              <button
+                type="button"
+                [class]="favoriteButtonClass(isFavorite(beach.id))"
+                [attr.aria-pressed]="isFavorite(beach.id)"
+                [attr.aria-label]="
+                  isFavorite(beach.id)
+                    ? 'Quitar ' + beach.name + ' de favoritas'
+                    : 'Añadir ' + beach.name + ' a favoritas'
+                "
+                [attr.data-testid]="'favorite-' + beach.id"
+                (click)="toggleFavorite(beach)"
+              >
+                <svg
+                  viewBox="0 0 24 24"
+                  class="h-4 w-4"
+                  [attr.fill]="isFavorite(beach.id) ? 'currentColor' : 'none'"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  aria-hidden="true"
+                >
+                  <path
+                    d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                </svg>
+              </button>
+            </div>
+          } @empty {
+            <div class="px-4 py-10 text-center">
+              @if (showFavoritesOnly() && favorites.count() === 0) {
+                <p class="text-sm font-semibold text-slate-700">Todavía no tienes favoritas</p>
+                <p class="mt-1 text-xs text-slate-500">
+                  Pulsa el corazón de una playa para guardarla aquí. Se queda en este navegador.
+                </p>
+                <button
+                  type="button"
+                  class="mt-4 rounded-xl bg-slate-900 px-3.5 py-2 text-xs font-semibold text-white transition hover:bg-slate-700"
+                  (click)="showAllBeaches()"
+                >
+                  Ver todas las playas
+                </button>
+              } @else {
+                <p class="text-sm font-semibold text-slate-700">No hay playas con esos filtros</p>
+                <p class="mt-1 text-xs text-slate-500">Prueba a quitar algún filtro o buscar otra cosa.</p>
+                <button
+                  type="button"
+                  class="mt-4 rounded-xl bg-slate-900 px-3.5 py-2 text-xs font-semibold text-white transition hover:bg-slate-700"
+                  (click)="clearFilters()"
+                >
+                  Limpiar filtros
+                </button>
+              }
             </div>
           }
         </div>
@@ -211,7 +276,11 @@
       </div>
 
       @if (selectedBeach(); as beach) {
-        <app-beach-detail [beach]="beach" (closed)="closeDetail()" />
+        <app-beach-detail
+          [beach]="beach"
+          [shareUrl]="shareUrl()"
+          (closed)="closeDetail()"
+        />
       }
     </section>
   </main>

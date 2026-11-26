@@ -1,5 +1,15 @@
-import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  DestroyRef,
+  computed,
+  inject,
+  input,
+  output,
+  signal,
+} from '@angular/core';
 import { Beach, ISLANDS, QUALITY_COLORS, QUALITY_LABELS } from '../../core/models/beach';
+import { FavoritesStore } from '../../core/services/favorites';
 
 @Component({
   selector: 'app-beach-detail',
@@ -11,8 +21,8 @@ import { Beach, ISLANDS, QUALITY_COLORS, QUALITY_LABELS } from '../../core/model
     <article
       class="max-h-[calc(100%-1rem)] overflow-y-auto rounded-2xl border border-slate-200/80 bg-white/95 p-5 shadow-2xl shadow-slate-900/10 backdrop-blur"
     >
-      <div class="flex items-start justify-between gap-4">
-        <div class="flex items-center gap-2">
+      <div class="flex items-start justify-between gap-3">
+        <div class="flex min-w-0 flex-wrap items-center gap-2">
           <span class="h-2.5 w-2.5 rounded-full" [style.background-color]="qualityColor()"></span>
           <span class="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-500">
             {{ qualityLabel() }}
@@ -23,17 +33,69 @@ import { Beach, ISLANDS, QUALITY_COLORS, QUALITY_LABELS } from '../../core/model
             </span>
           }
         </div>
-        <button
-          type="button"
-          class="-mr-1 -mt-1 rounded-full p-1.5 text-slate-400 transition hover:bg-slate-100 hover:text-slate-700"
-          aria-label="Cerrar ficha"
-          (click)="closed.emit()"
-        >
-          <svg viewBox="0 0 24 24" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M6 6l12 12M18 6L6 18" stroke-linecap="round" />
-          </svg>
-        </button>
+
+        <div class="flex shrink-0 items-center gap-0.5">
+          <button
+            type="button"
+            data-testid="detail-favorite"
+            [class]="favoriteButtonClass()"
+            [attr.aria-pressed]="isFavorite()"
+            [attr.aria-label]="isFavorite() ? 'Quitar de favoritas' : 'Añadir a favoritas'"
+            (click)="favorites.toggle(beach().id)"
+          >
+            <svg
+              viewBox="0 0 24 24"
+              class="h-4 w-4"
+              [attr.fill]="isFavorite() ? 'currentColor' : 'none'"
+              stroke="currentColor"
+              stroke-width="2"
+              aria-hidden="true"
+            >
+              <path
+                d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+          </button>
+
+          <button
+            type="button"
+            class="rounded-full p-1.5 text-slate-400 transition hover:bg-slate-100 hover:text-slate-700"
+            data-testid="detail-share"
+            aria-label="Compartir playa"
+            (click)="share()"
+          >
+            <svg
+              viewBox="0 0 24 24"
+              class="h-4 w-4"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              aria-hidden="true"
+            >
+              <path d="M12 16V4M7 9l5-5 5 5M5 20h14" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </button>
+
+          <button
+            type="button"
+            class="-mr-1 rounded-full p-1.5 text-slate-400 transition hover:bg-slate-100 hover:text-slate-700"
+            aria-label="Cerrar ficha"
+            (click)="closed.emit()"
+          >
+            <svg viewBox="0 0 24 24" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M6 6l12 12M18 6L6 18" stroke-linecap="round" />
+            </svg>
+          </button>
+        </div>
       </div>
+
+      @if (shareState() !== 'idle') {
+        <p [class]="shareStatusClass()" role="status" aria-live="polite">
+          {{ shareState() === 'error' ? 'No se pudo copiar el enlace' : 'Enlace copiado' }}
+        </p>
+      }
 
       <h2 class="mt-2 text-2xl font-semibold tracking-tight text-slate-900">{{ beach().name }}</h2>
       <p class="mt-0.5 text-sm text-slate-500">{{ islandLabel() }} · {{ beach().municipality }}</p>
@@ -82,7 +144,15 @@ import { Beach, ISLANDS, QUALITY_COLORS, QUALITY_LABELS } from '../../core/model
 })
 export class BeachDetail {
   readonly beach = input.required<Beach>();
+  readonly shareUrl = input('');
   readonly closed = output<void>();
+
+  readonly favorites = inject(FavoritesStore);
+  private readonly destroyRef = inject(DestroyRef);
+
+  readonly shareState = signal<'idle' | 'copied' | 'error'>('idle');
+
+  private shareTimer?: ReturnType<typeof setTimeout>;
 
   readonly qualityLabel = computed(() => QUALITY_LABELS[this.beach().quality]);
   readonly qualityColor = computed(() => QUALITY_COLORS[this.beach().quality]);
@@ -100,4 +170,59 @@ export class BeachDetail {
       year: 'numeric',
     })
   );
+
+  readonly isFavorite = computed(() => this.favorites.isFavorite(this.beach().id));
+
+  readonly favoriteButtonClass = computed(() => {
+    const base = 'rounded-full p-1.5 transition';
+    return this.isFavorite()
+      ? `${base} text-rose-500 hover:bg-rose-50`
+      : `${base} text-slate-400 hover:bg-slate-100 hover:text-slate-700`;
+  });
+
+  readonly shareStatusClass = computed(
+    () =>
+      `mt-2 text-xs font-medium ${this.shareState() === 'error' ? 'text-rose-600' : 'text-emerald-600'}`
+  );
+
+  constructor() {
+    this.destroyRef.onDestroy(() => clearTimeout(this.shareTimer));
+  }
+
+  async share(): Promise<void> {
+    const url = this.shareUrl();
+    if (!url) return;
+
+    const data = {
+      title: `${this.beach().name} · Costa Clara`,
+      text: `Consulta ${this.beach().name} en Costa Clara`,
+      url,
+    };
+
+    if (typeof navigator !== 'undefined' && typeof navigator.share === 'function') {
+      try {
+        await navigator.share(data);
+        return;
+      } catch (error) {
+        if ((error as { name?: string } | null)?.name === 'AbortError') return;
+      }
+    }
+
+    try {
+      if (typeof navigator === 'undefined' || !navigator.clipboard) {
+        throw new Error('Clipboard no disponible');
+      }
+
+      await navigator.clipboard.writeText(url);
+      this.setShareState('copied');
+    } catch {
+      this.setShareState('error');
+    }
+  }
+
+  private setShareState(state: 'copied' | 'error'): void {
+    this.shareState.set(state);
+    clearTimeout(this.shareTimer);
+    this.shareTimer = setTimeout(() => this.shareState.set('idle'), 2500);
+  }
 }
