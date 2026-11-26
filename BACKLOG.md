@@ -4,7 +4,7 @@ Listado de tickets para evolucionar la app desde la v0.1 actual hasta una v1.0 p
 
 > **Contexto:** v0.1 con 19 playas de demostración, mapa OpenLayers con clustering, filtros sincronizados con la URL y ficha lateral. Sin backend, sin deploy y sin e2e todavía.
 
-**Estado:** 30/36 cerrados · actualizado 2026-11-26.
+**Estado:** 32/36 cerrados · actualizado 2026-11-26.
 
 ## Hecho
 
@@ -29,6 +29,7 @@ Listado de tickets para evolucionar la app desde la v0.1 actual hasta una v1.0 p
 - ✅ **CC-25** Filtros avanzados de servicios y accesibilidad.
 - ✅ **CC-26** Compartir ficha con Web Share API y fallback al portapapeles.
 - ✅ **CC-27** Estado del mar con Open-Meteo Marine en la ficha.
+- ✅ **CC-28** Reportar un dato con issue prellenada.
 - ✅ **CC-43** Analítica sin cookies/PII con eventos locales y Plausible opcional.
 - ✅ **CC-30** Geolocalización, orden por distancia y marcador de posición.
 - ✅ **CC-31** Capas base: mapa, relieve y satélite con atribución.
@@ -37,6 +38,7 @@ Listado de tickets para evolucionar la app desde la v0.1 actual hasta una v1.0 p
 - ✅ **CC-34** Alternativa textual, live regions y foco en el mapa.
 - ✅ **CC-42** Imagen OG 1200×630 y metas Open Graph/Twitter.
 - ✅ **CC-50** Auditoría axe WCAG AA, foco, contraste y reduced motion.
+- ✅ **CC-53** robots, sitemap, JSON-LD, canonical y og:url.
 - ✅ **CC-54** Caso de estudio y 4 ADRs.
 
 ## Cómo leer esto
@@ -244,6 +246,7 @@ Reglas del proyecto que aplican a todos los tickets: UI en español, no inventar
 - No se guardan claves en el cliente.
 
 ### CC-28 · Reportar dato incorrecto · P2 · S
+**Estado:** ✅ Hecho (2026-11-26) · issue prellenada con playa, campo y URL.
 **Qué:** enlace en la ficha para reportar un dato (formulario `mailto:` o issue prellenada), con playa y campo en el mensaje.
 **Hecho cuando:**
 - El reporte incluye id de playa, campo y URL.
@@ -345,6 +348,7 @@ Reglas del proyecto que aplican a todos los tickets: UI en español, no inventar
 - El idioma se puede fijar por URL o preferencia y no rompe el SEO.
 
 ### CC-53 · SEO técnico · P1 · S
+**Estado:** ✅ Hecho (2026-11-26) · robots, sitemap, JSON-LD y canonical; URLs `?playa=id`.
 **Qué:** sitemap, `robots.txt`, JSON-LD (`TouristAttraction`/`Beach`), metadatos por playa y URLs legibles.
 **Hecho cuando:**
 - Cada playa tiene URL propia indexable con título y descripción únicos.
