@@ -398,7 +398,7 @@ test('incluye metadatos Open Graph / Twitter y sirve /og-image.png (CC-42)', asy
   expect(response.headers()['content-type']).toContain('image/png');
 });
 
-test('muestra el estado del mar si responde y lo oculta sin romper la ficha si falla (CC-27)', async ({
+test('muestra el estado del mar con viento si responde y lo oculta sin romper la ficha si falla (CC-27)', async ({
   page,
 }) => {
   await page.route('https://marine-api.open-meteo.com/v1/marine**', (route) =>
@@ -415,6 +415,19 @@ test('muestra el estado del mar si responde y lo oculta sin romper la ficha si f
       }),
     }),
   );
+  await page.route('https://api.open-meteo.com/v1/forecast**', (route) =>
+    route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({
+        current: {
+          time: '2026-11-26T14:30',
+          wind_speed_10m: 14.2,
+          wind_direction_10m: 315,
+        },
+      }),
+    }),
+  );
 
   await page.goto('/?playa=es-trenc');
 
@@ -427,9 +440,17 @@ test('muestra el estado del mar si responde y lo oculta sin romper la ficha si f
   );
   await expect(marine).toContainText('CC BY 4.0');
   await expect(marine).toContainText('—');
+  await expect(marine.getByText('Viento')).toBeVisible();
+  await expect(marine.getByText('Dirección')).toBeVisible();
+  await expect(marine.getByText('NO', { exact: true })).toBeVisible();
+  await expect(marine).toContainText('km/h');
 
   await page.unroute('https://marine-api.open-meteo.com/v1/marine**');
+  await page.unroute('https://api.open-meteo.com/v1/forecast**');
   await page.route('https://marine-api.open-meteo.com/v1/marine**', (route) =>
+    route.fulfill({ status: 503, body: '' }),
+  );
+  await page.route('https://api.open-meteo.com/v1/forecast**', (route) =>
     route.fulfill({ status: 503, body: '' }),
   );
 
@@ -446,6 +467,9 @@ test('emite eventos de analítica sin PII ni texto de búsqueda crudo (CC-43)', 
 }) => {
   await context.grantPermissions(['clipboard-read', 'clipboard-write']);
   await page.route('https://marine-api.open-meteo.com/v1/marine**', (route) =>
+    route.fulfill({ status: 503, body: '' }),
+  );
+  await page.route('https://api.open-meteo.com/v1/forecast**', (route) =>
     route.fulfill({ status: 503, body: '' }),
   );
   await page.addInitScript(() => {
@@ -554,6 +578,9 @@ test('incluye enlace para reportar un dato con issue prellenado y sin PII (CC-28
   await page.route('https://marine-api.open-meteo.com/v1/marine**', (route) =>
     route.fulfill({ status: 503, body: '' }),
   );
+  await page.route('https://api.open-meteo.com/v1/forecast**', (route) =>
+    route.fulfill({ status: 503, body: '' }),
+  );
 
   await page.goto('/?playa=es-trenc');
 
@@ -604,6 +631,9 @@ test('expone JSON-LD WebSite en home y canonical, og:url y JSON-LD dinámicos en
   page,
 }) => {
   await page.route('https://marine-api.open-meteo.com/v1/marine**', (route) =>
+    route.fulfill({ status: 503, body: '' }),
+  );
+  await page.route('https://api.open-meteo.com/v1/forecast**', (route) =>
     route.fulfill({ status: 503, body: '' }),
   );
 
@@ -727,10 +757,28 @@ test('expone el manifest PWA con iconos válidos y enlaces en el documento (CC-4
   }
 });
 
+test('muestra el aviso sin conexión y lo oculta al recuperar la red (CC-40)', async ({
+  page,
+  context,
+}) => {
+  await page.goto('/');
+  await expect(page.getByTestId('pwa-offline-banner')).toHaveCount(0);
+
+  await context.setOffline(true);
+  await expect(page.getByTestId('pwa-offline-banner')).toBeVisible();
+  await expect(page.getByTestId('pwa-offline-banner')).toHaveText(/Sin conexión/);
+
+  await context.setOffline(false);
+  await expect(page.getByTestId('pwa-offline-banner')).toHaveCount(0);
+});
+
 test('cambia idioma ES/EN/CA, sincroniza ?lang= y persiste tras recarga (CC-52)', async ({
   page,
 }) => {
   await page.route('https://marine-api.open-meteo.com/v1/marine**', (route) =>
+    route.fulfill({ status: 503, body: '' }),
+  );
+  await page.route('https://api.open-meteo.com/v1/forecast**', (route) =>
     route.fulfill({ status: 503, body: '' }),
   );
 

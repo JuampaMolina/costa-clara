@@ -46,9 +46,14 @@ npm run data:import
 
 # Prueba el pipeline con el fixture, sin tocar la app
 npm run data:example
+
+# Regenera public/sitemap.xml a partir del dataset actual
+npm run sitemap:generate
 ```
 
 `data:example` escribe en `data/generated/example.ts` (ignorado por git).
+
+`data:import` también regenera `public/sitemap.xml` tras importar, para que la home y las URLs `/?playa=id` de las playas activas queden indexadas sin pasos manuales. El generador vive en `scripts/generate-sitemap.ts` (usa `buildSitemap` de `src/app/core/utils/sitemap.ts`) y acepta `--date YYYY-MM-DD` y `--base-url <url>`.
 
 ## Validación
 
