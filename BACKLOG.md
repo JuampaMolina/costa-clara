@@ -4,13 +4,14 @@ Listado de tickets para evolucionar la app desde la v0.1 actual hasta una v1.0 p
 
 > **Contexto:** v0.1 con 19 playas de demostración, mapa OpenLayers con clustering, filtros sincronizados con la URL y ficha lateral. Sin backend, sin deploy y sin e2e todavía.
 
-**Estado:** 4/36 cerrados · actualizado 2026-11-26.
+**Estado:** 5/36 cerrados · actualizado 2026-11-26.
 
 ## Hecho
 
 - ✅ **CC-01** Deploy en Cloudflare Pages (auto-deploy desde `main`).
 - ✅ **CC-02** CI con GitHub Actions (tests, build y e2e).
 - ✅ **CC-03** Playwright configurado + 16 e2e (desktop y móvil).
+- ✅ **CC-04** README, HANDOFF y BACKLOG al día.
 - ✅ **CC-06** 404 propia, títulos y metadatos dinámicos.
 
 ## Cómo leer esto
@@ -77,6 +78,7 @@ Reglas del proyecto que aplican a todos los tickets: UI en español, no inventar
 **Nota:** Playwright ya está instalado, falta configuración y specs.
 
 ### CC-04 · Documentación viva · P0 · S
+**Estado:** ✅ Hecho (2026-11-26).
 **Qué:** actualizar `README.md` y `HANDOFF.md` al estado real (bugs cerrados, commits, URL de deploy) y convertir el handoff en guía de contribución en vez de diario de una sesión.
 **Hecho cuando:**
 - README incluye URL pública, scripts, stack y limitaciones de datos.
