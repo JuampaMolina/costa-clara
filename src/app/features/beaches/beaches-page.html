@@ -1,0 +1,217 @@
+<div class="min-h-dvh bg-slate-50 text-slate-900">
+  <header class="sticky top-0 z-30 border-b border-slate-200/70 bg-white/85 backdrop-blur">
+    <div class="mx-auto flex h-16 max-w-[1600px] items-center justify-between gap-4 px-3 sm:px-6">
+      <a class="flex items-center gap-2.5" href="/" aria-label="Costa Clara, inicio">
+        <span class="grid h-9 w-9 place-items-center rounded-2xl bg-sea-600 text-white shadow-sm">
+          <svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M3 16c2.2 0 2.2-2 4.4-2s2.2 2 4.4 2 2.2-2 4.4-2 2.2 2 4.4 2" stroke-linecap="round" />
+            <path d="M3 20c2.2 0 2.2-2 4.4-2s2.2 2 4.4 2 2.2-2 4.4-2 2.2 2 4.4 2" stroke-linecap="round" />
+            <path d="M12 4v7M9 7l3-3 3 3" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </span>
+        <span>
+          <span class="block text-sm font-bold tracking-tight text-slate-900">Costa Clara</span>
+          <span class="block text-[11px] leading-4 text-slate-500">Playas de Baleares</span>
+        </span>
+      </a>
+
+      <div class="flex items-center gap-2">
+        <span
+          class="hidden rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-[11px] font-medium text-amber-700 sm:inline"
+        >
+          Datos de demostración
+        </span>
+        <span class="rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-semibold text-slate-500">
+          v0.1
+        </span>
+      </div>
+    </div>
+  </header>
+
+  <main
+    class="mx-auto grid max-w-[1600px] gap-3 px-3 py-3 sm:px-6 sm:py-4 lg:h-[calc(100dvh-4rem)] lg:grid-cols-[400px_minmax(0,1fr)] lg:gap-4"
+  >
+    <aside class="flex min-h-0 flex-col gap-3">
+      <section class="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-sm">
+        <div class="flex items-start justify-between gap-3">
+          <div>
+            <h1 class="text-xl font-semibold tracking-tight text-slate-900">Encuentra tu playa</h1>
+            <p class="mt-1 text-sm leading-5 text-slate-500">
+              Calidad del agua, servicios y ubicación en un solo mapa.
+            </p>
+          </div>
+          <span
+            class="mt-0.5 grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-sea-50 text-sea-700"
+            aria-hidden="true"
+          >
+            <svg viewBox="0 0 24 24" class="h-4.5 w-4.5" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="11" cy="11" r="7" />
+              <path d="M20 20l-4-4" stroke-linecap="round" />
+            </svg>
+          </span>
+        </div>
+
+        <div class="relative mt-4">
+          <svg
+            viewBox="0 0 24 24"
+            class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            aria-hidden="true"
+          >
+            <circle cx="11" cy="11" r="7" />
+            <path d="M20 20l-4-4" stroke-linecap="round" />
+          </svg>
+          <input
+            type="search"
+            class="w-full rounded-xl border border-slate-200 bg-slate-50 py-2.5 pl-10 pr-3 text-sm text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-sea-400 focus:bg-white focus:ring-4 focus:ring-sea-100"
+            placeholder="Buscar playa, municipio o servicio"
+            aria-label="Buscar playa"
+            [value]="query()"
+            (input)="setQuery($any($event.target).value)"
+          />
+        </div>
+
+        <div class="mt-3 flex flex-wrap gap-1.5" role="group" aria-label="Filtrar por isla">
+          @for (option of islandOptions; track option.id) {
+            <button
+              type="button"
+              [class]="pillClass(island() === option.id)"
+              [attr.aria-pressed]="island() === option.id"
+              (click)="setIsland(option.id)"
+            >
+              {{ option.label }}
+            </button>
+          }
+        </div>
+
+        <div class="mt-3 grid grid-cols-[1fr_auto] gap-2">
+          <label class="sr-only" for="quality-filter">Calidad del agua</label>
+          <select
+            id="quality-filter"
+            class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-700 outline-none transition focus:border-sea-400 focus:ring-4 focus:ring-sea-100"
+            [value]="quality()"
+            (change)="setQuality($any($event.target).value)"
+          >
+            @for (option of qualityOptions; track option.id) {
+              <option [value]="option.id">{{ option.label }}</option>
+            }
+          </select>
+
+          <label
+            class="flex cursor-pointer items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm font-medium text-slate-700 transition hover:border-slate-300"
+          >
+            <input
+              type="checkbox"
+              class="h-4 w-4 rounded border-slate-300 text-sea-600 accent-sea-600"
+              [checked]="blueFlag()"
+              (change)="toggleBlueFlag()"
+            />
+            <span class="whitespace-nowrap">Bandera azul</span>
+          </label>
+        </div>
+
+        <div class="mt-3 flex items-center justify-between gap-2 text-xs">
+          <span class="text-slate-500" aria-live="polite">
+            <strong class="font-semibold text-slate-800">{{ filteredBeaches().length }}</strong>
+            {{ filteredBeaches().length === 1 ? 'playa' : 'playas' }}
+          </span>
+          @if (hasFilters()) {
+            <button
+              type="button"
+              class="font-semibold text-sea-700 transition hover:text-sea-900"
+              (click)="clearFilters()"
+            >
+              Limpiar filtros
+            </button>
+          }
+        </div>
+      </section>
+
+      <section
+        class="flex min-h-0 flex-1 flex-col overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-sm"
+      >
+        <div class="flex items-center justify-between border-b border-slate-100 px-4 py-3">
+          <span class="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-400">
+            Resultados
+          </span>
+          <span class="text-[11px] text-slate-400">Orden alfabético</span>
+        </div>
+
+        <div class="max-h-[46dvh] overflow-y-auto p-2 lg:max-h-none lg:flex-1">
+          @for (beach of filteredBeaches(); track beach.id) {
+            <button
+              type="button"
+              [class]="beachItemClass(selectedId() === beach.id)"
+              (click)="selectBeach(beach)"
+            >
+              <span
+                class="mt-1.5 h-2 w-2 shrink-0 rounded-full ring-2 ring-white"
+                [style.background-color]="qualityColor(beach.quality)"
+                aria-hidden="true"
+              ></span>
+              <span class="min-w-0 flex-1">
+                <span class="block truncate text-sm font-semibold text-slate-800">{{ beach.name }}</span>
+                <span class="block truncate text-xs text-slate-500">
+                  {{ beach.municipality }} · {{ islandLabel(beach.island) }}
+                </span>
+              </span>
+              @if (beach.blueFlag) {
+                <span
+                  class="mt-0.5 rounded-full bg-sky-50 px-2 py-0.5 text-[10px] font-semibold text-sky-700"
+                >
+                  Azul
+                </span>
+              }
+            </button>
+          } @empty {
+            <div class="px-4 py-10 text-center">
+              <p class="text-sm font-semibold text-slate-700">No hay playas con esos filtros</p>
+              <p class="mt-1 text-xs text-slate-500">Prueba a quitar algún filtro o buscar otra cosa.</p>
+              <button
+                type="button"
+                class="mt-4 rounded-xl bg-slate-900 px-3.5 py-2 text-xs font-semibold text-white transition hover:bg-slate-700"
+                (click)="clearFilters()"
+              >
+                Limpiar filtros
+              </button>
+            </div>
+          }
+        </div>
+      </section>
+    </aside>
+
+    <section
+      class="relative min-h-[62dvh] overflow-hidden rounded-2xl border border-slate-200/80 bg-sky-100 shadow-sm lg:min-h-0"
+    >
+      <app-beach-map
+        [beaches]="filteredBeaches()"
+        [selected]="selectedBeach()"
+        (beachSelected)="selectBeach($event)"
+      />
+
+      <div
+        class="pointer-events-none absolute left-3 top-3 z-10 rounded-xl border border-white/70 bg-white/90 px-3 py-2 shadow-sm backdrop-blur"
+      >
+        <p class="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-400">Calidad</p>
+        <div class="mt-1.5 flex flex-wrap gap-x-3 gap-y-1">
+          @for (item of qualityLegend; track item.id) {
+            <span class="flex items-center gap-1.5 text-[11px] font-medium text-slate-600">
+              <span
+                class="h-2 w-2 rounded-full"
+                [style.background-color]="item.color"
+                aria-hidden="true"
+              ></span>
+              {{ item.label }}
+            </span>
+          }
+        </div>
+      </div>
+
+      @if (selectedBeach(); as beach) {
+        <app-beach-detail [beach]="beach" (closed)="closeDetail()" />
+      }
+    </section>
+  </main>
+</div>

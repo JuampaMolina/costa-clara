@@ -1,59 +1,60 @@
-# CostaClara
+# Costa Clara
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 22.3.0.
+Observatorio de playas y calidad del agua de Baleares. Un mapa interactivo para consultar el estado de las playas, sus servicios y su ubicación.
 
-## Development server
+> **Si eres el agente que continúa el proyecto, lee [HANDOFF.md](./HANDOFF.md) antes de tocar código.**
 
-To start a local development server, run:
+> **Estado:** v0.1 · datos de demostración. La calidad del agua, los servicios y las fechas son datos de ejemplo hasta conectar el importador de datos abiertos.
 
-```bash
-ng serve
-```
+## Stack
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+- Angular 22 (standalone, signals, control flow)
+- OpenLayers
+- Tailwind CSS 4
+- Vitest (tests unitarios)
+- Playwright (e2e y capturas)
+- GitHub Actions + Cloudflare Pages (próximo paso)
 
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
-
-```bash
-ng generate component component-name
-```
-
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+## Desarrollo
 
 ```bash
-ng generate --help
+npm install
+npm start
 ```
 
-## Building
+Abre `http://localhost:4200`.
 
-To build the project run:
+## Scripts
 
 ```bash
-ng build
+npm start        # servidor de desarrollo
+npm run build    # build de producción
+npm test         # tests unitarios
 ```
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+## Qué hay hecho
 
-## Running unit tests
+- Mapa de Baleares con clustering de playas.
+- Filtros por texto, isla, calidad y bandera azul.
+- Estado de filtros y playa seleccionada en la URL (compartible).
+- Ficha de playa con calidad, servicios, última muestra, coordenadas y enlace a cómo llegar.
+- Leyenda de calidad y diseño responsive.
+- Dataset semilla de 19 playas reales (calidad y servicios de ejemplo).
 
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
+## Próximos pasos
 
-```bash
-ng test
-```
+1. Importador de datos abiertos (CSV/JSON) y modelo de datos definitivo.
+2. Ficha completa con histórico de calidad y gráficas.
+3. Favoritos + PWA offline.
+4. Tests unitarios de filtros y e2e con Playwright.
+5. CI/CD y deploy en Cloudflare Pages.
+6. Accesibilidad del mapa (navegación por teclado y alternativa textual).
+7. Storybook para los componentes de UI.
 
-## Running end-to-end tests
+## Datos
 
-For end-to-end (e2e) testing, run:
+Los nombres y las coordenadas son reales. La calidad, los servicios y las fechas son de demostración. Antes de publicar datos reales hay que citar la fuente oficial y su licencia.
 
-```bash
-ng e2e
-```
+## Licencia
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+MIT
