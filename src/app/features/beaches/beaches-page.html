@@ -55,31 +55,14 @@
   >
     <aside class="flex min-h-0 flex-col gap-3">
       <section class="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-sm">
-        <div class="flex items-start justify-between gap-3">
-          <div>
-            <h1 class="text-xl font-semibold tracking-tight text-slate-900">Encuentra tu playa</h1>
-            <p class="mt-1 text-sm leading-5 text-slate-500">
-              Calidad del agua, servicios y ubicación en un solo mapa.
-            </p>
-          </div>
-          <span
-            class="mt-0.5 grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-sea-50 text-sea-700"
-            aria-hidden="true"
-          >
-            <svg
-              viewBox="0 0 24 24"
-              class="h-4.5 w-4.5"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-            >
-              <circle cx="11" cy="11" r="7" />
-              <path d="M20 20l-4-4" stroke-linecap="round" />
-            </svg>
-          </span>
+        <div>
+          <h1 class="text-xl font-semibold tracking-tight text-slate-900">Encuentra tu playa</h1>
+          <p class="mt-0.5 text-sm leading-5 text-slate-500">
+            Calidad del agua, servicios y ubicación en un solo mapa.
+          </p>
         </div>
 
-        <div class="relative mt-4">
+        <div class="relative mt-3">
           <svg
             viewBox="0 0 24 24"
             class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"
@@ -92,24 +75,50 @@
             <path d="M20 20l-4-4" stroke-linecap="round" />
           </svg>
           <input
+            #searchInput
             type="search"
-            class="w-full rounded-xl border border-slate-200 bg-slate-50 py-2.5 pl-10 pr-3 text-sm text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-sea-400 focus:bg-white focus:ring-4 focus:ring-sea-100"
-            placeholder="Buscar playa, municipio o servicio"
+            class="w-full rounded-xl border border-slate-200 bg-slate-50 py-2.5 pl-10 pr-9 text-sm text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-sea-400 focus:bg-white focus:ring-4 focus:ring-sea-100 [&::-webkit-search-cancel-button]:appearance-none"
+            placeholder="Buscar playa, cala, municipio o servicio"
             aria-label="Buscar playa"
-            [value]="query()"
-            (input)="setQuery($any($event.target).value)"
+            [value]="queryInput()"
+            (input)="onQueryInput($any($event.target).value)"
+            (keydown)="onSearchKeydown($event)"
           />
+          @if (queryInput().length > 0) {
+            <button
+              type="button"
+              class="absolute right-2 top-1/2 grid h-7 w-7 -translate-y-1/2 place-items-center rounded-full text-slate-400 transition hover:bg-slate-200/70 hover:text-slate-700"
+              aria-label="Limpiar búsqueda"
+              data-testid="clear-search"
+              (click)="clearSearch()"
+            >
+              <svg
+                viewBox="0 0 24 24"
+                class="h-3.5 w-3.5"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                aria-hidden="true"
+              >
+                <path d="M6 6l12 12M18 6L6 18" stroke-linecap="round" />
+              </svg>
+            </button>
+          }
         </div>
 
         <div class="mt-3 flex flex-wrap gap-1.5" role="group" aria-label="Filtrar por isla">
           @for (option of islandOptions; track option.id) {
             <button
               type="button"
-              [class]="pillClass(island() === option.id)"
+              [attr.data-testid]="'island-' + option.id"
+              [class]="pillClass(island() === option.id, islandCounts()[option.id] === 0)"
               [attr.aria-pressed]="island() === option.id"
               (click)="setIsland(option.id)"
             >
               {{ option.label }}
+              <span class="ml-1 text-[11px] opacity-75 tabular-nums">{{
+                islandCounts()[option.id]
+              }}</span>
             </button>
           }
         </div>
@@ -118,18 +127,18 @@
           <label class="sr-only" for="quality-filter">Calidad del agua</label>
           <select
             id="quality-filter"
-            class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-700 outline-none transition focus:border-sea-400 focus:ring-4 focus:ring-sea-100"
+            class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 outline-none transition focus:border-sea-400 focus:ring-4 focus:ring-sea-100"
             (change)="setQuality($any($event.target).value)"
           >
             @for (option of qualityOptions; track option.id) {
               <option [value]="option.id" [selected]="quality() === option.id">
-                {{ option.label }}
+                {{ option.label }} ({{ qualityCounts()[option.id] }})
               </option>
             }
           </select>
 
           <label
-            class="flex cursor-pointer items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm font-medium text-slate-700 transition hover:border-slate-300"
+            class="flex cursor-pointer items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 transition hover:border-slate-300"
           >
             <input
               type="checkbox"
@@ -141,11 +150,55 @@
           </label>
         </div>
 
-        <div class="mt-3 flex flex-wrap items-center justify-between gap-2 text-xs">
-          <span class="text-slate-500" aria-live="polite" data-testid="result-count">
-            <strong class="font-semibold text-slate-800">{{ filteredBeaches().length }}</strong>
-            {{ filteredBeaches().length === 1 ? 'playa' : 'playas' }}
-          </span>
+        <div class="mt-2.5 flex flex-wrap items-center justify-between gap-2 text-xs">
+          <div class="flex items-center gap-2">
+            <button
+              id="advanced-filters-toggle"
+              type="button"
+              data-testid="advanced-filters-toggle"
+              class="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-slate-50 px-2.5 py-1 font-semibold text-slate-700 transition hover:border-slate-300 hover:bg-slate-100"
+              [attr.aria-expanded]="advancedOpen()"
+              aria-controls="advanced-filters-panel"
+              (click)="toggleAdvancedFilters()"
+            >
+              <svg
+                viewBox="0 0 24 24"
+                class="h-3.5 w-3.5 text-slate-500"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                aria-hidden="true"
+              >
+                <path d="M4 6h16M7 12h10M10 18h4" stroke-linecap="round" />
+              </svg>
+              Más filtros
+              @if (activeAdvancedCount() > 0) {
+                <span
+                  data-testid="advanced-filters-badge"
+                  class="rounded-full bg-sea-700 px-1.5 py-0.5 text-[10px] font-semibold leading-none text-white tabular-nums"
+                >
+                  {{ activeAdvancedCount() }}
+                </span>
+              }
+              <svg
+                viewBox="0 0 24 24"
+                class="h-3.5 w-3.5 text-slate-500 transition-transform"
+                [class.rotate-180]="advancedOpen()"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                aria-hidden="true"
+              >
+                <path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </button>
+
+            <span class="text-slate-500" aria-live="polite" data-testid="result-count">
+              <strong class="font-semibold text-slate-800">{{ filteredBeaches().length }}</strong>
+              {{ filteredBeaches().length === 1 ? 'playa' : 'playas' }}
+            </span>
+          </div>
+
           <div class="flex items-center gap-3">
             <button
               type="button"
@@ -181,13 +234,87 @@
           </div>
         </div>
 
+        @if (advancedOpen()) {
+          <div
+            id="advanced-filters-panel"
+            data-testid="advanced-filters-panel"
+            class="mt-3 space-y-3 rounded-xl border border-slate-200/80 bg-slate-50/75 p-3"
+          >
+            <div>
+              <div class="flex items-center justify-between gap-2">
+                <span class="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-600">
+                  Servicios
+                </span>
+                <span class="text-[11px] text-slate-500">Coinciden todos</span>
+              </div>
+              <div
+                class="mt-2 flex flex-wrap gap-1.5"
+                role="group"
+                aria-label="Filtrar por servicios"
+              >
+                @for (service of availableServices; track service) {
+                  <button
+                    type="button"
+                    [attr.data-testid]="'service-' + serviceSlug(service)"
+                    [class]="
+                      serviceChipClass(isServiceSelected(service), serviceCounts()[service] === 0)
+                    "
+                    [attr.aria-pressed]="isServiceSelected(service)"
+                    (click)="toggleService(service)"
+                  >
+                    {{ service }}
+                    <span class="ml-1 text-[11px] opacity-75 tabular-nums">{{
+                      serviceCounts()[service]
+                    }}</span>
+                  </button>
+                }
+              </div>
+            </div>
+
+            <div>
+              <span class="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-600">
+                Accesibilidad
+              </span>
+              <div
+                class="mt-2 flex flex-wrap gap-1.5"
+                role="group"
+                aria-label="Filtrar por accesibilidad"
+              >
+                @for (level of availableAccessibility; track level) {
+                  <button
+                    type="button"
+                    [attr.data-testid]="'accessibility-' + level"
+                    [class]="
+                      serviceChipClass(
+                        accessibility() === level,
+                        accessibilityCounts()[level] === 0
+                      )
+                    "
+                    [attr.aria-pressed]="accessibility() === level"
+                    (click)="setAccessibility(level)"
+                  >
+                    {{ accessibilityLabel(level) }}
+                    <span class="ml-1 text-[11px] opacity-75 tabular-nums">{{
+                      accessibilityCounts()[level]
+                    }}</span>
+                  </button>
+                }
+              </div>
+            </div>
+          </div>
+        }
+
         @if (locationStatus() === 'error') {
           <p class="mt-2 text-[11px] text-rose-600" role="status">
             No hemos podido obtener tu ubicación.
           </p>
-        } @else if (locationStatus() === 'ready') {
+        } @else if (locationStatus() === 'ready' && sortBy() === 'distancia') {
           <p class="mt-2 text-[11px] text-slate-500" role="status">
             Ordenado por distancia a tu ubicación.
+          </p>
+        } @else if (locationStatus() === 'ready') {
+          <p class="mt-2 text-[11px] text-slate-500" role="status">
+            Ubicación activa. Puedes elegir «Más cercanas» en el orden.
           </p>
         }
       </section>
@@ -195,10 +322,25 @@
       <section
         class="flex min-h-0 flex-1 flex-col overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-sm"
       >
-        <div class="flex items-center justify-between gap-2 border-b border-slate-100 px-4 py-3">
-          <span class="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-400">
-            Resultados
-          </span>
+        <div
+          class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 px-3 py-2.5"
+        >
+          <div>
+            <label for="sort-filter" class="sr-only">Ordenar resultados</label>
+            <select
+              id="sort-filter"
+              data-testid="sort-filter"
+              class="rounded-lg border border-slate-200 bg-slate-50 px-2.5 py-1 text-xs font-medium text-slate-700 outline-none transition focus:border-sea-400 focus:ring-2 focus:ring-sea-100"
+              (change)="setSort($any($event.target).value)"
+            >
+              @for (option of sortOptions(); track option.id) {
+                <option [value]="option.id" [selected]="sortBy() === option.id">
+                  {{ option.label }}
+                </option>
+              }
+            </select>
+          </div>
+
           <button
             type="button"
             [class]="favoritesPillClass()"
@@ -227,11 +369,12 @@
           @for (beach of filteredBeaches(); track beach.id) {
             <div
               [attr.id]="'beach-item-' + beach.id"
+              [attr.data-testid]="'beach-row-' + beach.id"
               [class]="beachItemClass(selectedId() === beach.id)"
             >
               <button
                 type="button"
-                class="flex w-full items-start gap-3 px-3 py-2.5 pr-10 text-left"
+                class="flex min-w-0 flex-1 items-start gap-3 px-3 py-2.5 text-left"
                 (click)="selectBeach(beach)"
               >
                 <span
@@ -246,6 +389,7 @@
                   <span class="block truncate text-xs text-slate-500">
                     {{ beach.municipality }} · {{ islandLabel(beach.island) }}
                   </span>
+                  <span class="sr-only"> · Agua {{ qualityLabel(beach.quality) }}</span>
                   @if (distanceLabel(beach); as distance) {
                     <span
                       class="block text-[10px] font-semibold text-sea-700"
@@ -257,40 +401,67 @@
                 </span>
                 @if (beach.blueFlag) {
                   <span
-                    class="mt-0.5 rounded-full bg-sky-50 px-2 py-0.5 text-[10px] font-semibold text-sky-700"
+                    class="mt-0.5 shrink-0 rounded-full bg-sky-50 px-2 py-0.5 text-[10px] font-semibold text-sky-700"
                   >
                     Azul
                   </span>
                 }
               </button>
 
-              <button
-                type="button"
-                [class]="favoriteButtonClass(isFavorite(beach.id))"
-                [attr.aria-pressed]="isFavorite(beach.id)"
-                [attr.aria-label]="
-                  isFavorite(beach.id)
-                    ? 'Quitar ' + beach.name + ' de favoritas'
-                    : 'Añadir ' + beach.name + ' a favoritas'
-                "
-                [attr.data-testid]="'favorite-' + beach.id"
-                (click)="toggleFavorite(beach)"
-              >
-                <svg
-                  viewBox="0 0 24 24"
-                  class="h-4 w-4"
-                  [attr.fill]="isFavorite(beach.id) ? 'currentColor' : 'none'"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  aria-hidden="true"
+              <div class="flex shrink-0 items-center gap-0.5 pr-1.5">
+                <button
+                  type="button"
+                  [class]="compareButtonClass(isCompared(beach.id))"
+                  [attr.aria-pressed]="isCompared(beach.id)"
+                  [attr.aria-label]="
+                    isCompared(beach.id)
+                      ? 'Quitar ' + beach.name + ' del comparador'
+                      : 'Añadir ' + beach.name + ' al comparador'
+                  "
+                  [attr.data-testid]="'compare-' + beach.id"
+                  (click)="toggleCompare(beach)"
                 >
-                  <path
-                    d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                  />
-                </svg>
-              </button>
+                  <svg
+                    viewBox="0 0 24 24"
+                    class="h-4 w-4"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    aria-hidden="true"
+                  >
+                    <rect x="3" y="4" width="7" height="16" rx="1.5" />
+                    <rect x="14" y="4" width="7" height="16" rx="1.5" />
+                  </svg>
+                </button>
+
+                <button
+                  type="button"
+                  [class]="favoriteButtonClass(isFavorite(beach.id))"
+                  [attr.aria-pressed]="isFavorite(beach.id)"
+                  [attr.aria-label]="
+                    isFavorite(beach.id)
+                      ? 'Quitar ' + beach.name + ' de favoritas'
+                      : 'Añadir ' + beach.name + ' a favoritas'
+                  "
+                  [attr.data-testid]="'favorite-' + beach.id"
+                  (click)="toggleFavorite(beach)"
+                >
+                  <svg
+                    viewBox="0 0 24 24"
+                    class="h-4 w-4"
+                    [attr.fill]="isFavorite(beach.id) ? 'currentColor' : 'none'"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    aria-hidden="true"
+                  >
+                    <path
+                      d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    />
+                  </svg>
+                </button>
+              </div>
             </div>
           } @empty {
             <div class="px-4 py-10 text-center">
@@ -306,10 +477,39 @@
                 >
                   Ver todas las playas
                 </button>
+              } @else if (query().trim().length > 0) {
+                <p class="text-sm font-semibold text-slate-700">
+                  No hay playas para «{{ query().trim() }}»
+                </p>
+                <p class="mt-1 text-xs text-slate-500">
+                  Prueba con otro nombre, municipio o quita algún filtro.
+                </p>
+                <div class="mt-4 flex flex-wrap justify-center gap-2">
+                  @if (hasNonQueryFilters()) {
+                    <button
+                      type="button"
+                      class="rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs font-semibold text-slate-700 transition hover:bg-slate-50"
+                      (click)="clearSearch()"
+                    >
+                      Limpiar búsqueda
+                    </button>
+                  }
+                  <button
+                    type="button"
+                    class="rounded-xl bg-slate-900 px-3.5 py-2 text-xs font-semibold text-white transition hover:bg-slate-700"
+                    (click)="clearFilters()"
+                  >
+                    Limpiar filtros
+                  </button>
+                </div>
               } @else {
                 <p class="text-sm font-semibold text-slate-700">No hay playas con esos filtros</p>
                 <p class="mt-1 text-xs text-slate-500">
-                  Prueba a quitar algún filtro o buscar otra cosa.
+                  {{
+                    activeAdvancedCount() > 0
+                      ? 'Prueba a quitar algún servicio o cambiar de isla.'
+                      : 'Prueba a quitar algún filtro o buscar otra cosa.'
+                  }}
                 </p>
                 <button
                   type="button"
@@ -385,12 +585,12 @@
           [attr.aria-expanded]="legendOpen()"
           (click)="toggleLegend()"
         >
-          <span class="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-400">
+          <span class="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-500">
             Calidad
           </span>
           <svg
             viewBox="0 0 24 24"
-            class="h-3 w-3 text-slate-400 transition-transform"
+            class="h-3 w-3 text-slate-500 transition-transform"
             [class.rotate-180]="legendOpen()"
             fill="none"
             stroke="currentColor"
@@ -418,7 +618,13 @@
       </div>
 
       @if (selectedBeach(); as beach) {
-        <app-beach-detail [beach]="beach" [shareUrl]="shareUrl()" (closed)="closeDetail()" />
+        <app-beach-detail
+          [beach]="beach"
+          [shareUrl]="shareUrl()"
+          [isCompared]="isCompared(beach.id)"
+          (compareToggled)="toggleCompare(beach)"
+          (closed)="closeDetail()"
+        />
       }
 
       <p class="sr-only" aria-live="polite">
@@ -428,4 +634,95 @@
       </p>
     </section>
   </main>
+
+  @if (comparedBeaches().length > 0 && !compareOpen() && !selectedBeach()) {
+    <div
+      role="region"
+      aria-label="Comparador de playas"
+      data-testid="compare-tray"
+      class="fixed inset-x-3 bottom-3 z-40 rounded-2xl border border-slate-700/70 bg-slate-900/95 px-4 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] text-white shadow-2xl backdrop-blur sm:inset-x-auto sm:bottom-4 sm:left-1/2 sm:w-[min(92vw,680px)] sm:-translate-x-1/2"
+    >
+      <div class="flex flex-wrap items-center justify-between gap-2.5">
+        <div class="min-w-0 flex-1">
+          <div class="flex flex-wrap items-center gap-1.5">
+            <span class="text-xs font-semibold text-white tabular-nums">
+              Comparar ({{ comparedBeaches().length }}/3)
+            </span>
+            @for (beach of comparedBeaches(); track beach.id) {
+              <span
+                class="inline-flex max-w-[160px] items-center gap-1 rounded-full border border-slate-700 bg-slate-800 py-0.5 pl-2.5 pr-1 text-[11px] font-medium text-slate-100"
+              >
+                <span class="truncate">{{ beach.name }}</span>
+                <button
+                  type="button"
+                  class="grid h-4 w-4 shrink-0 place-items-center rounded-full text-slate-300 transition hover:bg-slate-700 hover:text-white"
+                  [attr.aria-label]="'Quitar ' + beach.name + ' del comparador'"
+                  (click)="removeFromCompare(beach.id)"
+                >
+                  ×
+                </button>
+              </span>
+            }
+          </div>
+        </div>
+
+        <div class="flex shrink-0 items-center gap-2">
+          <button
+            type="button"
+            data-testid="tray-clear-compare"
+            class="rounded-lg px-2 py-1.5 text-xs font-semibold text-slate-300 transition hover:bg-slate-800 hover:text-white"
+            (click)="clearCompare()"
+          >
+            Vaciar
+          </button>
+
+          <button
+            #openCompareButton
+            type="button"
+            data-testid="open-compare"
+            [disabled]="comparedBeaches().length < 2"
+            [class]="
+              comparedBeaches().length >= 2
+                ? 'rounded-xl bg-sky-300 px-3.5 py-1.5 text-xs font-semibold text-slate-950 transition hover:bg-sky-200'
+                : 'cursor-not-allowed rounded-xl bg-slate-800 px-3.5 py-1.5 text-xs font-semibold text-slate-300'
+            "
+            (click)="openCompare()"
+          >
+            @if (comparedBeaches().length < 2) {
+              Añade 1 playa más
+            } @else {
+              Comparar ({{ comparedBeaches().length }})
+            }
+          </button>
+        </div>
+      </div>
+
+      @if (compareWarning(); as warning) {
+        <p
+          class="mt-2 text-xs font-medium text-amber-300"
+          role="status"
+          aria-live="polite"
+          data-testid="compare-warning"
+        >
+          {{ warning }}
+        </p>
+      }
+    </div>
+  }
+
+  @if (compareOpen() && comparedBeaches().length >= 2) {
+    <app-beach-compare
+      [beaches]="comparedBeaches()"
+      [shareUrl]="shareUrl()"
+      [userLocation]="userLocation()"
+      (removed)="removeFromCompare($event)"
+      (cleared)="clearCompare()"
+      (selected)="selectFromCompare($event)"
+      (closed)="closeCompare()"
+    />
+  }
+
+  <p class="sr-only" aria-live="polite" data-testid="compare-live-region">
+    {{ compareAnnouncement() }}
+  </p>
 </div>
