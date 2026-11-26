@@ -28,7 +28,7 @@ test('busca por texto y limpia los filtros', async ({ page }) => {
 test('restaura isla y calidad desde la URL', async ({ page }) => {
   await page.goto('/?isla=menorca&calidad=excelente');
 
-  await expect(page.getByRole('button', { name: 'Menorca', exact: true })).toHaveAttribute(
+  await expect(page.getByRole('button', { name: /^Menorca \d+$/ })).toHaveAttribute(
     'aria-pressed',
     'true',
   );
@@ -66,7 +66,7 @@ test('mantiene el estado compartido al recargar', async ({ page }) => {
   await page.reload();
 
   await expect(detailTitle).toBeVisible();
-  await expect(page.getByRole('button', { name: 'Formentera', exact: true })).toHaveAttribute(
+  await expect(page.getByRole('button', { name: /^Formentera \d+$/ })).toHaveAttribute(
     'aria-pressed',
     'true',
   );
@@ -77,7 +77,7 @@ test('muestra el estado vacío y permite limpiar', async ({ page }) => {
 
   await page.getByLabel('Buscar playa').fill('zzzz');
 
-  await expect(page.getByText('No hay playas con esos filtros')).toBeVisible();
+  await expect(page.getByText('No hay playas para «zzzz»')).toBeVisible();
 
   await page.getByRole('button', { name: 'Limpiar filtros' }).last().click();
 
@@ -191,7 +191,10 @@ test('colapsa y expande la leyenda de calidad', async ({ page }) => {
   await expect(toggle).toHaveAttribute('aria-expanded', initial ?? 'true');
 });
 
-test('ordena por distancia con la geolocalización', async ({ page, context }) => {
+test('ordena por distancia con la geolocalización y permite cambiar de orden', async ({
+  page,
+  context,
+}) => {
   await context.grantPermissions(['geolocation']);
   await context.setGeolocation({ latitude: 39.57, longitude: 2.65 });
 
@@ -199,6 +202,11 @@ test('ordena por distancia con la geolocalización', async ({ page, context }) =
   await page.getByRole('button', { name: 'Cerca de mí' }).click();
 
   await expect(page.getByText('Ordenado por distancia a tu ubicación.')).toBeVisible();
+  await expect(page.getByTestId('sort-filter')).toHaveValue('distancia');
+  await expect(page.getByTestId('distance-es-trenc')).toHaveText(/a .*(km|m)/);
+
+  await page.getByTestId('sort-filter').selectOption('nombre');
+  await expect(page.getByText(/Ubicación activa/)).toBeVisible();
   await expect(page.getByTestId('distance-es-trenc')).toHaveText(/a .*(km|m)/);
 });
 
@@ -211,4 +219,180 @@ test('muestra el histórico de calidad y la tendencia', async ({ page }) => {
   await expect(detail.getByText('↑ Mejora')).toBeVisible();
   await expect(detail.getByRole('img', { name: /Histórico de 5 muestras/ })).toBeVisible();
   await expect(detail.getByText('Datos de demostración')).toBeVisible();
+});
+
+test('búsqueda robusta con acentos, sinónimos, debounce y limpieza (CC-24)', async ({ page }) => {
+  await page.goto('/');
+  const search = page.getByLabel('Buscar playa');
+
+  await page.evaluate(() => {
+    (window as unknown as { __replaceCalls: number }).__replaceCalls = 0;
+    const original = history.replaceState.bind(history);
+    history.replaceState = (...args) => {
+      (window as unknown as { __replaceCalls: number }).__replaceCalls += 1;
+      return original(...args);
+    };
+  });
+
+  await search.pressSequentially('formentera', { delay: 10 });
+  await expect(page.getByTestId('result-count')).toHaveText('3 playas');
+  await expect(page).toHaveURL(/q=formentera/);
+
+  const replaceCalls = await page.evaluate(
+    () => (window as unknown as { __replaceCalls: number }).__replaceCalls,
+  );
+  expect(replaceCalls).toBe(1);
+
+  await search.press('Escape');
+  await expect(search).toHaveValue('');
+  await expect(search).toBeFocused();
+  await expect(page.getByTestId('result-count')).toHaveText('19 playas');
+  await expect(page).not.toHaveURL(/q=/);
+
+  await search.fill('cala dhort');
+  await expect(page.getByTestId('result-count')).toHaveText('1 playa');
+  await expect(page.getByRole('button', { name: /^Cala d'Hort/ })).toBeVisible();
+
+  await page.getByTestId('clear-search').click();
+  await expect(search).toHaveValue('');
+  await expect(search).toBeFocused();
+
+  await search.fill('playa de palma');
+  await expect(page.getByRole('button', { name: /^Platja de Palma/ })).toBeVisible();
+});
+
+test('ordena resultados, sincroniza ?orden= y muestra contadores cross-filter (CC-23)', async ({
+  page,
+}) => {
+  await page.goto('/');
+
+  await expect(page.getByTestId('island-todas')).toHaveText('Todas 19');
+  await expect(page.getByTestId('island-menorca')).toHaveText('Menorca 4');
+
+  await page.getByLabel('Calidad del agua').selectOption('excelente');
+  await expect(page.getByTestId('island-todas')).toHaveText('Todas 10');
+  await expect(page.getByTestId('island-menorca')).toHaveText('Menorca 2');
+
+  await page.getByTestId('island-menorca').click();
+  await expect(page.getByTestId('island-mallorca')).toHaveText('Mallorca 4');
+
+  await page.getByTestId('sort-filter').selectOption('muestra');
+  await expect(page).toHaveURL(/orden=muestra/);
+
+  await page.reload();
+  await expect(page.getByTestId('sort-filter')).toHaveValue('muestra');
+
+  await page.goto('/?orden=distancia');
+  await expect(page.getByTestId('sort-filter')).toHaveValue('nombre');
+  await expect(page).not.toHaveURL(/orden=/);
+});
+
+test('filtra por servicios (AND) y accesibilidad en Más filtros y restaura por URL (CC-25)', async ({
+  page,
+}) => {
+  await page.goto('/');
+
+  const toggle = page.getByTestId('advanced-filters-toggle');
+  await expect(toggle).toHaveAttribute('aria-expanded', 'false');
+  await expect(page.getByTestId('advanced-filters-panel')).toHaveCount(0);
+
+  await toggle.click();
+  await expect(toggle).toHaveAttribute('aria-expanded', 'true');
+  await expect(page.getByTestId('advanced-filters-panel')).toBeVisible();
+
+  await page.getByTestId('service-aparcamiento').click();
+  await page.getByTestId('service-socorrista').click();
+  await expect(page).toHaveURL(/servicios=aparcamiento,socorrista/);
+
+  await page.getByTestId('accessibility-adaptada').click();
+  await expect(page).toHaveURL(/accesibilidad=adaptada/);
+  await expect(page.getByTestId('result-count')).toHaveText('3 playas');
+
+  await page.reload();
+  await expect(page.getByTestId('advanced-filters-toggle')).toHaveAttribute(
+    'aria-expanded',
+    'true',
+  );
+  await expect(page.getByTestId('advanced-filters-panel')).toBeVisible();
+  await expect(page.getByTestId('service-aparcamiento')).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.getByTestId('accessibility-adaptada')).toHaveAttribute('aria-pressed', 'true');
+
+  await page.getByRole('button', { name: 'Limpiar filtros' }).first().click();
+  await expect(page.getByTestId('result-count')).toHaveText('19 playas');
+  await expect(page).not.toHaveURL(/servicios=|accesibilidad=/);
+});
+
+test('compara 2-3 playas, limita la 4ª, soporta teclado y URL ?comparar= (CC-21)', async ({
+  page,
+  isMobile,
+}) => {
+  await page.goto('/');
+
+  await page.getByTestId('compare-es-trenc').click();
+  const tray = page.getByTestId('compare-tray');
+  await expect(tray).toBeVisible();
+  await expect(page.getByTestId('open-compare')).toBeDisabled();
+  await expect(page.getByTestId('open-compare')).toHaveText('Añade 1 playa más');
+
+  await page.getByRole('button', { name: /^Cala Macarella/ }).click();
+  await page.getByTestId('detail-compare').click();
+  await expect(page.getByTestId('compare-cala-macarella')).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.getByTestId('open-compare')).toBeEnabled();
+  await expect(page).toHaveURL(/comparar=es-trenc,cala-macarella/);
+
+  await page.getByRole('button', { name: 'Cerrar ficha' }).click();
+  await page.getByTestId('compare-ses-illetes').click();
+  await expect(page).toHaveURL(/comparar=es-trenc,cala-macarella,ses-illetes/);
+
+  await page.getByTestId('compare-son-bou').click();
+  await expect(page.getByTestId('compare-warning')).toHaveText(
+    'Máximo 3 playas a la vez. Quita una para añadir otra.',
+  );
+  await expect(page.getByTestId('compare-son-bou')).toHaveAttribute('aria-pressed', 'false');
+
+  await page.getByTestId('open-compare').click();
+  const dialog = page.getByRole('dialog', { name: 'Comparativa de playas' });
+  await expect(dialog).toBeVisible();
+  await expect(page.getByTestId('compare-close')).toBeFocused();
+
+  if (isMobile) {
+    await expect(page.getByTestId('compare-cards')).toBeVisible();
+    await expect(page.getByTestId('compare-table')).toBeHidden();
+    const hasOverflow = await page.evaluate(
+      () => document.documentElement.scrollWidth > window.innerWidth,
+    );
+    expect(hasOverflow).toBe(false);
+  } else {
+    await expect(page.getByTestId('compare-table')).toBeVisible();
+    await expect(page.getByTestId('compare-cards')).toBeHidden();
+  }
+
+  await page.keyboard.press('Escape');
+  await expect(dialog).toHaveCount(0);
+  await expect(page.getByTestId('open-compare')).toBeFocused();
+
+  await page.goto('/?comparar=es-trenc,cala-macarella,ses-illetes,son-bou,inexistente');
+  await expect(page.getByRole('dialog', { name: 'Comparativa de playas' })).toBeVisible();
+  await expect(page).toHaveURL(/comparar=es-trenc,cala-macarella,ses-illetes$/);
+});
+
+test('incluye metadatos Open Graph / Twitter y sirve /og-image.png (CC-42)', async ({ page }) => {
+  await page.goto('/');
+
+  await expect(page.locator('meta[property="og:image"]')).toHaveAttribute(
+    'content',
+    'https://costa-clara-k23.pages.dev/og-image.png',
+  );
+  await expect(page.locator('meta[name="twitter:card"]')).toHaveAttribute(
+    'content',
+    'summary_large_image',
+  );
+  await expect(page.locator('meta[name="twitter:image"]')).toHaveAttribute(
+    'content',
+    'https://costa-clara-k23.pages.dev/og-image.png',
+  );
+
+  const response = await page.request.get('/og-image.png');
+  expect(response.status()).toBe(200);
+  expect(response.headers()['content-type']).toContain('image/png');
 });

@@ -40,6 +40,31 @@ import { BeachHistory } from './beach-history';
         <div class="flex shrink-0 items-center gap-0.5">
           <button
             type="button"
+            data-testid="detail-compare"
+            [class]="compareButtonClass()"
+            [attr.aria-pressed]="isCompared()"
+            [attr.aria-label]="
+              isCompared()
+                ? 'Quitar ' + beach().name + ' del comparador'
+                : 'Añadir ' + beach().name + ' al comparador'
+            "
+            (click)="compareToggled.emit()"
+          >
+            <svg
+              viewBox="0 0 24 24"
+              class="h-4 w-4"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              aria-hidden="true"
+            >
+              <rect x="3" y="4" width="7" height="16" rx="1.5" />
+              <rect x="14" y="4" width="7" height="16" rx="1.5" />
+            </svg>
+          </button>
+
+          <button
+            type="button"
             data-testid="detail-favorite"
             [class]="favoriteButtonClass()"
             [attr.aria-pressed]="isFavorite()"
@@ -192,6 +217,8 @@ import { BeachHistory } from './beach-history';
 export class BeachDetail {
   readonly beach = input.required<Beach>();
   readonly shareUrl = input('');
+  readonly isCompared = input(false);
+  readonly compareToggled = output<void>();
   readonly closed = output<void>();
 
   readonly favorites = inject(FavoritesStore);
@@ -233,6 +260,13 @@ export class BeachDetail {
   });
 
   readonly isFavorite = computed(() => this.favorites.isFavorite(this.beach().id));
+
+  readonly compareButtonClass = computed(() => {
+    const base = 'rounded-full p-1.5 transition';
+    return this.isCompared()
+      ? `${base} bg-sea-50 text-sea-700 ring-1 ring-sea-200`
+      : `${base} text-slate-400 hover:bg-slate-100 hover:text-slate-700`;
+  });
 
   readonly favoriteButtonClass = computed(() => {
     const base = 'rounded-full p-1.5 transition';
