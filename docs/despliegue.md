@@ -64,7 +64,7 @@ Angular copia ese fichero a la raíz del build, así que recargar `/?isla=mallor
 - `/?isla=menorca&calidad=excelente` mantiene los filtros al recargar.
 - Una ruta inexistente devuelve la app (la página 404 propia es el ticket CC-06).
 - En **Workers & Pages → costa-clara → Deployments** aparece un deployment `production` por cada push.
-- El build tarda ~3 s y el bundle inicial ronda los 685 kB (límite de warning: 700 kB).
+- El build tarda ~3 s y el bundle inicial ronda los 693 kB (límite de warning: 700 kB).
 
 ## Alternativa: integración Git del dashboard
 

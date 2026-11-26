@@ -4,7 +4,7 @@ Listado de tickets para evolucionar la app desde la v0.1 actual hasta una v1.0 p
 
 > **Contexto:** v0.1 con 19 playas de demostración, mapa OpenLayers con clustering, filtros sincronizados con la URL y ficha lateral. Sin backend, sin deploy y sin e2e todavía.
 
-**Estado:** 28/36 cerrados · actualizado 2026-11-26.
+**Estado:** 30/36 cerrados · actualizado 2026-11-26.
 
 ## Hecho
 
@@ -28,6 +28,8 @@ Listado de tickets para evolucionar la app desde la v0.1 actual hasta una v1.0 p
 - ✅ **CC-24** Búsqueda con debounce, apóstrofos y sinónimos baleares.
 - ✅ **CC-25** Filtros avanzados de servicios y accesibilidad.
 - ✅ **CC-26** Compartir ficha con Web Share API y fallback al portapapeles.
+- ✅ **CC-27** Estado del mar con Open-Meteo Marine en la ficha.
+- ✅ **CC-43** Analítica sin cookies/PII con eventos locales y Plausible opcional.
 - ✅ **CC-30** Geolocalización, orden por distancia y marcador de posición.
 - ✅ **CC-31** Capas base: mapa, relieve y satélite con atribución.
 - ✅ **CC-32** Leyenda colapsable y mapa a pantalla completa.
@@ -234,6 +236,7 @@ Reglas del proyecto que aplican a todos los tickets: UI en español, no inventar
 - El enlace abierto en otro dispositivo centra el mapa y abre la ficha.
 
 ### CC-27 · Estado del mar y meteorología · P2 · M
+**Estado:** ✅ Hecho (2026-11-26) · Open-Meteo Marine, bloque resiliente y atribución.
 **Qué:** integración con una API abierta (por ejemplo Open-Meteo marino/meteo o AEMET si su licencia lo permite) para oleaje, viento y temperatura en la ficha.
 **Hecho cuando:**
 - Se muestra “actualizado a las HH:MM” y la fuente.
@@ -312,6 +315,7 @@ Reglas del proyecto que aplican a todos los tickets: UI en español, no inventar
 - Las fotos tienen autoría/licencia documentada.
 
 ### CC-43 · Analítica respetuosa con la privacidad · P2 · S
+**Estado:** ✅ Hecho (2026-11-26) · sin cookies/PII; eventos locales y Plausible opcional.
 **Qué:** analítica sin cookies (Plausible/Umami) o ninguna; medir búsquedas, filtros y fichas abiertas.
 **Hecho cuando:**
 - No hay cookies de terceros ni datos personales.

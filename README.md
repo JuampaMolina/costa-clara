@@ -56,6 +56,7 @@ Instrucciones y rotación del token en [docs/despliegue.md](./docs/despliegue.md
 - [Caso de estudio](./docs/caso-de-estudio.md)
 - [ADRs](./docs/adr/)
 - [Fuentes de datos](./docs/datos.md)
+- [Privacidad](./docs/privacidad.md)
 - [Despliegue](./docs/despliegue.md)
 
 ## Qué hay hecho
@@ -72,7 +73,8 @@ Instrucciones y rotación del token en [docs/despliegue.md](./docs/despliegue.md
 - Página 404 propia, título y metadatos dinámicos por playa.
 - Imagen OG 1200×630 y metas Open Graph/Twitter.
 - Accesibilidad WCAG AA con axe, foco visible y `prefers-reduced-motion`.
-- Tests: 42 unitarios y 46 e2e (desktop y móvil).
+- Estado del mar en la ficha (Open-Meteo Marine) y analítica sin cookies/PII.
+- Tests: 54 unitarios y 50 e2e (desktop y móvil).
 - Importador CSV con validación, fixture y fallback al dataset demo.
 - CI con tests, build y e2e; deploy automático en Cloudflare Pages.
 - Dataset semilla de 19 playas reales (calidad y servicios de ejemplo).
