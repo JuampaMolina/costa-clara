@@ -4,7 +4,7 @@ Listado de tickets para evolucionar la app desde la v0.1 actual hasta una v1.0 p
 
 > **Contexto:** v0.1 con 19 playas de demostración, mapa OpenLayers con clustering, filtros sincronizados con la URL y ficha lateral. Sin backend, sin deploy y sin e2e todavía.
 
-**Estado:** 22/36 cerrados · actualizado 2026-11-26.
+**Estado:** 27/36 cerrados · actualizado 2026-11-26.
 
 ## Hecho
 
@@ -22,13 +22,18 @@ Listado de tickets para evolucionar la app desde la v0.1 actual hasta una v1.0 p
 - ✅ **CC-15** Procedencia demo/oficial, fuente y licencia en la ficha.
 - ✅ **CC-16** Tests del importador con casos válidos y errores.
 - ✅ **CC-20** Gráfica SVG del histórico y tendencia.
+- ✅ **CC-21** Comparador 0–3 con modal accesible y URL.
 - ✅ **CC-22** Favoritos con `localStorage`, filtro y sincronización entre pestañas.
+- ✅ **CC-23** Orden y contadores cross-filter en islas y calidad.
+- ✅ **CC-24** Búsqueda con debounce, apóstrofos y sinónimos baleares.
+- ✅ **CC-25** Filtros avanzados de servicios y accesibilidad.
 - ✅ **CC-26** Compartir ficha con Web Share API y fallback al portapapeles.
 - ✅ **CC-30** Geolocalización, orden por distancia y marcador de posición.
 - ✅ **CC-31** Capas base: mapa, relieve y satélite con atribución.
 - ✅ **CC-32** Leyenda colapsable y mapa a pantalla completa.
 - ✅ **CC-33** Sincronía lista↔mapa con marcador resaltado.
 - ✅ **CC-34** Alternativa textual, live regions y foco en el mapa.
+- ✅ **CC-42** Imagen OG 1200×630 y metas Open Graph/Twitter.
 - ✅ **CC-54** Caso de estudio y 4 ADRs.
 
 ## Cómo leer esto
@@ -185,6 +190,7 @@ Reglas del proyecto que aplican a todos los tickets: UI en español, no inventar
 - Funciona en móvil y con `prefers-reduced-motion`.
 
 ### CC-21 · Comparador de playas · P1 · M
+**Estado:** ✅ Hecho (2026-11-26) · 0–3, modal accesible y `?comparar=`.
 **Qué:** seleccionar 2–3 playas y comparar calidad, servicios, bandera azul, municipio y última muestra en una vista/tabla.
 **Hecho cuando:**
 - La selección se puede compartir por URL (`?comparar=id1,id2`).
@@ -199,18 +205,21 @@ Reglas del proyecto que aplican a todos los tickets: UI en español, no inventar
 - El corazón tiene `aria-pressed` y nombre accesible.
 
 ### CC-23 · Ordenación y facetas · P1 · S
+**Estado:** ✅ Hecho (2026-11-26) · `?orden=` y contadores cross-filter.
 **Qué:** ordenar resultados (nombre, isla, calidad, última muestra) y mostrar contadores por isla/calidad en los filtros.
 **Hecho cuando:**
 - El orden elegido se refleja en la URL y en la lista.
 - Los contadores respetan el resto de filtros activos.
 
 ### CC-24 · Búsqueda robusta · P1 · S
+**Estado:** ✅ Hecho (2026-11-26) · debounce 250 ms, apóstrofos y sinónimos.
 **Qué:** búsqueda insensible a mayúsculas y acentos, tolerante a “platja/playa/cala”, con debounce y limpieza.
 **Hecho cuando:**
 - “formentera”, “Formentera” y “fòrmentera” dan el mismo resultado.
 - Escribir rápido no dispara navegaciones de URL por cada tecla.
 
 ### CC-25 · Filtros avanzados · P1 · M
+**Estado:** ✅ Hecho (2026-11-26) · servicios derivados + accesibilidad con `?servicios=`/`?accesibilidad=`.
 **Qué:** filtrar por servicios (socorrista, acceso adaptado, chiringuito, aparcamiento…), accesibilidad y tipo de playa, con panel colapsable.
 **Hecho cuando:**
 - Los servicios se derivan del dataset, no están hardcodeados en la vista.
@@ -295,6 +304,7 @@ Reglas del proyecto que aplican a todos los tickets: UI en español, no inventar
 - El build no supera el presupuesto acordado y el mapa no bloquea el primer render de la lista.
 
 ### CC-42 · Imágenes de playas y OG images · P2 · M
+**Estado:** ✅ Hecho (2026-11-26) · OG 1200×630 y metas; fotos de playas pendientes si se añaden.
 **Qué:** si se añaden fotos, servirlas en AVIF/WebP con `srcset` y lazy loading; generar imagen OG por playa o una genérica cuidada.
 **Hecho cuando:**
 - Ninguna imagen bloquea el LCP ni se sirve a tamaño completo en móvil.
