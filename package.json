@@ -9,6 +9,8 @@
     "test": "ng test",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
+    "data:import": "tsx scripts/import-data.ts",
+    "data:example": "tsx scripts/import-data.ts --input data/raw/example --output data/generated/example.ts",
     "deploy": "npm run build && wrangler pages deploy dist/costa-clara/browser --project-name costa-clara --branch main"
   },
   "private": true,
@@ -30,10 +32,12 @@
     "@angular/compiler-cli": "^22.3.0",
     "@playwright/test": "^1.65.1",
     "@tailwindcss/postcss": "^4.3.5",
+    "csv-parse": "^7.0.3",
     "jsdom": "^31.0.0",
     "postcss": "^8.5.33",
     "prettier": "^3.8.1",
     "tailwindcss": "^4.3.5",
+    "tsx": "^4.23.15",
     "typescript": "~6.0.2",
     "vitest": "^5.0.0",
     "wrangler": "^4.168.0"

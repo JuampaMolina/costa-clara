@@ -10,16 +10,19 @@ import {
 } from '@angular/core';
 import { Beach, ISLANDS, QUALITY_COLORS, QUALITY_LABELS } from '../../core/models/beach';
 import { FavoritesStore } from '../../core/services/favorites';
+import { getBeachSamples } from '../../core/utils/beach-history';
+import { BeachHistory } from './beach-history';
 
 @Component({
   selector: 'app-beach-detail',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [BeachHistory],
   host: {
-    class: 'absolute inset-x-3 bottom-3 z-10 sm:left-auto sm:w-[370px]',
+    class: 'absolute inset-x-3 bottom-3 top-3 z-30 sm:left-auto sm:top-auto sm:w-[370px]',
   },
   template: `
     <article
-      class="max-h-[calc(100%-1rem)] overflow-y-auto rounded-2xl border border-slate-200/80 bg-white/95 p-5 shadow-2xl shadow-slate-900/10 backdrop-blur"
+      class="max-h-full overflow-y-auto rounded-2xl border border-slate-200/80 bg-white/95 p-5 shadow-2xl shadow-slate-900/10 backdrop-blur sm:max-h-[calc(100dvh-6rem)]"
     >
       <div class="flex items-start justify-between gap-3">
         <div class="flex min-w-0 flex-wrap items-center gap-2">
@@ -112,6 +115,8 @@ import { FavoritesStore } from '../../core/services/favorites';
         }
       </div>
 
+      <app-beach-history [samples]="samples()" />
+
       <dl class="mt-5 grid grid-cols-2 gap-3 border-t border-slate-100 pt-4 text-sm">
         <div>
           <dt class="text-[11px] font-semibold uppercase tracking-wide text-slate-400">Última muestra</dt>
@@ -137,8 +142,30 @@ import { FavoritesStore } from '../../core/services/favorites';
             <path d="M7 17L17 7M9 7h8v8" stroke-linecap="round" stroke-linejoin="round" />
           </svg>
         </a>
-        <span class="text-[11px] text-slate-400">Datos de demostración</span>
+        <span class="text-[11px] text-slate-400">
+          @if (isDemo()) {
+            <span class="text-amber-600">Datos de demostración</span>
+          } @else if (source(); as src) {
+            <a
+              [href]="src.url"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="font-medium text-sea-700 underline underline-offset-2"
+            >
+              Fuente: {{ src.name }}
+            </a>
+          }
+        </span>
       </div>
+
+      @if (!isDemo() && source(); as src) {
+        <p class="mt-2 text-[10px] leading-4 text-slate-400">
+          {{ src.license }}
+          @if (updatedAt()) {
+            · Actualizado {{ updatedAt() }}
+          }
+        </p>
+      }
     </article>
   `,
 })
@@ -170,6 +197,20 @@ export class BeachDetail {
       year: 'numeric',
     })
   );
+
+  readonly samples = computed(() => getBeachSamples(this.beach()));
+  readonly isDemo = computed(() => this.beach().dataStatus !== 'real');
+  readonly source = computed(() => this.beach().source ?? null);
+  readonly updatedAt = computed(() => {
+    const value = this.beach().updatedAt;
+    if (!value) return null;
+
+    return new Date(`${value.slice(0, 10)}T00:00:00`).toLocaleDateString('es-ES', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric',
+    });
+  });
 
   readonly isFavorite = computed(() => this.favorites.isFavorite(this.beach().id));
 

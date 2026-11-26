@@ -11,7 +11,7 @@ import {
 } from '@angular/core';
 import { Meta, Title } from '@angular/platform-browser';
 import { ActivatedRoute, Router } from '@angular/router';
-import { BEACHES } from '../../core/data/beaches.seed';
+import { BEACHES, DATA_STATUS } from '../../core/data/beaches';
 import {
   Beach,
   ISLANDS,
@@ -46,6 +46,8 @@ export class BeachesPage {
   private readonly meta = inject(Meta);
   readonly favorites = inject(FavoritesStore);
   private readonly destroyRef = inject(DestroyRef);
+
+  readonly dataStatus = DATA_STATUS;
 
   readonly mapSection = viewChild<ElementRef<HTMLElement>>('mapSection');
   readonly userLocation = signal<Coordinates | null>(null);
@@ -91,12 +93,13 @@ export class BeachesPage {
   private readonly pillActive = 'bg-slate-900 text-white shadow-sm';
   private readonly pillIdle = 'bg-slate-100 text-slate-600 hover:bg-slate-200';
   private readonly itemBase =
-    'group flex w-full items-start gap-1 rounded-xl px-2 py-2.5 transition';
+    'group relative flex w-full items-start rounded-xl transition focus-within:ring-2 focus-within:ring-sea-400';
   private readonly itemActive = 'bg-sky-50 ring-1 ring-sky-200';
   private readonly itemIdle = 'hover:bg-slate-50';
   private readonly favoritesPillBase =
     'inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-semibold transition';
-  private readonly favoriteButtonBase = 'mt-0.5 shrink-0 rounded-full p-1.5 transition';
+  private readonly favoriteButtonBase =
+    'absolute right-2 top-2.5 rounded-full p-1.5 transition';
 
   readonly filteredBeaches = computed(() => {
     const beaches = filterBeaches(BEACHES, {
@@ -170,6 +173,13 @@ export class BeachesPage {
         favoritas: this.showFavoritesOnly() ? '1' : null,
         playa: this.selectedId(),
       };
+
+      const current = this.route.snapshot.queryParamMap;
+      const unchanged = Object.entries(queryParams).every(
+        ([key, value]) => (current.get(key) ?? null) === value
+      );
+
+      if (unchanged) return;
 
       void this.router.navigate([], {
         relativeTo: this.route,

@@ -38,6 +38,8 @@ Abre **http://localhost:4200** (no `127.0.0.1`).
 npm run build          # build de producción
 npm test -- --watch=false
 npm run test:e2e       # Playwright, desktop + móvil
+npm run data:import    # importa data/raw y regenera el dataset
+npm run data:example   # prueba el importador con el fixture
 npm run deploy         # build + deploy manual (requiere token de Cloudflare)
 ```
 
@@ -47,10 +49,12 @@ npm run deploy         # build + deploy manual (requiere token de Cloudflare)
 - 19 playas reales en `src/app/core/data/beaches.seed.ts` (calidad y servicios de ejemplo).
 - Filtros por texto, isla, calidad y bandera azul, sincronizados con la URL (`?q=&isla=&calidad=&bandera=&playa=`).
 - Favoritos en `localStorage`, con filtro “Favoritas”, contador y sincronización entre pestañas.
-- Ficha con calidad, servicios, última muestra, coordenadas, enlace a Google Maps y botón para compartir (Web Share API + portapapeles).
+- Ficha con calidad, servicios, última muestra, histórico con gráfica y tendencia, coordenadas, enlace a Google Maps y botón para compartir (Web Share API + portapapeles).
+- Procedencia visible: demo/oficial, fuente, licencia y fecha de actualización.
+- Importador CSV con validación (`npm run data:import`), fixture de ejemplo y fallback al seed.
 - Leyenda, diseño responsive y estado vacío.
 - Página 404 propia y título/descripción/Open Graph dinámicos al abrir una playa.
-- Tests: 19 unitarios y 28 e2e (14 flujos × desktop/móvil).
+- Tests: 26 unitarios y 30 e2e (15 flujos × desktop/móvil).
 - CI (`.github/workflows/ci.yml`) y deploy automático en `main` (`.github/workflows/deploy.yml`).
 
 ## Bugs conocidos
@@ -70,32 +74,41 @@ Ninguno en la v0.2. Si aparece uno, documéntalo aquí antes de arreglarlo.
 ```
 src/app/
   core/
+    data/beaches.ts            # selector: datos reales o seed
+    data/beaches.generated.ts  # salida del importador (null = demo)
     data/beaches.seed.ts       # dataset de demostración
-    models/beach.ts            # tipos, islas, calidades, colores
+    models/beach.ts            # tipos, islas, calidades, colores, muestras
     services/favorites.ts      # favoritos en localStorage + tests
     utils/beach-filter.ts      # filtrado puro + tests
+    utils/beach-history.ts     # muestras y tendencia + tests
+    utils/data-import.ts       # validación del CSV + tests
+    utils/geo.ts               # distancia Haversine + tests
   features/beaches/
     beaches-page.ts/html/scss  # estado, filtros, URL, títulos
-    beach-map.ts               # OpenLayers: mapa, clustering, selección
+    beach-map.ts               # OpenLayers: mapa, clustering, capas, ubicación
     beach-detail.ts            # ficha lateral
+    beach-history.ts           # gráfica SVG del histórico
   features/not-found/
     not-found.ts               # 404
   app.ts / app.routes.ts       # shell y rutas
 src/styles.css                 # Tailwind + estilos globales de OpenLayers
 e2e/beaches.spec.ts            # flujos críticos con Playwright
 playwright.config.ts
+scripts/import-data.ts         # CLI del importador
+data/raw/example/              # fixture CSV (no oficial)
+data/README.md                 # esquema de datos
 .github/workflows/             # ci.yml + deploy.yml
+docs/datos.md                  # fuentes y licencias
 docs/despliegue.md
 BACKLOG.md                     # 36 tickets priorizados
 ```
 
 ## Próximos pasos
 
-1. **Datos reales:** investigar fuentes/licencias (CC-10), modelo v1 (CC-11) e importador CSV/JSON (CC-12).
-2. **Ficha:** histórico de calidad con gráfica (CC-14, CC-20).
-3. **Producto:** comparador (CC-21) y orden/facetas (CC-23).
-4. **Calidad:** accesibilidad del mapa (CC-34) y auditoría axe (CC-50).
-5. **PWA y portfolio:** offline (CC-40) y caso de estudio (CC-54).
+1. **Datos reales:** conectar la fuente oficial y automatizar la actualización (CC-13).
+2. **Producto:** comparador (CC-21) y orden/facetas (CC-23).
+3. **Calidad:** auditoría axe (CC-50) y pulido de accesibilidad.
+4. **PWA y portfolio:** offline (CC-40) y caso de estudio (CC-54).
 
 El orden recomendado, tamaños y criterios de aceptación están en [BACKLOG.md](./BACKLOG.md).
 

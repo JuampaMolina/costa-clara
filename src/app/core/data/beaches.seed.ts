@@ -20,6 +20,13 @@ export const BEACHES: Beach[] = [
     description:
       'Arena blanca y aguas turquesas. Uno de los arenales más largos y conocidos de Mallorca, con zonas nudistas y dunas protegidas.',
     lastSample: '2026-09-14',
+    samples: [
+      { date: '2026-05-18', quality: 'buena' },
+      { date: '2026-06-15', quality: 'excelente' },
+      { date: '2026-07-20', quality: 'excelente' },
+      { date: '2026-08-17', quality: 'buena' },
+      { date: '2026-09-14', quality: 'excelente' },
+    ],
   },
   {
     id: 'cala-mondrago',
@@ -132,6 +139,12 @@ export const BEACHES: Beach[] = [
     description:
       'Una de las calas más fotografiadas de Menorca: agua transparente, arena blanca y pinos hasta la orilla.',
     lastSample: '2026-09-11',
+    samples: [
+      { date: '2026-06-02', quality: 'excelente' },
+      { date: '2026-07-07', quality: 'excelente' },
+      { date: '2026-08-04', quality: 'buena' },
+      { date: '2026-09-11', quality: 'excelente' },
+    ],
   },
   {
     id: 'son-bou',
@@ -244,6 +257,12 @@ export const BEACHES: Beach[] = [
     description:
       'Arena blanca y agua transparente en el extremo norte de Formentera, junto al Parc Natural de ses Salines.',
     lastSample: '2026-09-14',
+    samples: [
+      { date: '2026-05-30', quality: 'excelente' },
+      { date: '2026-07-01', quality: 'buena' },
+      { date: '2026-08-12', quality: 'excelente' },
+      { date: '2026-09-14', quality: 'excelente' },
+    ],
   },
   {
     id: 'cala-saona',

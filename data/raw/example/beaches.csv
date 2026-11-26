@@ -1,0 +1,4 @@
+id,name,municipality,island,lon,lat,description,services,blue_flag,blue_flag_year,source_name,source_url,source_license,updated_at,accessibility
+es-trenc,Es Trenc,Campos,mallorca,2.9828,39.3406,"Arena blanca y aguas turquesas.","Socorrista;Aseos;Duchas;Aparcamiento",1,2026,Datos de ejemplo,https://example.com/fuente,CC0-1.0,2026-09-20,
+cala-macarella,Cala Macarella,Ciutadella de Menorca,menorca,3.936,39.936,"Cala de agua transparente y arena blanca.","Socorrista;Aseos;Chiringuito",0,,Datos de ejemplo,https://example.com/fuente,CC0-1.0,2026-09-20,parcial
+ses-illetes,Ses Illetes,Formentera,formentera,1.433,38.874,"Arena blanca junto al Parc Natural de ses Salines.","Socorrista;Aseos;Duchas;Chiringuito;Aparcamiento",1,2026,Datos de ejemplo,https://example.com/fuente,CC0-1.0,2026-09-20,

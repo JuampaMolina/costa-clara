@@ -4,15 +4,22 @@ Listado de tickets para evolucionar la app desde la v0.1 actual hasta una v1.0 p
 
 > **Contexto:** v0.1 con 19 playas de demostración, mapa OpenLayers con clustering, filtros sincronizados con la URL y ficha lateral. Sin backend, sin deploy y sin e2e todavía.
 
-**Estado:** 12/36 cerrados · actualizado 2026-11-26.
+**Estado:** 19/36 cerrados · actualizado 2026-11-26.
 
 ## Hecho
 
 - ✅ **CC-01** Deploy en Cloudflare Pages (auto-deploy desde `main`).
 - ✅ **CC-02** CI con GitHub Actions (tests, build y e2e).
-- ✅ **CC-03** Playwright configurado + 28 e2e (desktop y móvil).
+- ✅ **CC-03** Playwright configurado + 30 e2e (desktop y móvil).
 - ✅ **CC-04** README, HANDOFF y BACKLOG al día.
 - ✅ **CC-06** 404 propia, títulos y metadatos dinámicos.
+- ✅ **CC-10** Fuentes y licencias documentadas en `docs/datos.md`.
+- ✅ **CC-11** Modelo v1 con muestras, servicios tipados y procedencia.
+- ✅ **CC-12** Importador CSV validado + ejemplo y fallback al seed.
+- ✅ **CC-14** Histórico de muestras por playa.
+- ✅ **CC-15** Procedencia demo/oficial, fuente y licencia en la ficha.
+- ✅ **CC-16** Tests del importador con casos válidos y errores.
+- ✅ **CC-20** Gráfica SVG del histórico y tendencia.
 - ✅ **CC-22** Favoritos con `localStorage`, filtro y sincronización entre pestañas.
 - ✅ **CC-26** Compartir ficha con Web Share API y fallback al portapapeles.
 - ✅ **CC-30** Geolocalización, orden por distancia y marcador de posición.
@@ -110,6 +117,7 @@ Reglas del proyecto que aplican a todos los tickets: UI en español, no inventar
 ## E1 · Datos reales
 
 ### CC-10 · Investigar fuentes y licencias · P0 · M
+**Estado:** ✅ Hecho (2026-11-26) · `docs/datos.md` con candidatas y checklist.
 **Qué:** documentar en `docs/datos.md` las fuentes candidatas y su licencia antes de escribir código: calidad de aguas de baño (MITECO / sistema de información de aguas de baño y organismos de Baleares), bandera azul (ADEAC), cartografía (IDEIB) y mapa base (OSM). Verificar formato, frecuencia y condiciones de reutilización.
 **Hecho cuando:**
 - Tabla con fuente, URL, licencia, formato, frecuencia y campos disponibles.
@@ -117,6 +125,7 @@ Reglas del proyecto que aplican a todos los tickets: UI en español, no inventar
 - Queda claro qué datos son obligatorios y cuáles opcionales.
 
 ### CC-11 · Modelo de datos v1 · P0 · M
+**Estado:** ✅ Hecho (2026-11-26) · `samples`, `source`, `dataStatus`, servicios tipados.
 **Qué:** evolucionar `Beach` a un modelo con procedencia: `samples[]` (fecha, calidad, fuente), `services[]` tipados, `accessibility`, `blueFlagYear`, `source`, `license`, `updatedAt`, `dataStatus: 'demo' | 'real'`.
 **Hecho cuando:**
 - Tipos en `core/models` sin `any` y con uniones cerradas.
@@ -124,6 +133,7 @@ Reglas del proyecto que aplican a todos los tickets: UI en español, no inventar
 - Tests de normalización de calidad y fechas.
 
 ### CC-12 · Importador CSV/JSON con validación · P0 · L
+**Estado:** ✅ Hecho (2026-11-26) · `npm run data:import` / `npm run data:example`.
 **Qué:** script `npm run import:data` que lea un fichero en `data/raw/`, valide campos, normalice islas/municipios/calidades, deduplique por nombre+coordenadas y genere `src/app/core/data/beaches.generated.ts` (o JSON versionado).
 **Hecho cuando:**
 - Un CSV/JSON inválido falla con errores claros por fila y no genera salida.
@@ -138,18 +148,21 @@ Reglas del proyecto que aplican a todos los tickets: UI en español, no inventar
 **Depende:** CC-10, CC-12.
 
 ### CC-14 · Histórico de muestras por playa · P1 · M
+**Estado:** ✅ Hecho (2026-11-26) · últimas 3 muestras + tendencia.
 **Qué:** almacenar y mostrar la serie de muestras por playa, no solo la última.
 **Hecho cuando:**
 - La ficha lista las últimas N muestras con fecha y calidad.
 - Hay un indicador de tendencia (mejora/empeora/estable) con criterio documentado.
 
 ### CC-15 · Procedencia visible en la UI · P1 · S
+**Estado:** ✅ Hecho (2026-11-26) · badge demo/oficial y fuente con licencia.
 **Qué:** sustituir el badge fijo “Datos de demostración” por un estado derivado: banner ámbar si `dataStatus === 'demo'`, y pie de ficha con fuente, licencia y fecha de actualización cuando sea real.
 **Hecho cuando:**
 - Es imposible confundir datos demo con datos oficiales.
 - Cada muestra enlaza a su fuente.
 
 ### CC-16 · Tests del importador · P1 · S
+**Estado:** ✅ Hecho (2026-11-26) · 8 casos de validación.
 **Qué:** fixtures pequeños (válido, con acentos, duplicado, calidad desconocida, coordenada fuera de Baleares) y tests unitarios del pipeline.
 **Hecho cuando:**
 - Cobertura de las ramas de error y de normalización.
@@ -160,6 +173,7 @@ Reglas del proyecto que aplican a todos los tickets: UI en español, no inventar
 ## E2 · Producto y ficha
 
 ### CC-20 · Gráfica del histórico de calidad · P1 · M
+**Estado:** ✅ Hecho (2026-11-26) · SVG propio, sin dependencias extra.
 **Qué:** gráfica de la serie de muestras en la ficha. Preferible SVG propio o una librería ligera; no meter otra dependencia pesada sin justificarlo.
 **Hecho cuando:**
 - Se ve la evolución con eje temporal y colores de calidad accesibles (no solo color: también forma/etiqueta).

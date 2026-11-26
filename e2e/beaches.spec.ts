@@ -203,3 +203,14 @@ test('ordena por distancia con la geolocalización', async ({ page, context }) =
   await expect(page.getByText('Ordenado por distancia a tu ubicación.')).toBeVisible();
   await expect(page.getByTestId('distance-es-trenc')).toHaveText(/a .*(km|m)/);
 });
+
+test('muestra el histórico de calidad y la tendencia', async ({ page }) => {
+  await page.goto('/?playa=es-trenc');
+
+  const detail = page.locator('app-beach-detail');
+
+  await expect(detail.getByText('Histórico de calidad')).toBeVisible();
+  await expect(detail.getByText('↑ Mejora')).toBeVisible();
+  await expect(detail.getByRole('img', { name: /Histórico de 5 muestras/ })).toBeVisible();
+  await expect(detail.getByText('Datos de demostración')).toBeVisible();
+});

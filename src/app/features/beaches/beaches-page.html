@@ -16,13 +16,21 @@
       </a>
 
       <div class="flex items-center gap-2">
-        <span
-          class="hidden rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-[11px] font-medium text-amber-700 sm:inline"
-        >
-          Datos de demostración
-        </span>
+        @if (dataStatus === 'demo') {
+          <span
+            class="hidden rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-[11px] font-medium text-amber-700 sm:inline"
+          >
+            Datos de demostración
+          </span>
+        } @else {
+          <span
+            class="hidden rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-[11px] font-medium text-emerald-700 sm:inline"
+          >
+            Datos oficiales
+          </span>
+        }
         <span class="rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-semibold text-slate-500">
-          v0.1
+          v0.2
         </span>
       </div>
     </div>
@@ -203,7 +211,7 @@
             >
               <button
                 type="button"
-                class="flex min-w-0 flex-1 items-start gap-3 py-0.5 text-left"
+                class="flex w-full items-start gap-3 px-3 py-2.5 pr-10 text-left"
                 (click)="selectBeach(beach)"
               >
                 <span

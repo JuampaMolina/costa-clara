@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { BEACHES } from '../data/beaches.seed';
+import { BEACHES } from '../data/beaches';
 import { filterBeaches } from './beach-filter';
 
 const baseFilters = {

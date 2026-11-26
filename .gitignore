@@ -48,6 +48,9 @@ deploy.log
 /test-results
 /blob-report
 
+# Datos generados de ejemplo
+/data/generated
+
 # System files
 .DS_Store
 Thumbs.db

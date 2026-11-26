@@ -36,6 +36,8 @@ npm start        # servidor de desarrollo
 npm run build    # build de producción
 npm test         # tests unitarios
 npm run test:e2e # tests e2e con Playwright (desktop + móvil)
+npm run data:import  # importa data/raw y regenera el dataset
+npm run data:example # prueba el importador con el fixture
 npm run deploy   # build + deploy manual a Cloudflare Pages
 ```
 
@@ -54,28 +56,31 @@ Instrucciones y rotación del token en [docs/despliegue.md](./docs/despliegue.md
 - Mapa OpenLayers con clustering, capas base (mapa, relieve y satélite), geolocalización, pantalla completa y leyenda colapsable.
 - Filtros por texto, isla, calidad y bandera azul.
 - Estado de filtros y playa seleccionada en la URL (compartible).
-- Ficha de playa con calidad, servicios, última muestra, coordenadas y enlace a cómo llegar.
+- Ficha de playa con calidad, servicios, última muestra, histórico con gráfica, coordenadas y enlace a cómo llegar.
+- Procedencia visible: datos demo u oficiales, fuente y licencia.
 - Favoritos guardados en `localStorage` y enlace para compartir la ficha.
 - Leyenda de calidad y diseño responsive.
 - Página 404 propia, título y metadatos dinámicos por playa.
-- Tests: 19 unitarios y 28 e2e (desktop y móvil).
+- Tests: 26 unitarios y 30 e2e (desktop y móvil).
+- Importador CSV con validación, fixture y fallback al dataset demo.
 - CI con tests, build y e2e; deploy automático en Cloudflare Pages.
 - Dataset semilla de 19 playas reales (calidad y servicios de ejemplo).
 
 ## Próximos pasos
 
-1. Importador de datos abiertos (CSV/JSON) y modelo de datos definitivo.
-2. Ficha completa con histórico de calidad y gráficas.
-3. PWA offline.
-4. Comparador de playas.
-5. Accesibilidad del mapa (navegación por teclado y alternativa textual).
-6. Storybook para los componentes de UI.
+1. Conectar la fuente oficial y automatizar la actualización (CC-13).
+2. PWA offline.
+3. Comparador de playas.
+4. Accesibilidad del mapa y auditoría axe.
+5. Storybook para los componentes de UI.
 
 El detalle, prioridades y criterios de aceptación están en [BACKLOG.md](./BACKLOG.md).
 
 ## Datos
 
 Los nombres y las coordenadas son reales. La calidad, los servicios y las fechas son de demostración. Antes de publicar datos reales hay que citar la fuente oficial y su licencia.
+
+El importador está en `npm run data:import`; el esquema y las fuentes candidatas están en [data/README.md](./data/README.md) y [docs/datos.md](./docs/datos.md).
 
 ## Licencia
 
