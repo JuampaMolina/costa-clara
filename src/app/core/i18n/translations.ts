@@ -26,6 +26,14 @@ const ENTRIES = {
   'header.demoData': ['Datos de demostración', 'Demo data', 'Dades de demostració'],
   'header.officialData': ['Datos oficiales', 'Official data', 'Dades oficials'],
   'header.languageSelector': ['Idioma', 'Language', 'Idioma'],
+  'header.datasetSelector': ['Conjunto de datos', 'Dataset', 'Conjunt de dades'],
+  'header.datasetSeed': ['Demo', 'Demo', 'Demo'],
+  'header.datasetOsm': ['Muestreo OSM', 'OSM sample', 'Mostreig OSM'],
+  'header.osmSampleBadge': [
+    'Muestreo OSM · calidad pendiente',
+    'OSM sample · quality pending',
+    'Mostreig OSM · qualitat pendent',
+  ],
 
   'seo.homeTitle': [
     'Costa Clara · Playas de Baleares',
@@ -288,6 +296,12 @@ const ENTRIES = {
   'detail.sourceLabel': ['Fuente:', 'Source:', 'Font:'],
   'detail.sourceNamed': ['Fuente: {name}', 'Source: {name}', 'Font: {name}'],
   'detail.latestSample': ['Última muestra', 'Latest sample', 'Última mostra'],
+  'detail.noSample': ['Sin muestra', 'No sample', 'Sense mostra'],
+  'detail.samplingNote': [
+    'Muestreo de OpenStreetMap: la calidad del agua está pendiente de la fuente oficial.',
+    'OpenStreetMap sample: water quality is pending the official source.',
+    'Mostreig d’OpenStreetMap: la qualitat de l’aigua està pendent de la font oficial.',
+  ],
   'detail.coordinates': ['Coordenadas', 'Coordinates', 'Coordenades'],
   'detail.directions': ['Cómo llegar', 'Directions', 'Com arribar-hi'],
   'detail.updatedDate': ['Actualizado {date}', 'Updated {date}', 'Actualitzat {date}'],

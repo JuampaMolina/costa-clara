@@ -177,7 +177,9 @@ type MarineState =
         }
       </div>
 
-      <app-beach-history [samples]="samples()" />
+      @if (samples().length > 0) {
+        <app-beach-history [samples]="samples()" />
+      }
 
       <div aria-live="polite" role="status">
         @if (marineState().status === 'loading') {
@@ -327,6 +329,12 @@ type MarineState =
         </p>
       }
 
+      @if (isSampled()) {
+        <p class="mt-2 text-[10px] leading-4 text-amber-700" data-testid="osm-sampling-note">
+          {{ i18n.t('detail.samplingNote') }}
+        </p>
+      }
+
       <div class="mt-3 border-t border-slate-100 pt-2.5 text-[11px] leading-4 text-slate-600">
         <a
           data-testid="report-data"
@@ -397,10 +405,17 @@ export class BeachDetail {
 
     return `https://github.com/JuampaMolina/costa-clara/issues/new?title=${encodeURIComponent(title)}&body=${encodeURIComponent(body)}`;
   });
-  readonly sampleDate = computed(() => this.i18n.formatDate(this.beach().lastSample));
+  readonly sampleDate = computed(() => {
+    const value = this.beach().lastSample;
+    return value ? this.i18n.formatDate(value) : this.i18n.t('detail.noSample');
+  });
 
   readonly samples = computed(() => getBeachSamples(this.beach()));
-  readonly isDemo = computed(() => this.beach().dataStatus !== 'real');
+  readonly isDemo = computed(() => {
+    const status = this.beach().dataStatus;
+    return !status || status === 'demo';
+  });
+  readonly isSampled = computed(() => this.beach().dataStatus === 'sampled');
   readonly source = computed(() => this.beach().source ?? null);
   readonly updatedAt = computed(() => {
     const value = this.beach().updatedAt;

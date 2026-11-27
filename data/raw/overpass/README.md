@@ -16,22 +16,25 @@ playas (`natural=beach`) de las Illes Balears, capturadas para el prototipo de v
 out center tags;
 ```
 
-con `BBOX = (south, west, north, east)`:
+con `BBOX = 38.4,1.0,40.3,4.6` (una sola consulta, sin solape entre cuadrantes):
 
-| Isla | Elementos (clasificación por centroide) |
+| Isla (clasificación por centroide) | Elementos con nombre |
 | --- | --- |
-| Mallorca | 324 |
-| Menorca | 149 |
-| Ibiza | 132 |
-| Formentera | 34 |
-| **Total** | **639** (39 nodos, 514 vías, 86 relaciones; 471 con nombre) |
+| Mallorca | 242 |
+| Menorca | 112 |
+| Ibiza | 84 |
+| Formentera | 18 |
+| **Total** | **614** (38 nodos, 490 vías, 86 relaciones; **456 con nombre**) |
+
+> Nota: una versión anterior sumaba cuadrantes con solape y daba 639/471; esta cifra
+> corresponde a la consulta única definitiva sobre todo el bbox de Baleares.
 
 ## Provenance
 
 - **Fuente:** OpenStreetMap (vía Overpass API).
 - **Licencia:** [Open Database License (ODbL) 1.0](https://www.openstreetmap.org/copyright)
   — requiere atribución `© OpenStreetMap contributors` y compartir derivados bajo ODbL.
-- **Fecha de captura:** 2026-11-26 (base OSM `timestamp_osm_base` 2026-11-26T22:58Z).
+- **Fecha de captura:** 2026-11-27 (base OSM `timestamp_osm_base` 2026-11-26).
 - **Copyright:** declarado por Overpass en cada respuesta:
   "The data included in this document is from www.openstreetmap.org. The data is made
   available under ODbL."

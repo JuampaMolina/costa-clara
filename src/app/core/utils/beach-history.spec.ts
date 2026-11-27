@@ -21,6 +21,11 @@ describe('beach history', () => {
     expect(getBeachSamples(base)).toEqual([{ date: '2026-09-01', quality: 'buena' }]);
   });
 
+  it('returns an empty list when there is no sample and no history', () => {
+    const beach: Beach = { ...base, lastSample: '', samples: [] };
+    expect(getBeachSamples(beach)).toEqual([]);
+  });
+
   it('returns samples sorted by date', () => {
     const beach: Beach = {
       ...base,

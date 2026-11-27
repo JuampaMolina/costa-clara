@@ -16,7 +16,7 @@
 | **NÁYADE** (Ministerio de Sanidad) | https://nayadeciudadano.sanidad.gob.es/ | **Sin términos de reutilización publicados** (solo acceso ciudadano/profesional) | Visor web (sin API/descarga abierta) | Sí (todas las zonas censadas) | Sí, pero **no descargable**: el visor no expone CSV/JSON | Alto (habría que pedir acceso profesional) | No es fuente abierta; usarla requiere autorización |
 | **Censo de Zonas de Aguas de Baño** (MITECO) | https://www.miteco.gob.es/es/cartografia-y-sig/ide/descargas/agua/censo-aguas-bano.html | **Atribución MITECO** («© Ministerio para la Transición Ecológica…»); en datos.gob.es consta **CC BY 4.0** | Shapefile / GML / KMZ / GeoPackage (2020–2025) | Sí, nacional (cobertura de **puntos**) | No: identifica la zona de baño, **no** trae la serie de analíticas | Bajo (descarga zip) | La descarga directa devuelve una página de portal (requiere navegador/formulario) |
 | **Bandera Azul** (ADEAC) | https://www.banderaazul.org/ (PDF anual *Relación de Playas Galardonadas*) | **Todos los derechos reservados** — aviso legal §4 prohíbe «distribución, modificación, cesión o comunicación pública» | PDF | Sí | n/a | Alto (requiere **permiso escrito** de ADEAC) | **Bloqueado sin autorización**: no redistribuir el listado |
-| **Playas y servicios** (OpenStreetMap) | Overpass API https://overpass-api.de/api/interpreter | **ODbL 1.0** (atribución + compartir derivados) | JSON (Overpass) | Sí: **639 playas** muestreadas (ver §2) | n/a (geometría/servicios) | Bajo | Servicios de aseos/duchas/restauración son features `amenity` separadas (join espacial) |
+| **Playas y servicios** (OpenStreetMap) | Overpass API https://overpass-api.de/api/interpreter | **ODbL 1.0** (atribución + compartir derivados) | JSON (Overpass) | Sí: **614 playas** muestreadas (ver §2) | n/a (geometría/servicios) | Bajo | Servicios de aseos/duchas/restauración son features `amenity` separadas (join espacial) |
 | **Cartografía / municipios** (IDEIB · GOIB) | https://ideib.caib.es/ · https://intranet.caib.es/opendatacataleg | **CC BY** (GOIB, atribución «Govern de les Illes Balears»); IDEIB por capa | WMS/WFS + descarga; «Característica física de les platges» en GeoJSON/CSV | Sí | n/a | Medio | Licencia por capa en IDEIB; verificar metadatos de cada capa |
 
 ### Conclusión de la matriz
@@ -31,16 +31,17 @@
 
 ### Playas OSM en Baleares (`natural=beach`)
 
-| Isla | Elementos |
+| Isla (por centroide) | Elementos con nombre |
 | --- | --- |
-| Mallorca | 324 |
-| Menorca | 149 |
-| Ibiza | 132 |
-| Formentera | 34 |
-| **Total** | **639** (39 nodos · 514 vías · 86 relaciones; **471 con nombre**) |
+| Mallorca | 242 |
+| Menorca | 112 |
+| Ibiza | 84 |
+| Formentera | 18 |
+| **Total** | **614** (38 nodos · 490 vías · 86 relaciones; **456 con nombre**) |
 
-Consulta Overpass (bbox `south,west,north,east` por isla), respuesta capturada el 26 nov 2026
-(base OSM `timestamp_osm_base` 2026-11-26T22:58Z). Ver [data/raw/overpass/README.md](../data/raw/overpass/README.md).
+Consulta Overpass sobre el bbox único de Baleares (`38.4,1.0,40.3,4.6`), capturada el 27 nov 2026.
+Ver [data/raw/overpass/README.md](../data/raw/overpass/README.md). (Corrige un conteo anterior de
+639/471 que sumaba cuadrantes con solape.)
 
 Etiquetas de servicio presentes **sobre las propias playas**:
 
@@ -100,7 +101,7 @@ ADEAC=bloqueado), se propone **una API estática generada** que agrega las fuent
 {
   "meta": {
     "generated_at": "2026-11-27T00:00:00Z",
-    "count": 639,
+    "count": 614,
     "sources": [
       { "name": "OpenStreetMap", "url": "https://www.openstreetmap.org/copyright", "license": "ODbL 1.0" },
       { "name": "EEA Bathing Water Directive", "url": "https://www.eea.europa.eu/…", "license": "CC BY 4.0" }
@@ -143,7 +144,7 @@ ADEAC=bloqueado), se propone **una API estática generada** que agrega las fuent
 | **Estático** (JSON pregenerado en `public/`) | Gratis, sin cómputo en runtime, cache CDN, cero latencia fría, reproducible | El JSON se regenera en build (o con Pages Direct Upload); no hay query dinámica |
 | **Pages Functions** (proxy a fuentes) | Datos siempre frescos, filtros por query | Cold starts, cuota, hay que paginar/cachear, depende de endpoints externos |
 
-**Recomendación: estático.** El dataset es pequeño (639 playas ⇒ ~200–400 KB), la frecuencia de
+**Recomendación: estático.** El dataset es pequeño (456 playas con nombre ⇒ ~180 KB), la frecuencia de
 actualización es estacional (anual/mensual, no en tiempo real) y la app ya consume un bundle local.
 La regeneración se hace en CI (GitHub Actions) y se publica con `wrangler pages deploy`.
 
@@ -187,7 +188,7 @@ La regeneración se hace en CI (GitHub Actions) y se publica con `wrangler pages
 
 ```text
 ✓ 11 playas muestreadas -> data/generated/beaches-osm.json
-  Total OSM en Baleares: 639 (471 con nombre).
+  Total OSM en Baleares: 614 (456 con nombre).
 ```
 
 ### Mapeo OSM → `ServiceId` aplicado

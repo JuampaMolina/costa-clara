@@ -36,7 +36,7 @@ export interface Beach {
   samples?: BeachSample[];
   source?: DataSource;
   updatedAt?: string;
-  dataStatus?: 'demo' | 'real';
+  dataStatus?: 'demo' | 'real' | 'sampled';
 }
 
 export const ISLANDS: ReadonlyArray<{ id: IslandId; label: string }> = [

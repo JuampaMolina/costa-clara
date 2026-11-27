@@ -772,6 +772,42 @@ test('muestra el aviso sin conexión y lo oculta al recuperar la red (CC-40)', a
   await expect(page.getByTestId('pwa-offline-banner')).toHaveCount(0);
 });
 
+test('muestra el muestreo OSM con ?dataset=osm y permite volver al seed (CC-10)', async ({
+  page,
+}) => {
+  await page.route('https://marine-api.open-meteo.com/v1/marine**', (route) =>
+    route.fulfill({ status: 503, body: '' }),
+  );
+  await page.route('https://api.open-meteo.com/v1/forecast**', (route) =>
+    route.fulfill({ status: 503, body: '' }),
+  );
+
+  await page.goto('/?dataset=osm');
+
+  await expect(page.getByTestId('osm-sample-badge')).toBeAttached();
+  await expect(page.getByTestId('dataset-osm')).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.getByTestId('result-count')).toHaveText('456 playas');
+  await expect(page.getByRole('button', { name: /^Platja d'es Trenc/ })).toBeVisible();
+  await expect(page).toHaveURL(/dataset=osm/);
+
+  await page.getByRole('button', { name: /^Platja d'es Trenc/ }).click();
+
+  const detail = page.locator('app-beach-detail');
+  await expect(detail.getByRole('heading', { level: 2, name: "Platja d'es Trenc" })).toBeVisible();
+  await expect(detail.getByText('Sin datos', { exact: true })).toBeVisible();
+  await expect(detail.getByText('Sin muestra')).toBeVisible();
+  await expect(detail.getByRole('link', { name: /OpenStreetMap/ })).toBeVisible();
+  await expect(detail.getByText(/ODbL 1\.0/)).toBeVisible();
+  await expect(detail.getByTestId('osm-sampling-note')).toBeVisible();
+  await expect(detail.getByText('Histórico de calidad')).toHaveCount(0);
+
+  await page.getByRole('button', { name: 'Cerrar ficha' }).click();
+  await page.getByTestId('dataset-seed').click();
+
+  await expect(page.getByTestId('result-count')).toHaveText('19 playas');
+  await expect(page).not.toHaveURL(/dataset=osm/);
+});
+
 test('cambia idioma ES/EN/CA, sincroniza ?lang= y persiste tras recarga (CC-52)', async ({
   page,
 }) => {

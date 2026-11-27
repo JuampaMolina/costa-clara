@@ -34,7 +34,14 @@
       </a>
 
       <div class="flex items-center gap-2">
-        @if (dataStatus === 'demo') {
+        @if (dataset() === 'osm') {
+          <span
+            data-testid="osm-sample-badge"
+            class="hidden rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-[11px] font-medium text-amber-700 sm:inline"
+          >
+            {{ i18n.t('header.osmSampleBadge') }}
+          </span>
+        } @else if (dataStatus === 'demo') {
           <span
             class="hidden rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-[11px] font-medium text-amber-700 sm:inline"
           >
@@ -47,6 +54,32 @@
             {{ i18n.t('header.officialData') }}
           </span>
         }
+
+        <div
+          class="inline-flex items-center rounded-full border border-slate-200 bg-slate-100 p-0.5"
+          role="group"
+          [attr.aria-label]="i18n.t('header.datasetSelector')"
+          data-testid="dataset-selector"
+        >
+          <button
+            type="button"
+            data-testid="dataset-seed"
+            [attr.aria-pressed]="dataset() === 'seed'"
+            [class]="datasetButtonClass(dataset() === 'seed')"
+            (click)="setDataset('seed')"
+          >
+            {{ i18n.t('header.datasetSeed') }}
+          </button>
+          <button
+            type="button"
+            data-testid="dataset-osm"
+            [attr.aria-pressed]="dataset() === 'osm'"
+            [class]="datasetButtonClass(dataset() === 'osm')"
+            (click)="setDataset('osm')"
+          >
+            {{ i18n.t('header.datasetOsm') }}
+          </button>
+        </div>
 
         <div
           class="inline-flex items-center rounded-full border border-slate-200 bg-slate-100 p-0.5"
@@ -293,7 +326,7 @@
                 role="group"
                 [attr.aria-label]="i18n.t('filters.servicesGroupAria')"
               >
-                @for (service of availableServices; track service) {
+                @for (service of availableServices(); track service) {
                   <button
                     type="button"
                     [attr.data-testid]="'service-' + serviceSlug(service)"
@@ -321,7 +354,7 @@
                 role="group"
                 [attr.aria-label]="i18n.t('filters.accessibilityGroupAria')"
               >
-                @for (level of availableAccessibility; track level) {
+                @for (level of availableAccessibility(); track level) {
                   <button
                     type="button"
                     [attr.data-testid]="'accessibility-' + level"

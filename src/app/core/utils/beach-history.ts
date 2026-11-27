@@ -3,11 +3,13 @@ import { Beach, BeachSample, QUALITY_RANK } from '../models/beach';
 export type QualityTrend = 'mejora' | 'empeora' | 'estable' | 'sin-datos';
 
 export function getBeachSamples(beach: Beach): BeachSample[] {
-  const samples = beach.samples?.length
-    ? beach.samples
-    : [{ date: beach.lastSample, quality: beach.quality }];
+  if (beach.samples?.length) {
+    return [...beach.samples].sort((a, b) => a.date.localeCompare(b.date));
+  }
 
-  return [...samples].sort((a, b) => a.date.localeCompare(b.date));
+  if (!beach.lastSample) return [];
+
+  return [{ date: beach.lastSample, quality: beach.quality }];
 }
 
 export function getSamplesTrend(samples: BeachSample[]): QualityTrend {

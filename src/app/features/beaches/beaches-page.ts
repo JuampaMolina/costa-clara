@@ -10,7 +10,7 @@ import {
   viewChild,
 } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { BEACHES, DATA_STATUS } from '../../core/data/beaches';
+import { DATA_STATUS, DatasetId, beachesFor } from '../../core/data/beaches';
 import { TranslationService } from '../../core/i18n/translation.service';
 import { DEFAULT_LANG, Lang, SUPPORTED_LANGS } from '../../core/i18n/translations';
 import {
@@ -57,7 +57,6 @@ type QualityFilter = WaterQuality | 'todas';
 const ISLAND_IDS = new Set<string>(ISLANDS.map((island) => island.id));
 const QUALITY_KEYS = Object.keys(QUALITY_LABELS) as WaterQuality[];
 const QUALITY_IDS = new Set<string>(QUALITY_KEYS);
-const VALID_BEACH_IDS = new Set<string>(BEACHES.map((beach) => beach.id));
 const SEARCH_DEBOUNCE_MS = 250;
 const COMPARE_WARNING_MS = 3500;
 
@@ -92,21 +91,28 @@ export class BeachesPage {
     typeof window === 'undefined' || !window.matchMedia('(max-width: 639px)').matches,
   );
 
-  readonly availableServices = getAvailableServices(BEACHES);
-  readonly availableAccessibility = getAvailableAccessibilityLevels(BEACHES);
+  readonly dataset = signal<DatasetId>(
+    this.route.snapshot.queryParamMap.get('dataset') === 'osm' ? 'osm' : 'seed',
+  );
+  readonly activeBeaches = computed(() => beachesFor(this.dataset()));
+  readonly availableServices = computed(() => getAvailableServices(this.activeBeaches()));
+  readonly availableAccessibility = computed(() =>
+    getAvailableAccessibilityLevels(this.activeBeaches()),
+  );
+  readonly validBeachIds = computed(() => new Set(this.activeBeaches().map((beach) => beach.id)));
 
   private readonly initialQuery = this.route.snapshot.queryParamMap.get('q') ?? '';
   private readonly initialServices = parseServicesParam(
     this.route.snapshot.queryParamMap.get('servicios'),
-    this.availableServices,
+    this.availableServices(),
   );
   private readonly initialAccessibility = parseAccessibilityParam(
     this.route.snapshot.queryParamMap.get('accesibilidad'),
-    this.availableAccessibility,
+    this.availableAccessibility(),
   );
   private readonly initialCompareIds = parseCompareIds(
     this.route.snapshot.queryParamMap.get('comparar'),
-    VALID_BEACH_IDS,
+    this.validBeachIds(),
   );
 
   readonly queryInput = signal(this.initialQuery);
@@ -190,8 +196,8 @@ export class BeachesPage {
 
   private readonly favoriteScopedBeaches = computed(() =>
     this.showFavoritesOnly()
-      ? BEACHES.filter((beach) => this.favorites.isFavorite(beach.id))
-      : BEACHES,
+      ? this.activeBeaches().filter((beach) => this.favorites.isFavorite(beach.id))
+      : this.activeBeaches(),
   );
 
   readonly filteredBeaches = computed(() => {
@@ -208,7 +214,7 @@ export class BeachesPage {
   );
 
   readonly serviceCounts = computed(() =>
-    countByService(this.favoriteScopedBeaches(), this.currentFilters(), this.availableServices),
+    countByService(this.favoriteScopedBeaches(), this.currentFilters(), this.availableServices()),
   );
 
   readonly accessibilityCounts = computed(() =>
@@ -233,12 +239,12 @@ export class BeachesPage {
 
   readonly selectedBeach = computed(() => {
     const id = this.selectedId();
-    return id ? (BEACHES.find((beach) => beach.id === id) ?? null) : null;
+    return id ? (this.activeBeaches().find((beach) => beach.id === id) ?? null) : null;
   });
 
   readonly comparedBeaches = computed(() =>
     this.compareIds()
-      .map((id) => BEACHES.find((beach) => beach.id === id))
+      .map((id) => this.activeBeaches().find((beach) => beach.id === id))
       .filter((beach): beach is Beach => beach !== undefined),
   );
 
@@ -267,6 +273,7 @@ export class BeachesPage {
     // Las favoritas son locales: no se incluyen en el enlace compartido.
     if (beach) url.searchParams.set('playa', beach.id);
     if (compare) url.searchParams.set('comparar', compare);
+    if (this.dataset() === 'osm') url.searchParams.set('dataset', 'osm');
     if (lang !== DEFAULT_LANG) url.searchParams.set('lang', lang);
 
     return url.toString();
@@ -305,6 +312,7 @@ export class BeachesPage {
         orden: this.sortBy() === 'nombre' ? null : this.sortBy(),
         playa: this.selectedId(),
         comparar: compareIdsToParam(this.compareIds()),
+        dataset: this.dataset() === 'osm' ? 'osm' : null,
         lang: lang === DEFAULT_LANG ? null : lang,
       };
 
@@ -331,9 +339,27 @@ export class BeachesPage {
     this.i18n.setLang(lang);
   }
 
+  setDataset(value: string): void {
+    const next: DatasetId = value === 'osm' ? 'osm' : 'seed';
+    if (next === this.dataset()) return;
+
+    this.dataset.set(next);
+    this.selectedId.set(null);
+    this.compareIds.set([]);
+    this.compareOpen.set(false);
+  }
+
   langButtonClass(active: boolean): string {
     const base =
       'rounded-full px-2 py-1 text-[11px] font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sea-500';
+    return active
+      ? `${base} bg-slate-900 text-white shadow-xs`
+      : `${base} text-slate-700 hover:text-slate-900`;
+  }
+
+  datasetButtonClass(active: boolean): string {
+    const base =
+      'rounded-full px-2.5 py-1 text-[11px] font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sea-500';
     return active
       ? `${base} bg-slate-900 text-white shadow-xs`
       : `${base} text-slate-700 hover:text-slate-900`;
@@ -427,7 +453,7 @@ export class BeachesPage {
       const next = current.includes(service)
         ? current.filter((item) => item !== service)
         : [...current, service];
-      return this.availableServices.filter((item) => next.includes(item));
+      return this.availableServices().filter((item) => next.includes(item));
     });
     this.analytics.track('filter', {
       type: 'service',
@@ -442,7 +468,7 @@ export class BeachesPage {
   }
 
   setAccessibility(level: AccessibilityFilter): void {
-    if (this.availableAccessibility.includes(level) && level !== this.accessibility()) {
+    if (this.availableAccessibility().includes(level) && level !== this.accessibility()) {
       this.accessibility.set(level);
       this.analytics.track('filter', {
         type: 'accessibility',
@@ -519,7 +545,7 @@ export class BeachesPage {
   }
 
   removeFromCompare(id: string): void {
-    const beach = BEACHES.find((item) => item.id === id);
+    const beach = this.activeBeaches().find((item) => item.id === id);
     const next = this.compareIds().filter((item) => item !== id);
     const wasOpen = this.compareOpen();
 

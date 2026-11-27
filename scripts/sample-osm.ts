@@ -50,15 +50,55 @@ const SAMPLE: ReadonlyArray<{
 }> = [
   { id: 'es-trenc', osmName: "Platja d'es Trenc", island: 'mallorca', municipality: 'Campos' },
   { id: 'cala-varques', osmName: 'Cala Varques', island: 'mallorca', municipality: 'Manacor' },
-  { id: 'cala-macarella', osmName: 'Cala Macarella', island: 'menorca', municipality: 'Ciutadella de Menorca' },
+  {
+    id: 'cala-macarella',
+    osmName: 'Cala Macarella',
+    island: 'menorca',
+    municipality: 'Ciutadella de Menorca',
+  },
   { id: 'son-bou', osmName: 'Son Bou', island: 'menorca', municipality: 'Alaior' },
-  { id: 'cala-en-turqueta', osmName: 'Cala en Turqueta', island: 'menorca', municipality: 'Ciutadella de Menorca' },
-  { id: 'punta-prima', osmName: 'Platja de Punta Prima', island: 'menorca', municipality: 'Sant Lluís' },
-  { id: 'cala-comte', osmName: 'Platges de Comte', island: 'ibiza', municipality: 'Sant Josep de sa Talaia' },
-  { id: 'cala-dhort', osmName: "Cala d'Hort", island: 'ibiza', municipality: 'Sant Josep de sa Talaia' },
-  { id: 'platja-den-bossa', osmName: "Platja d'en Bossa", island: 'ibiza', municipality: 'Sant Josep de sa Talaia' },
-  { id: 'cala-saona', osmName: 'Platja cala Saona', island: 'formentera', municipality: 'Formentera' },
-  { id: 'platja-de-migjorn', osmName: 'Platja de Migjorn', island: 'formentera', municipality: 'Formentera' },
+  {
+    id: 'cala-en-turqueta',
+    osmName: 'Cala en Turqueta',
+    island: 'menorca',
+    municipality: 'Ciutadella de Menorca',
+  },
+  {
+    id: 'punta-prima',
+    osmName: 'Platja de Punta Prima',
+    island: 'menorca',
+    municipality: 'Sant Lluís',
+  },
+  {
+    id: 'cala-comte',
+    osmName: 'Platges de Comte',
+    island: 'ibiza',
+    municipality: 'Sant Josep de sa Talaia',
+  },
+  {
+    id: 'cala-dhort',
+    osmName: "Cala d'Hort",
+    island: 'ibiza',
+    municipality: 'Sant Josep de sa Talaia',
+  },
+  {
+    id: 'platja-den-bossa',
+    osmName: "Platja d'en Bossa",
+    island: 'ibiza',
+    municipality: 'Sant Josep de sa Talaia',
+  },
+  {
+    id: 'cala-saona',
+    osmName: 'Platja cala Saona',
+    island: 'formentera',
+    municipality: 'Formentera',
+  },
+  {
+    id: 'platja-de-migjorn',
+    osmName: 'Platja de Migjorn',
+    island: 'formentera',
+    municipality: 'Formentera',
+  },
 ];
 
 // ---------- Tipos ----------
@@ -187,7 +227,9 @@ function main(): void {
   }
   console.log('  Servicios por playa:');
   for (const b of beaches) {
-    console.log(`    ${b.name}: ${b.services.length ? b.services.join(', ') : '(sin etiquetas de servicio)'}`);
+    console.log(
+      `    ${b.name}: ${b.services.length ? b.services.join(', ') : '(sin etiquetas de servicio)'}`,
+    );
   }
 }
 

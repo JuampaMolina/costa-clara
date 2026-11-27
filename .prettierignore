@@ -6,3 +6,5 @@ playwright-report
 test-results
 package-lock.json
 data/generated
+src/app/core/data/beaches.generated.ts
+src/app/core/data/beaches-osm.generated.ts

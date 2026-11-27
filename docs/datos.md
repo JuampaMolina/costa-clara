@@ -9,7 +9,7 @@
 
 | Fuente | Licencia | ¿Reutilizable? | Uso |
 | --- | --- | --- | --- |
-| OpenStreetMap (Overpass) | ODbL 1.0 | ✅ con atribución | Playas, servicios, geometría (639 playas Baleares) |
+| OpenStreetMap (Overpass) | ODbL 1.0 | ✅ con atribución | Playas, servicios, geometría (614 playas Baleares) |
 | EEA Bathing Water Directive | CC BY 4.0 | ✅ | Clasificación anual de calidad por zona |
 | Censo Aguas de Baño (MITECO) | Atribución MITECO / CC BY 4.0 | ✅ | Zonas de baño (identificación/geometría) |
 | GOIB / IDEIB | CC BY (GOIB); por capa (IDEIB) | ✅ | Cartografía, características físicas de playas |
@@ -34,7 +34,7 @@
 - El importador exige `source_name`, `source_url`, `source_license` y `updated_at`; sin esos campos no genera datos.
 - **Calidad:** prioridad **EEA (CC BY 4.0)** — clasificación anual por zona; NÁYADE es la fuente primaria
   española pero **no es abierta** (verificación manual); el Censo MITECO da geometría/identificación.
-- **Playas y servicios:** **OSM (ODbL)** — 639 playas muestreadas en Baleares.
+- **Playas y servicios:** **OSM (ODbL)** — 614 playas muestreadas en Baleares (456 con nombre).
 - **Bandera azul (ADEAC):** **no reutilizable sin permiso escrito** (aviso legal §4); no publicar el listado.
 - **Cartografía/municipios:** GOIB/IDEIB (CC BY / por capa) + Nominatim para municipio/isla.
 - Los datos de demostración se mantienen etiquetados como tales (`dataStatus: 'demo'`). Al importar, el modelo pasa a `real` y la ficha muestra fuente, licencia y fecha.
