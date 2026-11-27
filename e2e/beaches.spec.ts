@@ -808,6 +808,21 @@ test('muestra el muestreo OSM con ?dataset=osm y permite volver al seed (CC-10)'
   await expect(page).not.toHaveURL(/dataset=osm/);
 });
 
+test('carga el modo real en /real con el muestreo OSM', async ({ page }) => {
+  await page.route('https://marine-api.open-meteo.com/v1/marine**', (route) =>
+    route.fulfill({ status: 503, body: '' }),
+  );
+  await page.route('https://api.open-meteo.com/v1/forecast**', (route) =>
+    route.fulfill({ status: 503, body: '' }),
+  );
+
+  await page.goto('/real');
+
+  await expect(page.getByTestId('dataset-osm')).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.getByTestId('result-count')).toHaveText('456 playas');
+  await expect(page.getByRole('button', { name: /^Platja d'es Trenc/ })).toBeVisible();
+});
+
 test('cambia idioma ES/EN/CA, sincroniza ?lang= y persiste tras recarga (CC-52)', async ({
   page,
 }) => {

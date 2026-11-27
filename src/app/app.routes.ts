@@ -8,6 +8,12 @@ export const routes: Routes = [
     component: BeachesPage,
   },
   {
+    path: 'real',
+    component: BeachesPage,
+    data: { dataset: 'osm' },
+    title: 'Datos reales (OSM) · Costa Clara',
+  },
+  {
     path: '**',
     component: NotFound,
     title: 'Página no encontrada · Costa Clara',

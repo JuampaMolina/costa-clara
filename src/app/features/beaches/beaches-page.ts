@@ -92,7 +92,10 @@ export class BeachesPage {
   );
 
   readonly dataset = signal<DatasetId>(
-    this.route.snapshot.queryParamMap.get('dataset') === 'osm' ? 'osm' : 'seed',
+    this.route.snapshot.data['dataset'] === 'osm' ||
+      this.route.snapshot.queryParamMap.get('dataset') === 'osm'
+      ? 'osm'
+      : 'seed',
   );
   readonly activeBeaches = computed(() => beachesFor(this.dataset()));
   readonly availableServices = computed(() => getAvailableServices(this.activeBeaches()));
