@@ -8,6 +8,29 @@ test('carga la home con mapa, lista y contador', async ({ page }) => {
   await expect(page.locator('app-beach-map canvas')).toBeVisible();
 });
 
+test.describe('pantallas grandes', () => {
+  test.use({ viewport: { width: 3840, height: 2160 } });
+
+  test('el mapa aprovecha el ancho en 4K', async ({ page, isMobile }) => {
+    test.skip(isMobile, 'Layout de escritorio');
+
+    await page.goto('/');
+    await expect(page.locator('app-beach-map canvas')).toBeVisible();
+
+    const widths = await page.evaluate(() => {
+      const main = document.querySelector('main');
+      const map = document.querySelector('main > section');
+      return {
+        main: main?.getBoundingClientRect().width ?? 0,
+        map: map?.getBoundingClientRect().width ?? 0,
+      };
+    });
+
+    expect(widths.main).toBeGreaterThan(3800);
+    expect(widths.map).toBeGreaterThan(3000);
+  });
+});
+
 test('busca por texto y limpia los filtros', async ({ page }) => {
   await page.goto('/');
 

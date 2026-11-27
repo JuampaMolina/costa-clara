@@ -3,7 +3,9 @@
     class="sticky top-0 z-30 border-b border-slate-200/70 bg-white/85 backdrop-blur"
     [attr.inert]="compareOpen() ? '' : null"
   >
-    <div class="mx-auto flex h-16 max-w-[1600px] items-center justify-between gap-4 px-3 sm:px-6">
+    <div
+      class="mx-auto flex h-16 w-full max-w-[1600px] items-center justify-between gap-4 px-3 sm:px-6 min-[1920px]:max-w-none min-[2560px]:px-8"
+    >
       <a class="flex items-center gap-2.5" href="/">
         <span class="grid h-9 w-9 place-items-center rounded-2xl bg-sea-600 text-white shadow-sm">
           <svg
@@ -112,7 +114,7 @@
   </header>
 
   <main
-    class="mx-auto grid max-w-[1600px] gap-3 px-3 py-3 sm:px-6 sm:py-4 lg:h-[calc(100dvh-4rem)] lg:grid-cols-[400px_minmax(0,1fr)] lg:gap-4"
+    class="mx-auto grid w-full max-w-[1600px] gap-3 px-3 py-3 sm:px-6 sm:py-4 lg:h-[calc(100dvh-4rem)] lg:grid-cols-[400px_minmax(0,1fr)] lg:gap-4 min-[1920px]:max-w-none min-[2560px]:gap-6 min-[2560px]:px-8 min-[2560px]:py-6"
     [attr.inert]="compareOpen() ? '' : null"
   >
     <aside class="flex min-h-0 flex-col gap-3">

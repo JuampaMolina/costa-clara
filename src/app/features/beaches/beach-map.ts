@@ -35,6 +35,9 @@ type BasemapId = 'osm' | 'topo' | 'satellite';
 
 const BASEMAP_STORAGE_KEY = 'costa-clara:basemap:v1';
 const ANIMATION_MS = 450;
+const BASE_ZOOM = 8.4;
+const BASE_MAP_WIDTH = 976;
+const MAX_RESPONSIVE_ZOOM = 10.5;
 
 function prefersReducedMotion(): boolean {
   return (
@@ -114,6 +117,7 @@ export class BeachMap implements AfterViewInit, OnDestroy {
   private userSource?: VectorSource;
   private resizeObserver?: ResizeObserver;
   private selectedId: string | null = null;
+  private userAdjustedView = false;
 
   private readonly tileLayers: Partial<Record<BasemapId, TileLayer>> = {};
 
@@ -268,11 +272,26 @@ export class BeachMap implements AfterViewInit, OnDestroy {
       }).extend([new ScaleLine({ units: 'metric' })]),
       view: new View({
         center: fromLonLat([2.9, 39.55]),
-        zoom: 8.4,
+        zoom: BASE_ZOOM,
         minZoom: 7,
         maxZoom: 18,
       }),
     });
+
+    // En pantallas anchas (ultrawide/4K) se acerca para que Baleares ocupe una
+    // proporción similar del mapa que a 1440 px, en lugar de dejar media pantalla vacía.
+    this.applyResponsiveZoom(target.clientWidth);
+
+    this.map.on('pointerdrag', () => {
+      this.userAdjustedView = true;
+    });
+    target.addEventListener(
+      'wheel',
+      () => {
+        this.userAdjustedView = true;
+      },
+      { passive: true },
+    );
 
     this.map.on('singleclick', (event) => {
       this.map?.forEachFeatureAtPixel(
@@ -307,9 +326,22 @@ export class BeachMap implements AfterViewInit, OnDestroy {
       el.style.cursor = this.map?.hasFeatureAtPixel(event.pixel) ? 'pointer' : '';
     });
 
-    this.resizeObserver = new ResizeObserver(() => this.map?.updateSize());
+    this.resizeObserver = new ResizeObserver(() => {
+      this.map?.updateSize();
+      if (!this.userAdjustedView) this.applyResponsiveZoom(target.clientWidth);
+    });
     this.resizeObserver.observe(target);
     this.mapReady.set(true);
+  }
+
+  /** Mantiene la misma cobertura relativa de Baleares a partir de 976 px de mapa. */
+  private applyResponsiveZoom(width: number): void {
+    const view = this.map?.getView();
+    if (!view) return;
+
+    const scale = Math.max(1, width / BASE_MAP_WIDTH);
+    const zoom = Math.min(MAX_RESPONSIVE_ZOOM, BASE_ZOOM + Math.log2(scale));
+    view.setZoom(zoom);
   }
 
   setBasemap(value: string): void {
@@ -343,6 +375,9 @@ export class BeachMap implements AfterViewInit, OnDestroy {
   private moveView(center: Coordinate, zoom: number): void {
     const view = this.map?.getView();
     if (!view) return;
+
+    // Al elegir una playa o "cerca de mí" el usuario espera conservar ese encuadre.
+    this.userAdjustedView = true;
 
     if (prefersReducedMotion()) {
       view.setCenter(center);
