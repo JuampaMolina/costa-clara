@@ -1,67 +1,61 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import { UiScaleService } from './ui-scale';
 
-function factor(): string {
-  return document.documentElement.style.getPropertyValue('--ui-factor');
+function baseSize(): string {
+  return document.documentElement.style.getPropertyValue('--ui-base');
 }
 
 describe('UiScaleService', () => {
   beforeEach(() => {
     localStorage.clear();
-    document.documentElement.style.removeProperty('--ui-factor');
+    document.documentElement.style.removeProperty('--ui-base');
   });
 
-  it('arranca al nivel por defecto (100 %)', () => {
+  it('arranca en Auto sin fijar la base', () => {
     const service = new UiScaleService();
 
-    expect(service.index()).toBe(1);
-    expect(factor()).toBe('1');
-    expect(service.canDecrease()).toBe(true);
-    expect(service.canIncrease()).toBe(true);
+    expect(service.value()).toBe('auto');
+    expect(baseSize()).toBe('');
   });
 
-  it('aumenta y reduce la escala', () => {
+  it('fija el tamaño en porcentaje de 16 px', () => {
     const service = new UiScaleService();
 
-    service.increase();
-    expect(service.index()).toBe(2);
-    expect(factor()).toBe('1.1');
+    service.set('125');
+    expect(service.value()).toBe('125');
+    expect(baseSize()).toBe('20px');
 
-    service.decrease();
-    service.decrease();
-    expect(service.index()).toBe(0);
-    expect(factor()).toBe('0.9');
+    service.set('150');
+    expect(baseSize()).toBe('24px');
   });
 
-  it('no se sale de los límites', () => {
+  it('vuelve a Auto y quita la base fija', () => {
     const service = new UiScaleService();
 
-    for (let i = 0; i < 10; i++) service.increase();
-    expect(service.index()).toBe(4);
-    expect(service.canIncrease()).toBe(false);
+    service.set('150');
+    service.set('auto');
 
-    for (let i = 0; i < 10; i++) service.decrease();
-    expect(service.index()).toBe(0);
-    expect(service.canDecrease()).toBe(false);
+    expect(service.value()).toBe('auto');
+    expect(baseSize()).toBe('');
   });
 
-  it('vuelve al 100 % al restablecer', () => {
+  it('ignora valores no admitidos', () => {
     const service = new UiScaleService();
 
-    service.increase();
-    service.reset();
+    service.set('999');
+    service.set('grande');
 
-    expect(service.index()).toBe(1);
-    expect(factor()).toBe('1');
+    expect(service.value()).toBe('auto');
+    expect(baseSize()).toBe('');
   });
 
   it('recuerda el nivel entre instancias', () => {
     const first = new UiScaleService();
-    first.increase();
+    first.set('110');
 
     const second = new UiScaleService();
 
-    expect(second.index()).toBe(2);
-    expect(factor()).toBe('1.1');
+    expect(second.value()).toBe('110');
+    expect(baseSize()).toBe('17.6px');
   });
 });

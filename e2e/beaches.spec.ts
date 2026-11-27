@@ -35,10 +35,10 @@ test.describe('pantallas grandes', () => {
     expect(widths.main).toBeGreaterThan(3800);
     expect(widths.map).toBeGreaterThan(3000);
 
-    await page.getByTestId('ui-scale-up').click();
-    expect(await rootFontSize()).toBe('22px');
+    await page.getByTestId('ui-scale').selectOption('150');
+    expect(await rootFontSize()).toBe('24px');
 
-    await page.getByTestId('ui-scale-reset').click();
+    await page.getByTestId('ui-scale').selectOption('auto');
     expect(await rootFontSize()).toBe('20px');
   });
 });

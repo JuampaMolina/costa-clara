@@ -83,46 +83,24 @@
           </button>
         </div>
 
-        <div
-          class="hidden items-center rounded-full border border-slate-200 bg-slate-100 p-0.5 md:inline-flex"
-          role="group"
-          [attr.aria-label]="i18n.t('header.uiScale')"
-          data-testid="ui-scale"
+        <label
+          class="hidden items-center gap-1.5 rounded-full border border-slate-200 bg-slate-100 py-1 pl-2.5 pr-1.5 md:inline-flex"
         >
-          <button
-            type="button"
-            data-testid="ui-scale-down"
-            [disabled]="!uiScale.canDecrease()"
-            [attr.aria-label]="'A− · ' + i18n.t('header.uiScaleDown')"
-            [attr.title]="i18n.t('header.uiScaleDown')"
-            class="grid h-6 w-6 place-items-center rounded-full text-[0.6875rem] font-semibold text-slate-700 transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent"
-            (click)="uiScale.decrease()"
+          <span class="text-[0.6875rem] font-semibold uppercase tracking-[0.08em] text-slate-600">
+            {{ i18n.t('header.uiScaleShort') }}
+          </span>
+          <select
+            data-testid="ui-scale"
+            class="cursor-pointer rounded-full bg-white/80 py-0.5 pl-2 pr-1 text-[0.6875rem] font-semibold text-slate-700 outline-none transition hover:bg-white focus:ring-2 focus:ring-sea-200"
+            (change)="uiScale.set($any($event.target).value)"
           >
-            A−
-          </button>
-          <button
-            type="button"
-            data-testid="ui-scale-reset"
-            [disabled]="uiScale.index() === 1"
-            [attr.aria-label]="'A · ' + i18n.t('header.uiScaleReset')"
-            [attr.title]="i18n.t('header.uiScaleReset')"
-            class="grid h-6 w-6 place-items-center rounded-full text-[0.6875rem] font-semibold text-slate-700 transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent"
-            (click)="uiScale.reset()"
-          >
-            A
-          </button>
-          <button
-            type="button"
-            data-testid="ui-scale-up"
-            [disabled]="!uiScale.canIncrease()"
-            [attr.aria-label]="'A+ · ' + i18n.t('header.uiScaleUp')"
-            [attr.title]="i18n.t('header.uiScaleUp')"
-            class="grid h-6 w-6 place-items-center rounded-full text-[0.6875rem] font-semibold text-slate-700 transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent"
-            (click)="uiScale.increase()"
-          >
-            A+
-          </button>
-        </div>
+            @for (option of uiScale.options; track option) {
+              <option [value]="option" [selected]="uiScale.value() === option">
+                {{ option === 'auto' ? i18n.t('header.uiScaleAuto') : option + ' %' }}
+              </option>
+            }
+          </select>
+        </label>
 
         <div
           class="inline-flex items-center rounded-full border border-slate-200 bg-slate-100 p-0.5"

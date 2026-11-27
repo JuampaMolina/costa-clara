@@ -1,12 +1,11 @@
 @import 'ol/ol.css';
 @import 'tailwindcss';
 
-/* Escala de interfaz: base automática según el ancho + factor manual (A−/A+).
-   Todo lo que usa rem (texto, espaciados, iconos) escala con estas variables. */
+/* Escala de interfaz: base automática según el ancho, sobrescribible con el selector de zoom.
+   Todo lo que usa rem (texto, espaciados, iconos) escala con --ui-base. */
 :root {
   --ui-base: 16px;
-  --ui-factor: 1;
-  font-size: calc(var(--ui-base) * var(--ui-factor));
+  font-size: var(--ui-base);
 }
 
 @media (min-width: 1920px) {

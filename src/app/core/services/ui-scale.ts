@@ -1,47 +1,41 @@
-import { Injectable, computed, signal } from '@angular/core';
+import { Injectable, signal } from '@angular/core';
 
-const STORAGE_KEY = 'costa-clara:ui-scale:v1';
+const STORAGE_KEY = 'costa-clara:ui-scale:v2';
+const BASE_PX = 16;
+
+export type UiScaleValue = 'auto' | '100' | '110' | '125' | '150';
+
+const VALUES: readonly UiScaleValue[] = ['auto', '100', '110', '125', '150'];
 
 /**
- * Factores de escala sobre la base automática (que crece con el ancho de pantalla).
- * A 1440 px la base es 16 px, así que el nivel por defecto no cambia nada.
+ * Ajusta el tamaño de toda la interfaz (basado en rem).
+ *
+ * - `auto`: base según el ancho de pantalla (16–20 px), definida en `styles.css`.
+ * - `100`–`150`: fija el tamaño base a un porcentaje de 16 px.
+ *
+ * La elección se recuerda entre visitas.
  */
-const FACTORS = [0.9, 1, 1.1, 1.2, 1.3] as const;
-const DEFAULT_INDEX = 1;
-
-/** Ajusta el tamaño de toda la interfaz (basado en rem) y lo recuerda entre visitas. */
 @Injectable({ providedIn: 'root' })
 export class UiScaleService {
-  private readonly indexSignal = signal(this.readIndex());
+  private readonly valueSignal = signal<UiScaleValue>(this.read());
 
-  readonly index = this.indexSignal.asReadonly();
-  readonly canDecrease = computed(() => this.indexSignal() > 0);
-  readonly canIncrease = computed(() => this.indexSignal() < FACTORS.length - 1);
+  readonly value = this.valueSignal.asReadonly();
+  readonly options = VALUES;
 
   constructor() {
     this.apply();
   }
 
-  decrease(): void {
-    this.setIndex(this.indexSignal() - 1);
-  }
+  set(value: string): void {
+    if (!VALUES.includes(value as UiScaleValue)) return;
 
-  increase(): void {
-    this.setIndex(this.indexSignal() + 1);
-  }
-
-  reset(): void {
-    this.setIndex(DEFAULT_INDEX);
-  }
-
-  private setIndex(index: number): void {
-    const next = Math.min(FACTORS.length - 1, Math.max(0, index));
-    this.indexSignal.set(next);
+    const next = value as UiScaleValue;
+    this.valueSignal.set(next);
 
     try {
-      localStorage.setItem(STORAGE_KEY, String(next));
+      localStorage.setItem(STORAGE_KEY, next);
     } catch {
-      // Sin persistencia la escala sigue funcionando en esta sesión.
+      // Sin persistencia el zoom sigue funcionando en esta sesión.
     }
 
     this.apply();
@@ -49,16 +43,20 @@ export class UiScaleService {
 
   private apply(): void {
     if (typeof document === 'undefined') return;
-    document.documentElement.style.setProperty('--ui-factor', String(FACTORS[this.indexSignal()]));
+
+    const value = this.valueSignal();
+    if (value === 'auto') {
+      document.documentElement.style.removeProperty('--ui-base');
+      return;
+    }
+
+    document.documentElement.style.setProperty('--ui-base', `${(BASE_PX * Number(value)) / 100}px`);
   }
 
-  private readIndex(): number {
-    if (typeof localStorage === 'undefined') return DEFAULT_INDEX;
+  private read(): UiScaleValue {
+    if (typeof localStorage === 'undefined') return 'auto';
 
     const raw = localStorage.getItem(STORAGE_KEY);
-    if (raw === null) return DEFAULT_INDEX;
-
-    const index = Number(raw);
-    return Number.isInteger(index) && index >= 0 && index < FACTORS.length ? index : DEFAULT_INDEX;
+    return raw && VALUES.includes(raw as UiScaleValue) ? (raw as UiScaleValue) : 'auto';
   }
 }
