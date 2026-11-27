@@ -13,6 +13,7 @@ import {
   viewChild,
 } from '@angular/core';
 import { TranslationService } from '../../core/i18n/translation.service';
+import { TranslationKey } from '../../core/i18n/translations';
 import { Beach, QUALITY_COLORS } from '../../core/models/beach';
 import { AnalyticsService } from '../../core/services/analytics';
 import { FavoritesStore } from '../../core/services/favorites';
@@ -233,6 +234,22 @@ type MarineState =
                 {{ formatMetric(marine.seaTemperature, '°C', 1) }}
               </dd>
             </div>
+            <div class="rounded-xl bg-white/90 px-2 py-2 ring-1 ring-slate-200/70">
+              <dt class="text-[10px] font-semibold uppercase tracking-wide text-slate-600">
+                {{ i18n.t('detail.marineWind') }}
+              </dt>
+              <dd class="mt-0.5 text-sm font-semibold text-slate-800 tabular-nums">
+                {{ formatMetric(marine.windSpeed, 'km/h', 1) }}
+              </dd>
+            </div>
+            <div class="rounded-xl bg-white/90 px-2 py-2 ring-1 ring-slate-200/70">
+              <dt class="text-[10px] font-semibold uppercase tracking-wide text-slate-600">
+                {{ i18n.t('detail.marineWindDirection') }}
+              </dt>
+              <dd class="mt-0.5 text-sm font-semibold text-slate-800 tabular-nums">
+                {{ windDirectionLabel(marine.windDirection) }}
+              </dd>
+            </div>
           </dl>
 
           <p class="mt-2 text-[10px] leading-4 text-slate-600">
@@ -446,6 +463,16 @@ export class BeachDetail {
     if (value === null) return '—';
 
     return `${this.i18n.formatNumber(value, { maximumFractionDigits: maxDecimals })} ${unit}`;
+  }
+
+  windDirectionLabel(value: number | null): string {
+    if (value === null) return '—';
+
+    const points = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'] as const;
+    const normalized = ((value % 360) + 360) % 360;
+    const point = points[Math.round(normalized / 45) % 8];
+
+    return this.i18n.t(`detail.windDir.${point}` as TranslationKey);
   }
 
   async share(): Promise<void> {

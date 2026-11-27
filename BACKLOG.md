@@ -242,7 +242,7 @@ Reglas del proyecto que aplican a todos los tickets: UI en español, no inventar
 - El enlace abierto en otro dispositivo centra el mapa y abre la ficha.
 
 ### CC-27 · Estado del mar y meteorología · P2 · M
-**Estado:** ✅ Hecho (2026-11-26) · Open-Meteo Marine, bloque resiliente y atribución.
+**Estado:** ✅ Hecho (2026-11-26) · Open-Meteo Marine + viento, bloque resiliente y atribución.
 **Qué:** integración con una API abierta (por ejemplo Open-Meteo marino/meteo o AEMET si su licencia lo permite) para oleaje, viento y temperatura en la ficha.
 **Hecho cuando:**
 - Se muestra “actualizado a las HH:MM” y la fuente.
@@ -302,7 +302,7 @@ Reglas del proyecto que aplican a todos los tickets: UI en español, no inventar
 ## E4 · PWA y rendimiento
 
 ### CC-40 · PWA instalable y offline · P1 · M
-**Estado:** ✅ Hecho (2026-11-26) · SW, manifest e iconos; offline validado en producción.
+**Estado:** ✅ Hecho (2026-11-26) · SW, manifest, iconos, banner offline y aviso de actualización.
 **Qué:** manifest, iconos, service worker (Angular `ngsw` o Workbox) con shell offline y última respuesta de datos cacheada.
 **Hecho cuando:**
 - Lighthouse marca instalable.
@@ -356,14 +356,14 @@ Reglas del proyecto que aplican a todos los tickets: UI en español, no inventar
 - El idioma se puede fijar por URL o preferencia y no rompe el SEO.
 
 ### CC-53 · SEO técnico · P1 · S
-**Estado:** ✅ Hecho (2026-11-26) · robots, sitemap, JSON-LD y canonical; URLs `?playa=id`.
+**Estado:** ✅ Hecho (2026-11-26) · robots, sitemap regenerable, JSON-LD y canonical; URLs `?playa=id`.
 **Qué:** sitemap, `robots.txt`, JSON-LD (`TouristAttraction`/`Beach`), metadatos por playa y URLs legibles.
 **Hecho cuando:**
 - Cada playa tiene URL propia indexable con título y descripción únicos.
 - Rich results válidos en el validador de Google.
 
 ### CC-54 · Caso de estudio y ADRs · P1 · M
-**Estado:** ✅ Hecho (2026-11-26) · `docs/caso-de-estudio.md` + 4 ADRs.
+**Estado:** ✅ Hecho (2026-11-26) · `docs/caso-de-estudio.md`, 4 ADRs y capturas 1440/390.
 **Qué:** documento de portfolio con problema, decisiones (OpenLayers vs MapLibre, seed vs backend, URL como estado), trade-offs, métricas y capturas; ADRs cortos en `docs/adr/`.
 **Hecho cuando:**
 - El caso se puede leer sin clonar el repo y enlaza a la demo.
