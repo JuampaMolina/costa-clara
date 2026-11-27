@@ -22,7 +22,7 @@ const CHART_PADDING_Y = 14;
   template: `
     <div class="mt-4 rounded-2xl border border-slate-100 bg-slate-50/70 p-3">
       <div class="flex items-center justify-between gap-2">
-        <h3 class="text-[11px] font-semibold uppercase tracking-wide text-slate-500">
+        <h3 class="text-[0.6875rem] font-semibold uppercase tracking-wide text-slate-500">
           {{ i18n.t('history.title') }}
         </h3>
         <span [class]="trendClass()">
@@ -58,14 +58,14 @@ const CHART_PADDING_Y = 14;
           }
         </svg>
 
-        <div class="mt-1 flex items-center justify-between text-[10px] text-slate-500">
+        <div class="mt-1 flex items-center justify-between text-[0.625rem] text-slate-500">
           <span>{{ formatDate(first()?.date) }}</span>
           <span>{{ formatDate(latest()?.date) }}</span>
         </div>
 
         <ul class="mt-2 space-y-1">
           @for (sample of lastThree(); track sample.date) {
-            <li class="flex items-center justify-between gap-2 text-[11px]">
+            <li class="flex items-center justify-between gap-2 text-[0.6875rem]">
               <span class="flex items-center gap-1.5 font-medium text-slate-600">
                 <span
                   class="h-1.5 w-1.5 rounded-full"
@@ -135,7 +135,7 @@ export class BeachHistory {
 
   readonly trendClass = computed(() => {
     const base =
-      'inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold';
+      'inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[0.625rem] font-semibold';
 
     switch (this.trend()) {
       case 'mejora':

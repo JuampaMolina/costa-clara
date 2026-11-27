@@ -34,7 +34,7 @@ type MarineState =
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [BeachHistory],
   host: {
-    class: 'absolute inset-x-3 bottom-3 top-3 z-30 sm:left-auto sm:top-auto sm:w-[370px]',
+    class: 'absolute inset-x-3 bottom-3 top-3 z-30 sm:left-auto sm:top-auto sm:w-[23rem]',
   },
   template: `
     <article
@@ -43,11 +43,13 @@ type MarineState =
       <div class="flex items-start justify-between gap-3">
         <div class="flex min-w-0 flex-wrap items-center gap-2">
           <span class="h-2.5 w-2.5 rounded-full" [style.background-color]="qualityColor()"></span>
-          <span class="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-500">
+          <span class="text-[0.6875rem] font-semibold uppercase tracking-[0.14em] text-slate-500">
             {{ qualityLabel() }}
           </span>
           @if (beach().blueFlag) {
-            <span class="rounded-full bg-sky-50 px-2 py-0.5 text-[11px] font-semibold text-sky-700">
+            <span
+              class="rounded-full bg-sky-50 px-2 py-0.5 text-[0.6875rem] font-semibold text-sky-700"
+            >
               {{ i18n.t('detail.blueFlag') }}
             </span>
           }
@@ -198,11 +200,11 @@ type MarineState =
           <div class="flex items-center justify-between gap-2">
             <h3
               id="marine-weather-title"
-              class="text-[11px] font-semibold uppercase tracking-wide text-slate-600"
+              class="text-[0.6875rem] font-semibold uppercase tracking-wide text-slate-600"
             >
               {{ i18n.t('detail.marineTitle') }}
             </h3>
-            <span class="text-[11px] text-slate-600">
+            <span class="text-[0.6875rem] text-slate-600">
               @if (marineObservedTime(); as time) {
                 {{ i18n.t('detail.marineUpdatedAt', { time }) }}
               } @else {
@@ -213,7 +215,7 @@ type MarineState =
 
           <dl class="mt-2.5 grid grid-cols-3 gap-2 text-center">
             <div class="rounded-xl bg-white/90 px-2 py-2 ring-1 ring-slate-200/70">
-              <dt class="text-[10px] font-semibold uppercase tracking-wide text-slate-600">
+              <dt class="text-[0.625rem] font-semibold uppercase tracking-wide text-slate-600">
                 {{ i18n.t('detail.marineWaves') }}
               </dt>
               <dd class="mt-0.5 text-sm font-semibold text-slate-800 tabular-nums">
@@ -221,7 +223,7 @@ type MarineState =
               </dd>
             </div>
             <div class="rounded-xl bg-white/90 px-2 py-2 ring-1 ring-slate-200/70">
-              <dt class="text-[10px] font-semibold uppercase tracking-wide text-slate-600">
+              <dt class="text-[0.625rem] font-semibold uppercase tracking-wide text-slate-600">
                 {{ i18n.t('detail.marinePeriod') }}
               </dt>
               <dd class="mt-0.5 text-sm font-semibold text-slate-800 tabular-nums">
@@ -229,7 +231,7 @@ type MarineState =
               </dd>
             </div>
             <div class="rounded-xl bg-white/90 px-2 py-2 ring-1 ring-slate-200/70">
-              <dt class="text-[10px] font-semibold uppercase tracking-wide text-slate-600">
+              <dt class="text-[0.625rem] font-semibold uppercase tracking-wide text-slate-600">
                 {{ i18n.t('detail.marineWaterTemp') }}
               </dt>
               <dd class="mt-0.5 text-sm font-semibold text-slate-800 tabular-nums">
@@ -237,7 +239,7 @@ type MarineState =
               </dd>
             </div>
             <div class="rounded-xl bg-white/90 px-2 py-2 ring-1 ring-slate-200/70">
-              <dt class="text-[10px] font-semibold uppercase tracking-wide text-slate-600">
+              <dt class="text-[0.625rem] font-semibold uppercase tracking-wide text-slate-600">
                 {{ i18n.t('detail.marineWind') }}
               </dt>
               <dd class="mt-0.5 text-sm font-semibold text-slate-800 tabular-nums">
@@ -245,7 +247,7 @@ type MarineState =
               </dd>
             </div>
             <div class="rounded-xl bg-white/90 px-2 py-2 ring-1 ring-slate-200/70">
-              <dt class="text-[10px] font-semibold uppercase tracking-wide text-slate-600">
+              <dt class="text-[0.625rem] font-semibold uppercase tracking-wide text-slate-600">
                 {{ i18n.t('detail.marineWindDirection') }}
               </dt>
               <dd class="mt-0.5 text-sm font-semibold text-slate-800 tabular-nums">
@@ -254,7 +256,7 @@ type MarineState =
             </div>
           </dl>
 
-          <p class="mt-2 text-[10px] leading-4 text-slate-600">
+          <p class="mt-2 text-[0.625rem] leading-4 text-slate-600">
             {{ i18n.t('detail.sourceLabel') }}
             <a
               [href]="marineSource.url"
@@ -271,13 +273,13 @@ type MarineState =
 
       <dl class="mt-5 grid grid-cols-2 gap-3 border-t border-slate-100 pt-4 text-sm">
         <div>
-          <dt class="text-[11px] font-semibold uppercase tracking-wide text-slate-500">
+          <dt class="text-[0.6875rem] font-semibold uppercase tracking-wide text-slate-500">
             {{ i18n.t('detail.latestSample') }}
           </dt>
           <dd class="mt-0.5 font-medium text-slate-700">{{ sampleDate() }}</dd>
         </div>
         <div>
-          <dt class="text-[11px] font-semibold uppercase tracking-wide text-slate-500">
+          <dt class="text-[0.6875rem] font-semibold uppercase tracking-wide text-slate-500">
             {{ i18n.t('detail.coordinates') }}
           </dt>
           <dd class="mt-0.5 font-medium text-slate-700">
@@ -304,7 +306,7 @@ type MarineState =
             <path d="M7 17L17 7M9 7h8v8" stroke-linecap="round" stroke-linejoin="round" />
           </svg>
         </a>
-        <span class="text-[11px] text-slate-500">
+        <span class="text-[0.6875rem] text-slate-500">
           @if (isDemo()) {
             <span class="text-amber-700">{{ i18n.t('header.demoData') }}</span>
           } @else if (source(); as src) {
@@ -321,7 +323,7 @@ type MarineState =
       </div>
 
       @if (!isDemo() && source(); as src) {
-        <p class="mt-2 text-[10px] leading-4 text-slate-500">
+        <p class="mt-2 text-[0.625rem] leading-4 text-slate-500">
           {{ src.license }}
           @if (updatedAt(); as date) {
             · {{ i18n.t('detail.updatedDate', { date }) }}
@@ -330,12 +332,12 @@ type MarineState =
       }
 
       @if (isSampled()) {
-        <p class="mt-2 text-[10px] leading-4 text-amber-700" data-testid="osm-sampling-note">
+        <p class="mt-2 text-[0.625rem] leading-4 text-amber-700" data-testid="osm-sampling-note">
           {{ i18n.t('detail.samplingNote') }}
         </p>
       }
 
-      <div class="mt-3 border-t border-slate-100 pt-2.5 text-[11px] leading-4 text-slate-600">
+      <div class="mt-3 border-t border-slate-100 pt-2.5 text-[0.6875rem] leading-4 text-slate-600">
         <a
           data-testid="report-data"
           [href]="reportUrl()"
@@ -345,7 +347,7 @@ type MarineState =
         >
           {{ i18n.t('detail.reportLink') }}
         </a>
-        <p class="mt-1 text-[10px] leading-4 text-slate-600">
+        <p class="mt-1 text-[0.625rem] leading-4 text-slate-600">
           {{ i18n.t('detail.reportHelp') }}
         </p>
       </div>

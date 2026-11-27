@@ -29,6 +29,10 @@ const ENTRIES = {
   'header.datasetSelector': ['Conjunto de datos', 'Dataset', 'Conjunt de dades'],
   'header.datasetSeed': ['Demo', 'Demo', 'Demo'],
   'header.datasetOsm': ['Muestreo OSM', 'OSM sample', 'Mostreig OSM'],
+  'header.uiScale': ['Tamaño de la interfaz', 'Interface size', 'Mida de la interfície'],
+  'header.uiScaleDown': ['Reducir interfaz', 'Decrease interface size', 'Reduir interfície'],
+  'header.uiScaleReset': ['Tamaño automático', 'Automatic size', 'Mida automàtica'],
+  'header.uiScaleUp': ['Aumentar interfaz', 'Increase interface size', 'Augmentar interfície'],
   'header.osmSampleBadge': [
     'Muestreo OSM · calidad pendiente',
     'OSM sample · quality pending',

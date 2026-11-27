@@ -269,7 +269,7 @@ const FOCUSABLE_SELECTOR =
                   <tr class="bg-slate-50/70">
                     <th
                       scope="row"
-                      class="py-2 pr-3 text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-600"
+                      class="py-2 pr-3 text-[0.6875rem] font-semibold uppercase tracking-[0.12em] text-slate-600"
                     >
                       {{ i18n.t('compare.services') }}
                     </th>
@@ -437,7 +437,9 @@ const FOCUSABLE_SELECTOR =
                 </dl>
 
                 <div class="mt-3 border-t border-slate-200/70 pt-3">
-                  <p class="text-[11px] font-semibold uppercase tracking-[0.1em] text-slate-600">
+                  <p
+                    class="text-[0.6875rem] font-semibold uppercase tracking-[0.1em] text-slate-600"
+                  >
                     {{ i18n.t('compare.services') }}
                   </p>
                   <div class="mt-1.5 flex flex-wrap gap-1.5">
@@ -650,7 +652,7 @@ export class BeachCompare implements OnInit {
 
   trendClass(beach: Beach): string {
     const base =
-      'inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-semibold';
+      'inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[0.6875rem] font-semibold';
 
     switch (this.getTrend(beach)) {
       case 'mejora':

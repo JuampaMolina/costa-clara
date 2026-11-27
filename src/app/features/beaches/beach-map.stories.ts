@@ -21,7 +21,9 @@ const meta: Meta<BeachMap> = {
     },
   },
   decorators: [
-    componentWrapperDecorator((story) => `<div class="h-dvh min-h-[520px] w-full">${story}</div>`),
+    componentWrapperDecorator(
+      (story) => `<div class="h-dvh min-h-[32.5rem] w-full">${story}</div>`,
+    ),
   ],
   args: {
     beaches: MOCK_MAP_BEACHES,

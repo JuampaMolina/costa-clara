@@ -47,6 +47,7 @@ import { Coordinates, distanceKm } from '../../core/utils/geo';
 import { AnalyticsService } from '../../core/services/analytics';
 import { FavoritesStore } from '../../core/services/favorites';
 import { SeoService } from '../../core/services/seo';
+import { UiScaleService } from '../../core/services/ui-scale';
 import { BeachCompare } from './beach-compare';
 import { BeachDetail } from './beach-detail';
 import { BeachMap } from './beach-map';
@@ -73,6 +74,7 @@ export class BeachesPage {
   private readonly seo = inject(SeoService);
   readonly i18n = inject(TranslationService);
   readonly favorites = inject(FavoritesStore);
+  readonly uiScale = inject(UiScaleService);
   private readonly analytics = inject(AnalyticsService);
   private readonly destroyRef = inject(DestroyRef);
 
@@ -185,7 +187,7 @@ export class BeachesPage {
   private readonly itemActive = 'bg-sky-50 ring-1 ring-sky-200';
   private readonly itemIdle = 'hover:bg-slate-50';
   private readonly favoritesPillBase =
-    'inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-semibold transition';
+    'inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[0.6875rem] font-semibold transition';
   private readonly actionIconBase = 'grid h-8 w-8 place-items-center rounded-full transition';
 
   private readonly currentFilters = computed<BeachFilters>(() => ({
@@ -354,7 +356,7 @@ export class BeachesPage {
 
   langButtonClass(active: boolean): string {
     const base =
-      'rounded-full px-2 py-1 text-[11px] font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sea-500';
+      'rounded-full px-2 py-1 text-[0.6875rem] font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sea-500';
     return active
       ? `${base} bg-slate-900 text-white shadow-xs`
       : `${base} text-slate-700 hover:text-slate-900`;
@@ -362,7 +364,7 @@ export class BeachesPage {
 
   datasetButtonClass(active: boolean): string {
     const base =
-      'rounded-full px-2.5 py-1 text-[11px] font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sea-500';
+      'rounded-full px-2.5 py-1 text-[0.6875rem] font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sea-500';
     return active
       ? `${base} bg-slate-900 text-white shadow-xs`
       : `${base} text-slate-700 hover:text-slate-900`;

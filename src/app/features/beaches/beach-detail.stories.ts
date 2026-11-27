@@ -32,7 +32,7 @@ const meta: Meta<BeachDetail> = {
   },
   decorators: [
     componentWrapperDecorator(
-      (story) => `<div class="relative min-h-[760px] w-full bg-slate-100">${story}</div>`,
+      (story) => `<div class="relative min-h-[47.5rem] w-full bg-slate-100">${story}</div>`,
     ),
   ],
   args: {

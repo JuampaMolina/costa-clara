@@ -17,6 +17,12 @@ test.describe('pantallas grandes', () => {
     await page.goto('/');
     await expect(page.locator('app-beach-map canvas')).toBeVisible();
 
+    const rootFontSize = (): Promise<string> =>
+      page.evaluate(() => getComputedStyle(document.documentElement).fontSize);
+
+    // Base automática para 3840 px.
+    expect(await rootFontSize()).toBe('20px');
+
     const widths = await page.evaluate(() => {
       const main = document.querySelector('main');
       const map = document.querySelector('main > section');
@@ -28,6 +34,12 @@ test.describe('pantallas grandes', () => {
 
     expect(widths.main).toBeGreaterThan(3800);
     expect(widths.map).toBeGreaterThan(3000);
+
+    await page.getByTestId('ui-scale-up').click();
+    expect(await rootFontSize()).toBe('22px');
+
+    await page.getByTestId('ui-scale-reset').click();
+    expect(await rootFontSize()).toBe('20px');
   });
 });
 

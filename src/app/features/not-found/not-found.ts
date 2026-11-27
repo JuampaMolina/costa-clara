@@ -12,7 +12,7 @@ import { TranslationService } from '../../core/i18n/translation.service';
       <div
         class="w-full max-w-md rounded-3xl border border-slate-200/80 bg-white p-8 text-center shadow-sm"
       >
-        <p class="text-[11px] font-semibold uppercase tracking-[0.18em] text-sea-600">
+        <p class="text-[0.6875rem] font-semibold uppercase tracking-[0.18em] text-sea-600">
           {{ i18n.t('notFound.eyebrow') }}
         </p>
         <h1 class="mt-3 text-3xl font-semibold tracking-tight">{{ i18n.t('notFound.heading') }}</h1>

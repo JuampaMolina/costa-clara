@@ -29,7 +29,7 @@
         </span>
         <span>
           <span class="block text-sm font-bold tracking-tight text-slate-900">Costa Clara</span>
-          <span class="block text-[11px] leading-4 text-slate-500">
+          <span class="block text-[0.6875rem] leading-4 text-slate-500">
             {{ i18n.t('header.subtitle') }}
           </span>
         </span>
@@ -39,19 +39,19 @@
         @if (dataset() === 'osm') {
           <span
             data-testid="osm-sample-badge"
-            class="hidden rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-[11px] font-medium text-amber-700 sm:inline"
+            class="hidden rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-[0.6875rem] font-medium text-amber-700 sm:inline"
           >
             {{ i18n.t('header.osmSampleBadge') }}
           </span>
         } @else if (dataStatus === 'demo') {
           <span
-            class="hidden rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-[11px] font-medium text-amber-700 sm:inline"
+            class="hidden rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-[0.6875rem] font-medium text-amber-700 sm:inline"
           >
             {{ i18n.t('header.demoData') }}
           </span>
         } @else {
           <span
-            class="hidden rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-[11px] font-medium text-emerald-700 sm:inline"
+            class="hidden rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-[0.6875rem] font-medium text-emerald-700 sm:inline"
           >
             {{ i18n.t('header.officialData') }}
           </span>
@@ -84,6 +84,47 @@
         </div>
 
         <div
+          class="hidden items-center rounded-full border border-slate-200 bg-slate-100 p-0.5 md:inline-flex"
+          role="group"
+          [attr.aria-label]="i18n.t('header.uiScale')"
+          data-testid="ui-scale"
+        >
+          <button
+            type="button"
+            data-testid="ui-scale-down"
+            [disabled]="!uiScale.canDecrease()"
+            [attr.aria-label]="'A− · ' + i18n.t('header.uiScaleDown')"
+            [attr.title]="i18n.t('header.uiScaleDown')"
+            class="grid h-6 w-6 place-items-center rounded-full text-[0.6875rem] font-semibold text-slate-700 transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent"
+            (click)="uiScale.decrease()"
+          >
+            A−
+          </button>
+          <button
+            type="button"
+            data-testid="ui-scale-reset"
+            [disabled]="uiScale.index() === 1"
+            [attr.aria-label]="'A · ' + i18n.t('header.uiScaleReset')"
+            [attr.title]="i18n.t('header.uiScaleReset')"
+            class="grid h-6 w-6 place-items-center rounded-full text-[0.6875rem] font-semibold text-slate-700 transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent"
+            (click)="uiScale.reset()"
+          >
+            A
+          </button>
+          <button
+            type="button"
+            data-testid="ui-scale-up"
+            [disabled]="!uiScale.canIncrease()"
+            [attr.aria-label]="'A+ · ' + i18n.t('header.uiScaleUp')"
+            [attr.title]="i18n.t('header.uiScaleUp')"
+            class="grid h-6 w-6 place-items-center rounded-full text-[0.6875rem] font-semibold text-slate-700 transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent"
+            (click)="uiScale.increase()"
+          >
+            A+
+          </button>
+        </div>
+
+        <div
           class="inline-flex items-center rounded-full border border-slate-200 bg-slate-100 p-0.5"
           role="group"
           [attr.aria-label]="i18n.t('header.languageSelector')"
@@ -105,7 +146,7 @@
         </div>
 
         <span
-          class="rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-semibold text-slate-600"
+          class="rounded-full bg-slate-100 px-2.5 py-1 text-[0.6875rem] font-semibold text-slate-600"
         >
           v0.2
         </span>
@@ -114,7 +155,7 @@
   </header>
 
   <main
-    class="mx-auto grid w-full max-w-[1600px] gap-3 px-3 py-3 sm:px-6 sm:py-4 lg:h-[calc(100dvh-4rem)] lg:grid-cols-[400px_minmax(0,1fr)] lg:gap-4 min-[1920px]:max-w-none min-[2560px]:gap-6 min-[2560px]:px-8 min-[2560px]:py-6"
+    class="mx-auto grid w-full max-w-[1600px] gap-3 px-3 py-3 sm:px-6 sm:py-4 lg:h-[calc(100dvh-4rem)] lg:grid-cols-[25rem_minmax(0,1fr)] lg:gap-4 min-[1920px]:max-w-none min-[2560px]:gap-6 min-[2560px]:px-8 min-[2560px]:py-6"
     [attr.inert]="compareOpen() ? '' : null"
   >
     <aside class="flex min-h-0 flex-col gap-3">
@@ -186,7 +227,9 @@
               (click)="setIsland(option.id)"
             >
               {{ option.label }}
-              <span class="ml-1 text-[11px] tabular-nums">{{ islandCounts()[option.id] }}</span>
+              <span class="ml-1 text-[0.6875rem] tabular-nums">{{
+                islandCounts()[option.id]
+              }}</span>
             </button>
           }
         </div>
@@ -243,7 +286,7 @@
               @if (activeAdvancedCount() > 0) {
                 <span
                   data-testid="advanced-filters-badge"
-                  class="rounded-full bg-sea-700 px-1.5 py-0.5 text-[10px] font-semibold leading-none text-white tabular-nums"
+                  class="rounded-full bg-sea-700 px-1.5 py-0.5 text-[0.625rem] font-semibold leading-none text-white tabular-nums"
                 >
                   {{ activeAdvancedCount() }}
                 </span>
@@ -318,10 +361,14 @@
           >
             <div>
               <div class="flex items-center justify-between gap-2">
-                <span class="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-600">
+                <span
+                  class="text-[0.6875rem] font-semibold uppercase tracking-[0.12em] text-slate-600"
+                >
                   {{ i18n.t('filters.services') }}
                 </span>
-                <span class="text-[11px] text-slate-500">{{ i18n.t('filters.matchAll') }}</span>
+                <span class="text-[0.6875rem] text-slate-500">{{
+                  i18n.t('filters.matchAll')
+                }}</span>
               </div>
               <div
                 class="mt-2 flex flex-wrap gap-1.5"
@@ -339,7 +386,7 @@
                     (click)="toggleService(service)"
                   >
                     {{ service }}
-                    <span class="ml-1 text-[11px] tabular-nums">{{
+                    <span class="ml-1 text-[0.6875rem] tabular-nums">{{
                       serviceCounts()[service]
                     }}</span>
                   </button>
@@ -348,7 +395,9 @@
             </div>
 
             <div>
-              <span class="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-600">
+              <span
+                class="text-[0.6875rem] font-semibold uppercase tracking-[0.12em] text-slate-600"
+              >
                 {{ i18n.t('filters.accessibility') }}
               </span>
               <div
@@ -370,7 +419,7 @@
                     (click)="setAccessibility(level)"
                   >
                     {{ accessibilityLabel(level) }}
-                    <span class="ml-1 text-[11px] tabular-nums">{{
+                    <span class="ml-1 text-[0.6875rem] tabular-nums">{{
                       accessibilityCounts()[level]
                     }}</span>
                   </button>
@@ -381,15 +430,15 @@
         }
 
         @if (locationStatus() === 'error') {
-          <p class="mt-2 text-[11px] text-rose-600" role="status">
+          <p class="mt-2 text-[0.6875rem] text-rose-600" role="status">
             {{ i18n.t('filters.locationError') }}
           </p>
         } @else if (locationStatus() === 'ready' && sortBy() === 'distancia') {
-          <p class="mt-2 text-[11px] text-slate-500" role="status">
+          <p class="mt-2 text-[0.6875rem] text-slate-500" role="status">
             {{ i18n.t('filters.locationSorted') }}
           </p>
         } @else if (locationStatus() === 'ready') {
-          <p class="mt-2 text-[11px] text-slate-500" role="status">
+          <p class="mt-2 text-[0.6875rem] text-slate-500" role="status">
             {{ i18n.t('filters.locationReady') }}
           </p>
         }
@@ -472,7 +521,7 @@
                   </span>
                   @if (distanceLabel(beach); as distance) {
                     <span
-                      class="block text-[10px] font-semibold text-sea-700"
+                      class="block text-[0.625rem] font-semibold text-sea-700"
                       [attr.data-testid]="'distance-' + beach.id"
                     >
                       {{ i18n.t('results.distanceAway', { distance }) }}
@@ -481,7 +530,7 @@
                 </span>
                 @if (beach.blueFlag) {
                   <span
-                    class="mt-0.5 shrink-0 rounded-full bg-sky-50 px-2 py-0.5 text-[10px] font-semibold text-sky-700"
+                    class="mt-0.5 shrink-0 rounded-full bg-sky-50 px-2 py-0.5 text-[0.625rem] font-semibold text-sky-700"
                   >
                     {{ i18n.t('results.blueBadge') }}
                   </span>
@@ -622,7 +671,7 @@
         />
       } @placeholder {
         <div
-          class="grid h-full min-h-[420px] w-full place-items-center bg-sky-100"
+          class="grid h-full min-h-[26rem] w-full place-items-center bg-sky-100"
           role="status"
           aria-live="polite"
         >
@@ -630,14 +679,14 @@
         </div>
       } @loading (after 100ms; minimum 150ms) {
         <div
-          class="grid h-full min-h-[420px] w-full place-items-center bg-sky-100"
+          class="grid h-full min-h-[26rem] w-full place-items-center bg-sky-100"
           role="status"
           aria-live="polite"
         >
           <p class="text-sm font-medium text-slate-600">{{ i18n.t('map.loading') }}</p>
         </div>
       } @error {
-        <div class="grid h-full min-h-[420px] w-full place-items-center bg-sky-100 p-6 text-center">
+        <div class="grid h-full min-h-[26rem] w-full place-items-center bg-sky-100 p-6 text-center">
           <div>
             <p class="text-sm font-semibold text-slate-900">{{ i18n.t('map.loadErrorTitle') }}</p>
             <p class="mt-1 text-xs text-slate-600">{{ i18n.t('detail.loadErrorBody') }}</p>
@@ -696,7 +745,7 @@
           [attr.aria-expanded]="legendOpen()"
           (click)="toggleLegend()"
         >
-          <span class="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-500">
+          <span class="text-[0.625rem] font-semibold uppercase tracking-[0.14em] text-slate-500">
             {{ i18n.t('map.legend') }}
           </span>
           <svg
@@ -715,7 +764,7 @@
         @if (legendOpen()) {
           <div class="mt-1.5 flex flex-wrap gap-x-3 gap-y-1" data-testid="quality-legend">
             @for (item of qualityLegend(); track item.id) {
-              <span class="flex items-center gap-1.5 text-[11px] font-medium text-slate-600">
+              <span class="flex items-center gap-1.5 text-[0.6875rem] font-medium text-slate-600">
                 <span
                   class="h-2 w-2 rounded-full"
                   [style.background-color]="item.color"
@@ -739,7 +788,7 @@
           />
         } @placeholder {
           <div
-            class="absolute inset-x-3 bottom-3 top-3 z-30 flex items-center justify-center rounded-2xl border border-slate-200/80 bg-white/95 p-5 shadow-2xl backdrop-blur sm:left-auto sm:top-auto sm:w-[370px]"
+            class="absolute inset-x-3 bottom-3 top-3 z-30 flex items-center justify-center rounded-2xl border border-slate-200/80 bg-white/95 p-5 shadow-2xl backdrop-blur sm:left-auto sm:top-auto sm:w-[23rem]"
             role="status"
             aria-live="polite"
           >
@@ -747,7 +796,7 @@
           </div>
         } @loading (after 100ms; minimum 150ms) {
           <div
-            class="absolute inset-x-3 bottom-3 top-3 z-30 flex items-center justify-center rounded-2xl border border-slate-200/80 bg-white/95 p-5 shadow-2xl backdrop-blur sm:left-auto sm:top-auto sm:w-[370px]"
+            class="absolute inset-x-3 bottom-3 top-3 z-30 flex items-center justify-center rounded-2xl border border-slate-200/80 bg-white/95 p-5 shadow-2xl backdrop-blur sm:left-auto sm:top-auto sm:w-[23rem]"
             role="status"
             aria-live="polite"
           >
@@ -755,7 +804,7 @@
           </div>
         } @error {
           <div
-            class="absolute inset-x-3 bottom-3 top-3 z-30 rounded-2xl border border-slate-200/80 bg-white/95 p-5 shadow-2xl backdrop-blur sm:left-auto sm:top-auto sm:w-[370px]"
+            class="absolute inset-x-3 bottom-3 top-3 z-30 rounded-2xl border border-slate-200/80 bg-white/95 p-5 shadow-2xl backdrop-blur sm:left-auto sm:top-auto sm:w-[23rem]"
             role="alert"
           >
             <p class="text-sm font-semibold text-slate-900">
@@ -801,7 +850,7 @@
             </span>
             @for (beach of comparedBeaches(); track beach.id) {
               <span
-                class="inline-flex max-w-[160px] items-center gap-1 rounded-full border border-slate-700 bg-slate-800 py-0.5 pl-2.5 pr-1 text-[11px] font-medium text-slate-100"
+                class="inline-flex max-w-[10rem] items-center gap-1 rounded-full border border-slate-700 bg-slate-800 py-0.5 pl-2.5 pr-1 text-[0.6875rem] font-medium text-slate-100"
               >
                 <span class="truncate">{{ beach.name }}</span>
                 <button
